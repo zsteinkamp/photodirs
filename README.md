@@ -11,7 +11,7 @@ Bring up a terminal window on the other side of the screen.
 In the terminal window, run:
 
 ```
-docker-compose run dev
+docker compose run dev
 ```
 
 Any time you edit a source file in the editor, the app will be killed, the terminal screen will clear, linter run, unit tests run, and the app executed again.
@@ -22,25 +22,35 @@ This lets you truly start with test-driven-development, or at the very least giv
 
 ## Fork It
 
-Fork this repo to start your own project.
+Fork this repo to start your own project. You probably want to delete everything in the README.md up to and including here.
+
+## Running Your App
+```
+docker compose run app
+```
+
+## Developing
+```
+docker compose run dev
+```
 
 ## Installing NPM Modules
 
 To install a new NPM module, first stop your dev container. To do this, run (in another terminal window):
 ```
-docker-compose down
+docker compose down
 ```
 Then you can run the npm command this way:
 ```
-docker-compose run dev npm install --save my-cool-module
+docker compose run dev npm install --save my-cool-module
 ```
 NPM will do its thing inside the container, and afterward you will see that the `package.json` and `package-lock.json` files have been updated.
 
 Now rebuild the container:
 ```
-docker-compose build
+docker compose build
 ```
 And then bring up the dev container again:
 ```
-docker-compose run dev
+docker compose run dev
 ```
