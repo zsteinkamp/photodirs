@@ -1,0 +1,13 @@
+services:
+  dev:
+    build: .
+    command: "npm run watch:dev"
+    volumes:
+      - .:/app
+      - /app/node_modules
+  app:
+    build: .
+    command: "npm run start"
+    volumes:
+      - .:/app
+      - /app/node_modules
