@@ -1,9 +1,13 @@
 # node-tdd-base
 
-The most basic test-driven-development environment for node. Fork this repo to begin your real work.
+The most basic test-driven-development environment for node and Docker. Fork this repo to begin your real work.
+
+Requires that you are running Docker.
 
 Bring up your editor in one window on one side of the screen.
+
 Bring up a terminal window on the other side of the screen.
+
 In the terminal window, run:
 
 ```
