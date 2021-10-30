@@ -2,6 +2,8 @@ services:
   dev:
     build: .
     command: "npm run watch:dev"
+    environment:
+      TERM: xterm
     volumes:
       - .:/app
       - /app/node_modules
