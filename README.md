@@ -1,30 +1,19 @@
-# node-tdd-base
+# photodirs
 
-The most basic test-driven-development environment for node and Docker. Fork this repo to begin your real work.
+A photo, and photo album service with the following design goals:
 
-Requires that you are running Docker.
+* Publicly accessible (no authentication requried)
+* Directories are automatically mapped to albums
+* Filesystem changes (e.g. new photos or directories) are immediately reflected
+in app output
+* Directories can have an optional YAML metadata file to override title
+(directory name is default), provide a description, specify an album image,
+    disable display, control photo sort order, optional file includelist, etc.
+* Support for RAW files (CRW, CR2, etc)
+* Support for video (transcoding?)
+* Flexible URL-based resizing and cropping options for photo download
 
-Bring up your editor in one window on one side of the screen.
-
-Bring up a terminal window on the other side of the screen.
-
-In the terminal window, run:
-
-```
-docker compose run dev
-```
-
-Any time you edit a source file in the editor, the app will be killed, the terminal screen will clear, linter run, unit tests run, and the app executed again.
-
-If the lint or unit tests fail, it will wait until you change a file again.
-
-This lets you truly start with test-driven-development, or at the very least give you the tightest possible save/test/run loop time.
-
-## Fork It
-
-Fork this repo to start your own project. You probably want to delete everything in the README.md up to and including here.
-
-## Running Your App
+## Running the App
 ```
 docker compose run app
 ```
