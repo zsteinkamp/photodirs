@@ -55,7 +55,7 @@ array.
 
 ### GET /api/photo/:dirname/:filename
 Returns metadata for a given photo. Metadata can come from the EXIF data
-embedded in the photo, and XMP sidecar file, or a YAML file with the same name
+embedded in the photo, an XMP sidecar file, or a YAML file with the same name
 as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 
 ```
@@ -64,7 +64,7 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 }
 ```
 
-### GET /photo/:dirname/:filename?:options
+### GET /:dirname/:filename?:options
 Returns a file, with options honored.
 
 Options can include:
@@ -76,12 +76,12 @@ whether to fit the scaled image into the given box dimensions (i.e. may return
 completely filled (may crop some of the image).
 
 Examples:
-* `/photo/2023-03-01_hawaii/CRW_1000.CR2` Will return a JPEG image with
+* `/2023-03-01_hawaii/CRW_1000.CR2` Will return a JPEG image with
 dimensions the same as the original.
-* `/photo/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=1000&maxheight=1000&mode=crop`
-Will always return a 1000x1000px JPEG image, cropping the long side if it is not
+* `/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=200&maxheight=200&mode=crop`
+Will always return a 200x200px JPEG image, cropping the long side if it is not
 square.
-* `/photo/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=1000&maxheight=1000&mode=fit`
+* `/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=1000&maxheight=1000&mode=fit`
 Will return JPEG image whose long side is 1000px.
 
 To cut down on abuse/DOS possibilities, the `maxwidth` and `maxheight` parameters are

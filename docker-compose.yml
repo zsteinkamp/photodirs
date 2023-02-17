@@ -4,12 +4,23 @@ services:
     command: "npm run watch:dev"
     environment:
       TERM: xterm
+    ports:
+      - '3000:3000'
     volumes:
       - .:/app
       - /app/node_modules
+      - ./test-images:/albums
+      - cache:/cache
   app:
     build: .
     command: "npm run start"
+    ports:
+      - '3000:3000'
     volumes:
       - .:/app
       - /app/node_modules
+      - ./test-images:/albums
+      - cache:/cache
+
+volumes:
+  cache:
