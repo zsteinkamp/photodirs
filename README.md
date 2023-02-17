@@ -2,14 +2,17 @@
 
 A photo album service with the following design goals:
 
+* Simple RESTful API
+* Ergonomic photo URLs (i.e. no UUIDs anywhere)
 * Publicly accessible (no authentication requried)
-* Directories are automatically mapped to albums
-* Directories can be arbitrarily deep
+* Your directory structure is your album structure
+* Directories can be nested arbitrarily deep
 * Filesystem changes (e.g. new photos or directories) are immediately reflected
 in app output
 * Directories can have an optional YAML metadata file to override title
 (directory name is default), provide a description, specify an album image,
     disable display, control photo sort order, optional file includelist, etc.
+* Support for EXIF metadata and sidecar files including a simple and flexible YAML sidecar format.
 * HEIC and RAW files (CRW, CR2, etc) are converted to JPEG when served.
 * Converted/scaled images are cached locally. (expiration / size limit?)
 * Support for video (transcoding?)
@@ -17,32 +20,48 @@ in app output
 
 ## REST API
 
-### GET /api/album
-Return the list of photo albums.
+### GET /api/albums
+Return the top-level list of photo albums, as well as photos if any are in the root dir.
 ```
-[
-  { 
-    "title": "Hawaii Vacation 2023",
-    "path": "/api/album/2023-03-01_hawaii",
-    "description": "Some cool photos",
-    "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-  },
-  ...
-]
+{
+  "title": "My Awesome Photo Gallery",
+  "description": "My cool collection of photos",
+  "thumb": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
+  "albums": [
+    { 
+      "title": "Hawaii Vacation 2023",
+      "path": "/api/album/2023-03-01_hawaii",
+      "date": "2023-03-01T00:00:00.000Z",
+      "description": "Some cool photos",
+      "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
+    },
+    ...
+  ],
+  "files": [
+    "/photo/IMG_4567.jpg",
+    "/photo/CRW_8934.CR2",
+  ]
+}
 ```
 
-### GET /api/album/:dirname
-Returns metadata for a specific album.
+### GET /api/albums/:album
+Returns metadata for a specific album, including sub-albums and images.
 ```
 {
   "title": "Hawaii Vacation 2023",
   "description": "Some cool photos",
   "thumb": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-  "subdirs": [
-    "waterfall",
-    "beach"
+  "albums": [
+    { 
+      "title": "Hawaii Vacation 2023",
+      "path": "/api/album/2023-03-01_hawaii",
+      "date": "2023-03-01T00:00:00.000Z",
+      "description": "Some cool photos",
+      "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
+    },
+    ...
   ],
-  "images": [
+  "files": [
     "/photo/2023-03-01_hawaii/CRW_1000.CR2",
     "/photo/2023-03-01_hawaii/IMG_1234.jpg",
     "/photo/2023-03-01_hawaii/IMG_1235.heic"
@@ -50,10 +69,7 @@ Returns metadata for a specific album.
 }
 ```
 
-Optionally append `?deep=1` to the URL to recurse subdirectories when building the `images`
-array.
-
-### GET /api/photo/:dirname/:filename
+### GET /api/photo/:album/:file
 Returns metadata for a given photo. Metadata can come from the EXIF data
 embedded in the photo, an XMP sidecar file, or a YAML file with the same name
 as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
