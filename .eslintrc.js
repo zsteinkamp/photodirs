@@ -13,6 +13,7 @@ module.exports = {
   },
   rules: {
     semi: [2, 'always'],
-    'space-before-function-paren': 0
+    'space-before-function-paren': 0,
+    'prefer-regex-literals': 0
   }
 }

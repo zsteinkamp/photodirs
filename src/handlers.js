@@ -1,44 +1,18 @@
 'use strict';
 
 // requires
+const dcraw = require('dcraw');
+const exifReader = require('exif-reader');
 const fsp = require('fs/promises');
+const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
+const sharp = require('sharp');
+const { Duplex } = require('stream');
 
-// constants
-const ALBUMS_ROOT = '/albums';
-const API_BASE = '/api';
-const PHOTO_URL_BASE = '/photo';
+const C = require('./constants');
+const utils = require('./utils');
 
-/*
- * Fetch metadata from `album.yml` file in a given path.
- */
-const getAlbumMeta = async (albumPath) => {
-  const metaPath = path.join(ALBUMS_ROOT, albumPath, 'album.yml');
-
-  let fileContents;
-  try {
-    fileContents = await fsp.readFile(metaPath, 'utf8');
-  } catch {
-    // no meta file
-    return {};
-  }
-  const meta = yaml.load(fileContents);
-  if (meta.apiPath) {
-    throw new Error(`Metadata file at ${metaPath} cannot contain a property called 'apiPath'.`);
-  }
-  return meta;
-};
-
-/*
- * Return whether a given directory entry is a supported type of image.
- * TODO: do more than look at extension
- */
-const isSupportedImageFile = (filePath) => {
-  return !!filePath.match(/(jpeg|jpg|crw|cr2|dng)$/i);
-};
-
-const apiGetForAlbum = async (albumPath) => {
+const apiGetAlbum = async (albumPath) => {
   const result = {
     albums: [],
     files: []
@@ -48,16 +22,18 @@ const apiGetForAlbum = async (albumPath) => {
     result.title = 'Root Album';
   }
 
+  const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
+
   // get meta for the current albumPath
-  Object.assign(result, getAlbumMeta(albumPath));
+  Object.assign(result, utils.getAlbumMeta(albumPath));
 
   const dirs = [];
   const files = [];
-  (await fsp.readdir(path.join(ALBUMS_ROOT, albumPath), { withFileTypes: true })).forEach((dirEnt) => {
+  (await fsp.readdir(path.join(C.ALBUMS_ROOT, albumPath), { withFileTypes: true })).forEach((dirEnt) => {
     if (dirEnt.isDirectory()) {
       dirs.push(dirEnt);
     } else if (dirEnt.isFile()) {
-      if (isSupportedImageFile(dirEnt.name)) {
+      if (utils.isSupportedImageFile(dirEnt.name)) {
         files.push(dirEnt);
       }
     }
@@ -73,12 +49,12 @@ const apiGetForAlbum = async (albumPath) => {
     const album = {
       title: dir.name,
       date: albumDate.toISOString(),
-      apiPath: path.join(API_BASE, ALBUMS_ROOT, encodeURIComponent(dir.name)),
+      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, encodeURIComponent(dir.name)),
       description: null
     };
 
     // merge meta with album object
-    Object.assign(album, getAlbumMeta(dir.name));
+    Object.assign(album, utils.getAlbumMeta(dir.name));
 
     if (!album.thumbnail) {
       album.thumbnail = null; // TODO: method to select a thumbnail
@@ -89,33 +65,103 @@ const apiGetForAlbum = async (albumPath) => {
 
   // TODO: decide if this should be a separate API call because paginating two lists feels yucky
   files.forEach((file) => {
-    const photoPath = path.join(PHOTO_URL_BASE, albumPath, file.name);
+    const uriFileName = encodeURIComponent(file.name);
     result.files.push({
       name: file.name,
-      photoPath: photoPath,
-      apiPath: path.join(API_BASE, ALBUMS_ROOT, albumPath, encodeURIComponent(file.name))
+      photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
+      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
     });
   });
 
-  return [result, 200];
+  return [200, result];
 };
 
-const apiGetForFile = async (filePath) => {
-  return ['a file!', 200];
+const apiGetFile = async (reqPath) => {
+  const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+
+  const exif = {};
+
+  if (!utils.isRaw(filePath)) {
+    const imgMeta = await sharp(filePath).metadata();
+    const imgExif = exifReader(imgMeta.exif);
+    exif.image = imgExif.image;
+  }
+
+  const uriReqPath = reqPath.split('/').map(encodeURIComponent).join('/');
+
+  const result = {
+    exif: exif,
+    photoPath: path.join(C.PHOTO_URL_BASE, uriReqPath)
+  };
+
+  return [200, result];
+};
+
+const handleImage = async (filePath, size, fit, res) => {
+  let width = null;
+  let height = null;
+
+  if (typeof size === 'string') {
+    const matches = size.match(/^(?<width>\d+)x(?<height>\d+)$/);
+
+    width = parseInt(matches.groups.width);
+    height = parseInt(matches.groups.height);
+  }
+
+  const resizeOptions = {
+    width: width,
+    height: height,
+    fit: fit === 'cover' ? sharp.fit.cover : sharp.fit.inside
+  };
+
+  // default -- overridden if RAW
+  let readStream = fs.createReadStream(filePath);
+
+  if (utils.isRaw(filePath)) {
+    // RAW handling
+    const rawBuf = await fsp.readFile(filePath);
+    // vvvv get raw metadata
+    // dcraw(rawBuf, { verbose: true, identify: true });
+    const tiffBuf = dcraw(rawBuf, { exportAsTIFF: true, useExportMode: true });
+
+    const jpegBuf = await sharp(tiffBuf).jpeg().rotate().resize(resizeOptions).toBuffer();
+
+    // convert buffer to stream
+    readStream = new Duplex();
+    readStream.push(jpegBuf);
+    readStream.push(null);
+  }
+
+  if (!width && !height) {
+    // return the original
+    return readStream.pipe(res);
+  }
+
+  const transform = sharp().rotate().resize(resizeOptions);
+
+  res.type('image/jpg');
+  return readStream.pipe(transform).pipe(res);
 };
 
 module.exports = {
-  apiGetForPath: async (reqPath) => {
-    const filePath = path.join(ALBUMS_ROOT, reqPath);
-    try {
-      await fsp.access(filePath);
-    } catch {
-      return [{ error: 'directory or file not found' }, 404];
+  apiGet: async (reqPath) => {
+    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    if (!(await utils.fileExists(filePath))) {
+      return [404, { error: 'directory or file not found' }];
     }
 
     if ((await fsp.stat(filePath)).isDirectory()) {
-      return apiGetForAlbum(reqPath);
+      return apiGetAlbum(reqPath);
     }
-    return apiGetForFile(reqPath);
+    return apiGetFile(reqPath);
+  },
+  photoGet: async (reqPath, size, fit, res) => {
+    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    if (!(await utils.fileExists(filePath))) {
+      return [404, { error: 'directory or file not found' }];
+    }
+
+    // file exists so convert/resize/send it
+    handleImage(filePath, size, fit, res);
   }
 };
