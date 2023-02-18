@@ -30,13 +30,36 @@ module.exports = {
    * TODO: do more than look at extension
    */
   isSupportedImageFile: (filePath) => {
-    return this.isJpeg(filePath) || this.isRaw(filePath);
+    return this.isJpeg(filePath) ||
+      this.isHeif(filePath) ||
+      this.isRaw(filePath) ||
+      this.isPng(filePath) ||
+      this.isGif(filePath);
   },
   /*
-   * Return whether a filename is for a RAW file
+   * Return whether a filename is for a JPEG file
    */
   isJpeg: (filePath) => {
     return !!filePath.match(/(jpeg|jpg)$/i);
+  },
+  /*
+   * Return whether a filename is for a HEIC file
+   */
+  isHeif: (filePath) => {
+    console.log('IS HEIF', !!filePath.match(/(heif|heic)$/i));
+    return !!filePath.match(/(heif|heic)$/i);
+  },
+  /*
+   * Return whether a filename is for a GIF file
+   */
+  isGif: (filePath) => {
+    return !!filePath.match(/(gif)$/i);
+  },
+  /*
+   * Return whether a filename is for a PNG file
+   */
+  isPng: (filePath) => {
+    return !!filePath.match(/(png)$/i);
   },
   /*
    * Return whether a filename is for a RAW file

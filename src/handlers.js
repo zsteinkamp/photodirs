@@ -81,7 +81,7 @@ const apiGetFile = async (reqPath) => {
 
   const exif = {};
 
-  if (!utils.isRaw(filePath)) {
+  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
     const imgMeta = await sharp(filePath).metadata();
     const imgExif = exifReader(imgMeta.exif);
     exif.image = imgExif.image;
@@ -97,7 +97,7 @@ const apiGetFile = async (reqPath) => {
   return [200, result];
 };
 
-const handleImage = async (filePath, size, fit, res) => {
+const handleImage = async (filePath, size, crop, res) => {
   let width = null;
   let height = null;
 
@@ -111,7 +111,7 @@ const handleImage = async (filePath, size, fit, res) => {
   const resizeOptions = {
     width: width,
     height: height,
-    fit: fit === 'cover' ? sharp.fit.cover : sharp.fit.inside
+    fit: crop ? sharp.fit.cover : sharp.fit.inside
   };
 
   // default -- overridden if RAW
@@ -137,9 +137,18 @@ const handleImage = async (filePath, size, fit, res) => {
     return readStream.pipe(res);
   }
 
-  const transform = sharp().rotate().resize(resizeOptions);
+  let transform;
 
-  res.type('image/jpg');
+  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
+    transform = sharp().jpeg().rotate().resize(resizeOptions);
+    res.type('image/jpg');
+  } else if (utils.isGif(filePath)) {
+    transform = sharp().resize(resizeOptions);
+    res.type('image/gif');
+  } else if (utils.isPng(filePath)) {
+    transform = sharp().resize(resizeOptions);
+    res.type('image/png');
+  }
   return readStream.pipe(transform).pipe(res);
 };
 
@@ -155,13 +164,13 @@ module.exports = {
     }
     return apiGetFile(reqPath);
   },
-  photoGet: async (reqPath, size, fit, res) => {
+  photoGet: async (reqPath, size, crop, res) => {
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
     if (!(await utils.fileExists(filePath))) {
       return [404, { error: 'directory or file not found' }];
     }
 
     // file exists so convert/resize/send it
-    handleImage(filePath, size, fit, res);
+    handleImage(filePath, size, crop, res);
   }
 };

@@ -22,9 +22,9 @@ app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
 // handles photo requests
 app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
   // sends the response on its own
-  handlers.photoGet(req.params[0], req.query.size, req.query.fit, res);
+  handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`photodirs listening on port ${port}`);
 });

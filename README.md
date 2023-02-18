@@ -84,43 +84,33 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 Returns a file, with options honored.
 
 Options can include:
-* `maxwidth=N` - specify a maximum width
-* `maxheight=N` - specify a maximum height
-* `mode=(fit|crop)` - if both `maxwidth` and `maxheight` are given, specifies
-whether to fit the scaled image into the given box dimensions (i.e. may return
-  an image that is smaller than the specified box) or fensure the box is
-completely filled (may crop some of the image).
+* `size=HxW` - specify a maximum image size as Height x Width
+* `crop` - fill the box of the specified size, cropping the image
 
 Examples:
 * `/2023-03-01_hawaii/CRW_1000.CR2` Will return a JPEG image with
 dimensions the same as the original.
-* `/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=200&maxheight=200&mode=crop`
+* `/2023-03-01_hawaii/CRW_1000.CR2?size=200x200&crop`
 Will always return a 200x200px JPEG image, cropping the long side if it is not
 square.
-* `/2023-03-01_hawaii/CRW_1000.CR2?maxwidth=1000&maxheight=1000&mode=fit`
-Will return JPEG image whose long side is 1000px.
-
-To cut down on abuse/DOS possibilities, the `maxwidth` and `maxheight` parameters are
-rounded up to the nearest 200px when actually generating the images, and an
-ceiling of 4000px is enforced. Ensure you account for this when displaying the
-images to your users!
+* `/2023-03-01_hawaii/CRW_1000.CR2?size=1000x1000`
+Will return JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
 
 ## Utilizes
-* Sharp - JPEG resizing
-* Darktable - RAW/HEIC conversion
-* Node.js
+* Sharp - JPEG conversion and resizing
+* dcraw - Convert RAW to TIFF for ingestion by Sharp to make a JPEG
 * node-tdd-base - The most primitive framework for a nice Node.js dev experience
 
 ## Requirements
 
 ## Running the App
 ```
-docker compose run app
+docker compose up app
 ```
 
 ## Developing
 ```
-docker compose run dev
+docker compose up dev
 ```
 
 ## Installing NPM Modules
