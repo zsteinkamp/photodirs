@@ -1,12 +1,10 @@
 'use strict';
 
 // requires
-const dcraw = require('dcraw');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
 const sharp = require('sharp');
-const { Duplex } = require('stream');
 
 const C = require('./constants');
 const utils = require('./utils');
@@ -110,22 +108,14 @@ const handleImage = async (filePath, size, crop, res) => {
     fit: crop ? sharp.fit.cover : sharp.fit.inside
   };
 
-  // default -- overridden if RAW
-  let readStream = fs.createReadStream(filePath);
+  let readStream;
 
   if (utils.isRaw(filePath)) {
     // RAW handling
-    const rawBuf = await fsp.readFile(filePath);
-    // vvvv get raw metadata
-    // dcraw(rawBuf, { verbose: true, identify: true });
-    const tiffBuf = dcraw(rawBuf, { exportAsTIFF: true, useExportMode: true });
-
-    const jpegBuf = await sharp(tiffBuf).jpeg().rotate().resize(resizeOptions).toBuffer();
-
-    // convert buffer to stream
-    readStream = new Duplex();
-    readStream.push(jpegBuf);
-    readStream.push(null);
+    readStream = utils.rawToTiffPipe(filePath);
+  } else {
+    // everything else -- just read the file
+    readStream = fs.createReadStream(filePath);
   }
 
   if (!width && !height) {
@@ -135,7 +125,7 @@ const handleImage = async (filePath, size, crop, res) => {
 
   let transform;
 
-  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
+  if (utils.isJpeg(filePath) || utils.isHeif(filePath) || utils.isRaw(filePath)) {
     transform = sharp().jpeg().rotate().resize(resizeOptions);
     res.type('image/jpg');
   } else if (utils.isGif(filePath)) {

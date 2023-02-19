@@ -4,11 +4,22 @@ const exifReader = require('exifreader');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
+const { spawn } = require('child_process');
 const yaml = require('js-yaml');
 
 const C = require('./constants');
 
 module.exports = {
+  /*
+   * Read raw files and return a pipe of TIFF
+   */
+  rawToTiffPipe: (filePath) => {
+    // -T == TIFF output
+    // -w == camera white balance
+    // -c == output to STDOUT
+    return spawn('/usr/bin/dcraw', ['-T', '-w', '-c', filePath],
+      { stdio: ['ignore', 'pipe', process.stderr] }).stdout;
+  },
   /*
    * Pull some EXIF data from supported files
    */

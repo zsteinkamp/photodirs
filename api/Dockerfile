@@ -1,11 +1,12 @@
 FROM node:18
 
+RUN apt-get update && apt-get install -y dcraw
+
 ##
 # START
 # mostly from https://github.com/jcupitt/docker-builds/blob/master/libvips-ubuntu20.04/Dockerfile
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update \
-	&& apt-get install -y \
+RUN apt-get install -y \
 		build-essential \
 		software-properties-common \
 		ninja-build \

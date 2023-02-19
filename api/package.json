@@ -15,7 +15,6 @@
   "author": "Zack Steinkamp",
   "license": "ISC",
   "dependencies": {
-    "dcraw": "^1.0.3",
     "exifreader": "^4.9.1",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
