@@ -174,7 +174,7 @@ const utils = module.exports = {
    * Return whether a filename is for a RAW file
    */
   isRaw: (filePath) => {
-    return !!filePath.match(/(crw|cr2|dng)$/i);
+    return !!filePath.match(/(crw|cr2|dng|arw)$/i);
   },
   /*
    * Return whether a given file or directory exists and is readable.

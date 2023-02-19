@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function Browse() {
   const makeApiPath = (path) => {
-    console.log('MAKEAPIPATH', path, '/api/albums' + path);
     return '/api/albums' + path;
   };
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname));
@@ -20,7 +19,6 @@ export default function Browse() {
 
   useEffect(() => {
     const getData = async () => {
-      console.log('APIPATH', apiPath);
       try {
         const response = await fetch(apiPath);
         if (!response.ok) {
@@ -30,7 +28,6 @@ export default function Browse() {
         }
         let actualData = await response.json();
         setData(actualData);
-        console.log(actualData);
         setError(null);
       } catch(err) {
         setError(err.message);
@@ -78,7 +75,7 @@ export default function Browse() {
             data.files.map((file) => (
               <li key={file.photoPath}>
                 <button onClick={ ()=> browseTo(file.path) }>
-                  <img src={file.photoPath + "?size=400x400&crop"} alt={file.name} />
+                  <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
                 </button>
                 <p>{file.name}</p>
               </li>
