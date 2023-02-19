@@ -57,7 +57,7 @@ export default function Browse() {
       <>
         <div className="album_nav"><button onClick={ () => browseTo(data.album.path) }>{ data.album.title }</button></div>
         <div className="photo">
-          <img src={ data.photoPath + "?size=2000x2000" } alt={ data.title } />
+          <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
         </div>
       </>
     );

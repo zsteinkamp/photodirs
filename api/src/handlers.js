@@ -120,25 +120,12 @@ const handleImage = async (filePath, size, crop, res) => {
     filePath = await utils.jpegFileForRaw(filePath);
   }
 
-  const readStream = fs.createReadStream(filePath);
+  const cachedImagePath = await utils.getCachedImagePath(filePath, resizeOptions);
 
-  if (!width && !height) {
-    // return the original
-    return readStream.pipe(res);
-  }
+  const readStream = fs.createReadStream(cachedImagePath);
+  const transform = utils.getSharpTransform(cachedImagePath, resizeOptions);
 
-  let transform;
-
-  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
-    transform = sharp().jpeg().rotate().resize(resizeOptions);
-    res.type('image/jpg');
-  } else if (utils.isGif(filePath)) {
-    transform = sharp().resize(resizeOptions);
-    res.type('image/gif');
-  } else if (utils.isPng(filePath)) {
-    transform = sharp().resize(resizeOptions);
-    res.type('image/png');
-  }
+  res.type(`image/${utils.getOutputTypeForFile(cachedImagePath)}`);
   return readStream.pipe(transform).pipe(res);
 };
 

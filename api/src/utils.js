@@ -11,26 +11,70 @@ const { pipeline } = require('stream/promises');
 
 const C = require('./constants');
 
-const self = module.exports = {
+const utils = module.exports = {
+  getSharpTransform: (filePath, resizeOptions) => {
+    return {
+      jpg: sharp().jpeg().rotate().resize(resizeOptions),
+      gif: sharp().resize(resizeOptions),
+      png: sharp().resize(resizeOptions)
+    }[utils.getOutputTypeForFile(filePath)];
+  },
+
+  // lets us clean up some big IFs
+  getOutputTypeForFile: (filePath) => {
+    if (utils.isGif(filePath)) {
+      return 'gif';
+    } else if (utils.isPng(filePath)) {
+      return 'png';
+    }
+    return 'jpg';
+  },
+  // Cache images in increments of 200px to avoid disk bloat.
+  getCachedImageSizes: (resizeOptions) => {
+    const cacheWidth = 200 * Math.ceil(resizeOptions.width / 200);
+    const cacheHeight = 200 * Math.ceil(resizeOptions.height / 200);
+    return [cacheWidth, cacheHeight];
+  },
+  getCachedImagePath: async (filePath, resizeOptions) => {
+    // first look for cached file that is close to the size we want
+    const [cacheWidth, cacheHeight] = utils.getCachedImageSizes(resizeOptions);
+
+    const cachePath = utils.makeCachePath(filePath, cacheWidth, cacheHeight);
+
+    if (!(await utils.fileExists(cachePath))) {
+      // now cache the intermediate size
+      await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
+      const readStream = fs.createReadStream(filePath);
+      // when we cache the intermediate size, use `sharp.fit.outside` to scale to the short side to facilitate cropping ()
+      const transform = utils.getSharpTransform(filePath, { height: cacheHeight, width: cacheWidth, fit: sharp.fit.outside });
+      const outStream = fs.createWriteStream(cachePath);
+      await pipeline(readStream, transform, outStream);
+    }
+    return cachePath;
+  },
   jpegFileForRaw: async (filePath) => {
     const cachePath = path.join(C.CACHE_ROOT, filePath + '.jpg');
-    if (await self.fileExists(cachePath)) {
+    if (await utils.fileExists(cachePath)) {
       // return existing jpg
       return cachePath;
     }
 
     // need to generate jpeg
     await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
-    const tiffPipe = self.rawToTiffPipe(filePath);
+    const tiffPipe = utils.rawToTiffPipe(filePath);
     const outStream = fs.createWriteStream(cachePath);
     await pipeline(tiffPipe, sharp().rotate().jpeg(), outStream);
     return cachePath;
   },
   /*
-   * Return the cache key for a given file and arguments
+   * Return the cache path for a given file and size
    */
-  cacheKeyForFile: (filePath, size, crop) => {
-    return `${filePath}!${size}!${crop ? 'y' : 'n'}`;
+  makeCachePath: (filePath, height, width) => {
+    if (!filePath.startsWith(C.CACHE_ROOT)) {
+      // if this was a raw conversion, the filePath with already have the CACHE_ROOT
+      filePath = path.join(C.CACHE_ROOT, filePath);
+    }
+    return `${filePath}^${width}x${height}.${utils.getOutputTypeForFile(filePath)}`;
   },
   /*
    * Read raw files and return a pipe of TIFF
@@ -49,7 +93,7 @@ const self = module.exports = {
     const ret = {};
 
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
-    if (!(self.isJpeg(filePath) || self.isHeif(filePath) || self.isRaw(filePath))) {
+    if (!(utils.isJpeg(filePath) || utils.isHeif(filePath) || utils.isRaw(filePath))) {
       return ret;
     }
 
@@ -65,7 +109,7 @@ const self = module.exports = {
    * Merge metadata into an object
    */
   fetchAndMergeMeta: async (dest, path) => {
-    const meta = await self.getAlbumMeta(path);
+    const meta = await utils.getAlbumMeta(path);
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
@@ -96,11 +140,11 @@ const self = module.exports = {
    * TODO: do more than look at extension
    */
   isSupportedImageFile: (filePath) => {
-    return self.isJpeg(filePath) ||
-      self.isHeif(filePath) ||
-      self.isRaw(filePath) ||
-      self.isPng(filePath) ||
-      self.isGif(filePath);
+    return utils.isJpeg(filePath) ||
+      utils.isHeif(filePath) ||
+      utils.isRaw(filePath) ||
+      utils.isPng(filePath) ||
+      utils.isGif(filePath);
   },
   /*
    * Return whether a filename is for a JPEG file
