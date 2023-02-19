@@ -3,6 +3,7 @@
 module.exports = {
   ALBUMS_ROOT: '/albums',
   API_BASE: '/api',
+  CACHE_ROOT: '/cache',
   EXIF_DESCRIPTION_PROPERTIES: [
     'Make',
     'Model',
@@ -30,6 +31,8 @@ module.exports = {
     'GPSSpeedRef',
     'GPSImgDirection'
   ],
+  MAX_DIMENSION: 3000,
+  MIN_DIMENSION: 16,
   PHOTO_URL_BASE: '/photo',
   TYPE_ALBUM: 'album',
   TYPE_PHOTO: 'photo'

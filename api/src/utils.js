@@ -4,12 +4,34 @@ const exifReader = require('exifreader');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
+const sharp = require('sharp');
 const { spawn } = require('child_process');
 const yaml = require('js-yaml');
+const { pipeline } = require('stream/promises');
 
 const C = require('./constants');
 
-module.exports = {
+const self = module.exports = {
+  jpegFileForRaw: async (filePath) => {
+    const cachePath = path.join(C.CACHE_ROOT, filePath + '.jpg');
+    if (await self.fileExists(cachePath)) {
+      // return existing jpg
+      return cachePath;
+    }
+
+    // need to generate jpeg
+    await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
+    const tiffPipe = self.rawToTiffPipe(filePath);
+    const outStream = fs.createWriteStream(cachePath);
+    await pipeline(tiffPipe, sharp().rotate().jpeg(), outStream);
+    return cachePath;
+  },
+  /*
+   * Return the cache key for a given file and arguments
+   */
+  cacheKeyForFile: (filePath, size, crop) => {
+    return `${filePath}!${size}!${crop ? 'y' : 'n'}`;
+  },
   /*
    * Read raw files and return a pipe of TIFF
    */
@@ -27,7 +49,7 @@ module.exports = {
     const ret = {};
 
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
-    if (!(module.exports.isJpeg(filePath) || module.exports.isHeif(filePath) || module.exports.isRaw(filePath))) {
+    if (!(self.isJpeg(filePath) || self.isHeif(filePath) || self.isRaw(filePath))) {
       return ret;
     }
 
@@ -43,7 +65,7 @@ module.exports = {
    * Merge metadata into an object
    */
   fetchAndMergeMeta: async (dest, path) => {
-    const meta = await module.exports.getAlbumMeta(path);
+    const meta = await self.getAlbumMeta(path);
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
@@ -74,11 +96,11 @@ module.exports = {
    * TODO: do more than look at extension
    */
   isSupportedImageFile: (filePath) => {
-    return module.exports.isJpeg(filePath) ||
-      module.exports.isHeif(filePath) ||
-      module.exports.isRaw(filePath) ||
-      module.exports.isPng(filePath) ||
-      module.exports.isGif(filePath);
+    return self.isJpeg(filePath) ||
+      self.isHeif(filePath) ||
+      self.isRaw(filePath) ||
+      self.isPng(filePath) ||
+      self.isGif(filePath);
   },
   /*
    * Return whether a filename is for a JPEG file

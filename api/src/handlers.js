@@ -90,14 +90,21 @@ const apiGetFile = async (reqPath) => {
 };
 
 const handleImage = async (filePath, size, crop, res) => {
-  let width = null;
-  let height = null;
+  let width = 1600;
+  let height = 1600;
 
   if (typeof size === 'string') {
-    const matches = size.match(/^(?<width>\d+)x(?<height>\d+)$/);
+    if (size === 'orig') {
+      // return original file
+      return fs.createReadStream(filePath).pipe(res);
+    }
 
-    width = parseInt(matches.groups.width);
-    height = parseInt(matches.groups.height);
+    // user provided size
+    const matches = size.match(/^(?<width>\d+)x(?<height>\d+)$/);
+    if (matches) {
+      width = Math.max(Math.min(parseInt(matches.groups.width), C.MAX_DIMENSION), C.MIN_DIMENSION);
+      height = Math.max(Math.min(parseInt(matches.groups.height), C.MAX_DIMENSION), C.MIN_DIMENSION);
+    }
   }
 
   crop = (typeof crop !== 'undefined');
@@ -108,15 +115,12 @@ const handleImage = async (filePath, size, crop, res) => {
     fit: crop ? sharp.fit.cover : sharp.fit.inside
   };
 
-  let readStream;
-
   if (utils.isRaw(filePath)) {
-    // RAW handling
-    readStream = utils.rawToTiffPipe(filePath);
-  } else {
-    // everything else -- just read the file
-    readStream = fs.createReadStream(filePath);
+    // RAW handling -- cache JPEG conversion and return JPEG filename
+    filePath = await utils.jpegFileForRaw(filePath);
   }
+
+  const readStream = fs.createReadStream(filePath);
 
   if (!width && !height) {
     // return the original
@@ -125,7 +129,7 @@ const handleImage = async (filePath, size, crop, res) => {
 
   let transform;
 
-  if (utils.isJpeg(filePath) || utils.isHeif(filePath) || utils.isRaw(filePath)) {
+  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
     transform = sharp().jpeg().rotate().resize(resizeOptions);
     res.type('image/jpg');
   } else if (utils.isGif(filePath)) {
