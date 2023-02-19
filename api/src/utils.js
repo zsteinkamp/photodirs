@@ -1,11 +1,22 @@
 'use strict';
 
 const fsp = require('fs/promises');
+const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
 const C = require('./constants');
 
 module.exports = {
+  /*
+   * Merge metadata into an object
+   */
+  fetchAndMergeMeta: async (dest, path) => {
+    const meta = await module.exports.getAlbumMeta(path);
+    Object.entries(meta).forEach(([key, val]) => {
+      dest[key] = val;
+    });
+    return dest;
+  },
   /*
    * Fetch metadata from `album.yml` file in a given path.
    */
@@ -14,7 +25,8 @@ module.exports = {
 
     let fileContents;
     try {
-      fileContents = await fsp.readFile(metaPath, 'utf8');
+      // TODO: figure out bug when this is async
+      fileContents = fs.readFileSync(metaPath);
     } catch {
       // no meta file
       return {};
@@ -30,11 +42,11 @@ module.exports = {
    * TODO: do more than look at extension
    */
   isSupportedImageFile: (filePath) => {
-    return this.isJpeg(filePath) ||
-      this.isHeif(filePath) ||
-      this.isRaw(filePath) ||
-      this.isPng(filePath) ||
-      this.isGif(filePath);
+    return module.exports.isJpeg(filePath) ||
+      module.exports.isHeif(filePath) ||
+      module.exports.isRaw(filePath) ||
+      module.exports.isPng(filePath) ||
+      module.exports.isGif(filePath);
   },
   /*
    * Return whether a filename is for a JPEG file
@@ -46,7 +58,6 @@ module.exports = {
    * Return whether a filename is for a HEIC file
    */
   isHeif: (filePath) => {
-    console.log('IS HEIF', !!filePath.match(/(heif|heic)$/i));
     return !!filePath.match(/(heif|heic)$/i);
   },
   /*

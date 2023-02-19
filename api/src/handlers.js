@@ -3,8 +3,8 @@
 // requires
 const dcraw = require('dcraw');
 const exifReader = require('exif-reader');
-const fsp = require('fs/promises');
 const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
 const sharp = require('sharp');
 const { Duplex } = require('stream');
@@ -12,20 +12,47 @@ const { Duplex } = require('stream');
 const C = require('./constants');
 const utils = require('./utils');
 
-const apiGetAlbum = async (albumPath) => {
-  const result = {
-    albums: [],
-    files: []
+const getAlbumObj = async (dirName) => {
+  let albumDate = new Date();
+  if (dirName.match(/^\d{4}-\d{2}-\d{2}/)) {
+    albumDate = new Date(dirName.substr(0, 10));
+  }
+  // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
+  const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
+  const album = {
+    type: C.TYPE_ALBUM,
+    title: dirName.replace(/^\//, ''),
+    date: albumDate.toISOString(),
+    path: path.join('/', uriPath),
+    apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
+    description: null
   };
 
-  if (albumPath === '/') {
-    result.title = 'Root Album';
+  // merge meta with album object
+  await utils.fetchAndMergeMeta(album, dirName);
+
+  if (!album.thumbnail) {
+    album.thumbnail = null; // TODO: pick the first image
   }
+  return album;
+};
 
+const getFileObj = async (fileName, albumPath) => {
   const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
+  const uriFileName = encodeURIComponent(fileName);
+  return {
+    type: C.TYPE_PHOTO,
+    name: fileName,
+    path: path.join('/', uriAlbumPath, uriFileName),
+    photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
+    apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
+  };
+};
 
-  // get meta for the current albumPath
-  Object.assign(result, utils.getAlbumMeta(albumPath));
+const apiGetAlbum = async (albumPath) => {
+  const result = await getAlbumObj(albumPath);
+  result.albums = [];
+  result.files = [];
 
   const dirs = [];
   const files = [];
@@ -40,59 +67,38 @@ const apiGetAlbum = async (albumPath) => {
   });
 
   // TODO: pagination
-  dirs.forEach((dir) => {
-    let albumDate = new Date();
-    if (dir.name.match(/^\d{4}-\d{2}-\d{2}/)) {
-      albumDate = new Date(dir.name.substr(0, 10));
-    }
-    // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
-    const album = {
-      title: dir.name,
-      date: albumDate.toISOString(),
-      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, encodeURIComponent(dir.name)),
-      description: null
-    };
-
-    // merge meta with album object
-    Object.assign(album, utils.getAlbumMeta(dir.name));
-
-    if (!album.thumbnail) {
-      album.thumbnail = null; // TODO: method to select a thumbnail
-    }
-
+  await dirs.forEach(async (dir) => {
+    const album = await getAlbumObj(path.join('/', dir.name));
     result.albums.push(album);
   });
 
   // TODO: decide if this should be a separate API call because paginating two lists feels yucky
-  files.forEach((file) => {
-    const uriFileName = encodeURIComponent(file.name);
-    result.files.push({
-      name: file.name,
-      photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
-      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
-    });
+  files.forEach(async (file) => {
+    const fileObj = await getFileObj(file.name, albumPath);
+    result.files.push(fileObj);
   });
 
   return [200, result];
 };
 
 const apiGetFile = async (reqPath) => {
-  const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+  const albumPath = path.dirname(reqPath);
+  const result = await getFileObj(path.basename(reqPath), albumPath);
+  // add parent album to the payload
+  result.album = await getAlbumObj(albumPath);
 
   const exif = {};
-
+  const filePath = path.join(C.ALBUMS_ROOT, reqPath);
   if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
     const imgMeta = await sharp(filePath).metadata();
-    const imgExif = exifReader(imgMeta.exif);
-    exif.image = imgExif.image;
+    try {
+      const imgExif = exifReader(imgMeta.exif);
+      exif.image = imgExif.image;
+    } catch (e) {
+      exif.error = e.message;
+    }
   }
-
-  const uriReqPath = reqPath.split('/').map(encodeURIComponent).join('/');
-
-  const result = {
-    exif: exif,
-    photoPath: path.join(C.PHOTO_URL_BASE, uriReqPath)
-  };
+  result.exif = exif;
 
   return [200, result];
 };
@@ -107,6 +113,8 @@ const handleImage = async (filePath, size, crop, res) => {
     width = parseInt(matches.groups.width);
     height = parseInt(matches.groups.height);
   }
+
+  crop = (typeof crop !== 'undefined');
 
   const resizeOptions = {
     width: width,

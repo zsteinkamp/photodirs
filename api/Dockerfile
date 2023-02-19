@@ -61,4 +61,4 @@ RUN npm ci
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ## END HACK
 
-CMD [ "npm", "start" ]
+CMD [ "/app/start.sh" ]
