@@ -52,4 +52,3 @@ module.exports = async (filePath, size, crop, res) => {
   // Stream the image through the transformer and out to the response.
   return readStream.pipe(transform).pipe(res);
 };
-
