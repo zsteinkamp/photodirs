@@ -1,12 +1,33 @@
 'use strict';
 
-const fsp = require('fs/promises');
+const exifReader = require('exifreader');
 const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
 const yaml = require('js-yaml');
+
 const C = require('./constants');
 
 module.exports = {
+  /*
+   * Pull some EXIF data from supported files
+   */
+  getExifForFile: async (reqPath) => {
+    const ret = {};
+
+    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    if (!(module.exports.isJpeg(filePath) || module.exports.isHeif(filePath) || module.exports.isRaw(filePath))) {
+      return ret;
+    }
+
+    const exif = await exifReader.load(filePath);
+    for (const prop of C.EXIF_DESCRIPTION_PROPERTIES) {
+      if (exif[prop]) {
+        ret[prop] = exif[prop] ? exif[prop].description : null;
+      }
+    }
+    return ret;
+  },
   /*
    * Merge metadata into an object
    */

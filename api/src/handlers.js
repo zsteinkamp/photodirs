@@ -2,7 +2,6 @@
 
 // requires
 const dcraw = require('dcraw');
-const exifReader = require('exif-reader');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
@@ -87,18 +86,7 @@ const apiGetFile = async (reqPath) => {
   // add parent album to the payload
   result.album = await getAlbumObj(albumPath);
 
-  const exif = {};
-  const filePath = path.join(C.ALBUMS_ROOT, reqPath);
-  if (utils.isJpeg(filePath) || utils.isHeif(filePath)) {
-    const imgMeta = await sharp(filePath).metadata();
-    try {
-      const imgExif = exifReader(imgMeta.exif);
-      exif.image = imgExif.image;
-    } catch (e) {
-      exif.error = e.message;
-    }
-  }
-  result.exif = exif;
+  result.exif = await utils.getExifForFile(reqPath);
 
   return [200, result];
 };
