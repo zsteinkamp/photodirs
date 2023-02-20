@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
 import FileList from "./FileList";
+import PhotoElement from "./PhotoElement";
 
 export default function Browse() {
   const makeApiPath = (path) => {
@@ -56,9 +57,7 @@ export default function Browse() {
 
   if (data.type === 'photo') {
     pageBody = (
-      <div className="photo">
-        <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
-      </div>
+      <PhotoElement browseTo={ browseTo } data={ data } />
     );
   } else if (data.type === 'album') {
     pageBody = (

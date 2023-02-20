@@ -13,6 +13,16 @@ const C = require('./constants');
 
 const utils = module.exports = {
   /*
+   * Fancy algorithm to get the default thumbnail for an album
+   */
+  getAlbumDefaultThumbnailFilename: async (reqPath) => {
+    const albumPath = path.join(C.ALBUMS_ROOT, reqPath);
+    const thumbEntry = (await fsp.readdir(albumPath, { withFileTypes: true })).find((dirEnt) => {
+      return utils.isSupportedImageFile(dirEnt.name);
+    });
+    return thumbEntry.name;
+  },
+  /*
    * Given a reqPath (i.e. the path root is the album root), return an array of
    * breadcrumb nodes, from the root to the current node.  Nodes have a title
    * and path.

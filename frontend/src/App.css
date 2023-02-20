@@ -1,4 +1,5 @@
 .App {
+  box-sizing: border-box;
 }
 
 .App-header {

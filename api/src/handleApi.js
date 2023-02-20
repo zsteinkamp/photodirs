@@ -7,10 +7,11 @@ const path = require('path');
 const C = require('./constants');
 const utils = require('./utils');
 
-const getAlbumObj = async (dirName, options) => {
+const getAlbumObj = async (dirName, options = {}) => {
   let albumDate = new Date();
-  if (dirName.match(/^\d{4}-\d{2}-\d{2}/)) {
-    albumDate = new Date(dirName.substr(0, 10));
+  const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
+  if (matches) {
+    albumDate = new Date(matches[0]);
   }
   // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
   const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
@@ -31,7 +32,8 @@ const getAlbumObj = async (dirName, options) => {
     album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(album.thumbnail));
   } else {
     if (options.thumbnail) {
-      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(options.thumbnail.name));
+      const thumbFname = await utils.getAlbumDefaultThumbnailFilename(dirName);
+      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
     }
   }
   return album;
@@ -42,7 +44,7 @@ const getFileObj = async (fileName, albumPath, options) => {
   const uriFileName = encodeURIComponent(fileName);
   const retObj = {
     type: C.TYPE_PHOTO,
-    name: fileName,
+    title: fileName,
     path: path.join('/', uriAlbumPath, uriFileName),
     photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
     apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
@@ -53,7 +55,8 @@ const getFileObj = async (fileName, albumPath, options) => {
   return retObj;
 };
 
-const apiGetAlbum = async (albumPath) => {
+const getAlbumPayload = async (albumPath) => {
+  const result = await getAlbumObj(albumPath);
   const dirs = [];
   const files = [];
   (await fsp.readdir(path.join(C.ALBUMS_ROOT, albumPath), { withFileTypes: true })).forEach((dirEnt) => {
@@ -66,31 +69,30 @@ const apiGetAlbum = async (albumPath) => {
     }
   });
 
-  const result = await getAlbumObj(albumPath);
-  result.albums = [];
-  result.files = [];
   result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
 
   // TODO: Pagination / caching this metadata
-  await dirs.forEach(async (dir) => {
-    const album = await getAlbumObj(path.join('/', dir.name), { thumbnail: files[0] });
-    result.albums.push(album);
-  });
+  const albumPromises = dirs.map((dir) => getAlbumObj(path.join('/', dir.name), { thumbnail: true }));
+  const albumResult = await Promise.all(albumPromises);
+  result.albums = albumResult;
 
   // TODO: metadata caching and/or pagination
-  files.forEach(async (file) => {
-    const fileObj = await getFileObj(file.name, albumPath, { breadcrumb: false });
-    result.files.push(fileObj);
-  });
+  const filePromises = files.map((file) => getFileObj(file.name, albumPath, { breadcrumb: false }));
+  const fileResult = await Promise.all(filePromises);
+  result.files = fileResult;
 
-  return [200, result];
+  return result;
+};
+
+const apiGetAlbum = async (albumPath) => {
+  return [200, await getAlbumPayload(albumPath)];
 };
 
 const apiGetFile = async (reqPath) => {
   const albumPath = path.dirname(reqPath);
   const result = await getFileObj(path.basename(reqPath), albumPath, { breadcrumb: true });
   // Add parent album to the payload
-  result.album = await getAlbumObj(albumPath);
+  result.album = await getAlbumPayload(albumPath);
 
   result.exif = await utils.getExifForFile(reqPath);
 

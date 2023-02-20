@@ -1,0 +1,52 @@
+.AlbumList {
+  clear: both;
+  padding: 2rem;
+}
+
+.AlbumList li {
+  list-style-type: none;
+  width: 30rem;
+  float: left;
+  min-height: 10rem;
+  position: relative;
+  padding-left: 10rem;
+  margin: 0 1rem 1rem 0;
+}
+
+.AlbumList li div.thumbnail {
+  width: 10rem;
+  height: 10rem;
+  background-size: cover;
+  background-color: black;
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.AlbumList li button {
+  cursor: pointer;
+  width: 30rem;
+  height: 10rem;
+  text-align: left;
+  font-size: 100%;
+}
+.AlbumList li h1 {
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  font-size: 2rem;
+}
+.AlbumList li p {
+  margin-top: 0;
+}
+.AlbumList li p.date {
+  margin-top: 0;
+  position:absolute;
+  top:1.5rem;
+  width: 30rem;
+  left: 10rem;
+  font-size:5.5rem;
+  color:rgba(0,0,0,0.1);
+  text-align: center;
+}
