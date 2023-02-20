@@ -70,8 +70,13 @@ export default function Browse() {
 
   return (
     <div className="Browse">
-      <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
-      { pageBody }
+      <header>
+        <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
+        photodirs
+      </header>
+      <div className="pageBody">
+        { pageBody }
+      </div>
     </div>
   );
 }

@@ -1,17 +1,14 @@
 .Breadcrumb {
-  clear: both;
-  font-size: 2rem;
   list-style: none;
 }
 
 .Breadcrumb li {
   float: left;
   padding: 0 0.5 0 0.5rem;
-  font-weight: bold;
 }
 .Breadcrumb li::before {
   content: '/';
-  color: rgba(0,0,0,0.2);
+  color: rgba(255,255,255,0.3);
   margin:0 1rem 0 0; 
   padding:0; 
 }
@@ -21,7 +18,7 @@
   background: none;
   border: none;
   text-decoration: underline;
-  color: #445;
+  color: #669;
   font-weight: bold;
   padding: 0;
   margin: 0 1rem 0 0;

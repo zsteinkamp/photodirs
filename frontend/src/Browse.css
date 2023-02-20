@@ -1,3 +1,15 @@
 .Browse {
-  margin: 2rem;
+}
+.Browse header {
+  background-color: #282c34;
+  height: 3rem;
+  line-height: 3rem;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  text-align: right;
+  padding: 0 1rem;
+  margin-top: -2rem;
+}
+.Browse .pageBody {
+  margin: 0 2rem;
 }
