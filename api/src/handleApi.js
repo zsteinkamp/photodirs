@@ -17,7 +17,7 @@ const getAlbumObj = async (dirName, options = {}) => {
   const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
   const album = {
     type: C.TYPE_ALBUM,
-    title: dirName.replace(/^\//, ''),
+    title: path.basename(dirName).replace(/^\//, ''),
     date: albumDate.toISOString(),
     path: path.join('/', uriPath),
     apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
@@ -72,7 +72,7 @@ const getAlbumPayload = async (albumPath) => {
   result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
 
   // TODO: Pagination / caching this metadata
-  const albumPromises = dirs.map((dir) => getAlbumObj(path.join('/', dir.name), { thumbnail: true }));
+  const albumPromises = dirs.map((dir) => getAlbumObj(path.join('/', albumPath, dir.name), { thumbnail: true }));
   const albumResult = await Promise.all(albumPromises);
   result.albums = albumResult;
 

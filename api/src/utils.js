@@ -20,7 +20,10 @@ const utils = module.exports = {
     const thumbEntry = (await fsp.readdir(albumPath, { withFileTypes: true })).find((dirEnt) => {
       return utils.isSupportedImageFile(dirEnt.name);
     });
-    return thumbEntry.name;
+    if (thumbEntry) {
+      return thumbEntry.name;
+    }
+    return null;
   },
   /*
    * Given a reqPath (i.e. the path root is the album root), return an array of
