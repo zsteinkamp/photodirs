@@ -13,6 +13,42 @@ const C = require('./constants');
 
 const utils = module.exports = {
   /*
+   * returns the standard album object
+   */
+  getAlbumObj: async (dirName, options = {}) => {
+    let albumDate = new Date();
+    const albumTitle = path.basename(dirName).replace(/^\//, '').replace(/_/g, ' ').replace(/^\d{4}-\d{2}-\d{2}/, '');
+    const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
+    if (matches) {
+      albumDate = new Date(matches[0]);
+    }
+    // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
+    const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
+    const album = {
+      type: C.TYPE_ALBUM,
+      title: albumTitle,
+      date: albumDate.toISOString(),
+      path: path.join('/', uriPath),
+      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
+      description: null
+    };
+
+    // Merge meta with album object
+    await utils.fetchAndMergeMeta(album, dirName);
+
+    if (album.thumbnail) {
+      // fixup with directory name
+      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(album.thumbnail));
+    } else {
+      if (options.thumbnail) {
+        const thumbFname = await utils.getAlbumDefaultThumbnailFilename(dirName);
+        album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
+      }
+    }
+    return album;
+  },
+
+  /*
    * Fancy algorithm to get the default thumbnail for an album
    */
   getAlbumDefaultThumbnailFilename: async (reqPath) => {
@@ -41,11 +77,11 @@ const utils = module.exports = {
     const breadcrumbPromises = pathParts.map(async (token) => {
       pushPaths.push(token);
       const currPath = pushPaths.join('/');
-      const dirMeta = await utils.getAlbumMeta(currPath);
+      const albumObj = await utils.getAlbumObj(currPath);
       const breadcrumbNode = {
-        title: dirMeta.title || token,
-        path: path.join('/', currPath),
-        apiPath: path.join(C.API_BASE, 'albums', currPath)
+        title: albumObj.title || token,
+        path: albumObj.path,
+        apiPath: albumObj.apiPath
       };
       return breadcrumbNode;
     });

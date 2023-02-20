@@ -10,47 +10,52 @@
 }
 
 .AlbumList > div {
-  min-height: 10rem;
-  min-width: 20rem;
-  position: relative;
-  padding-left: 10rem;
+  flex: 1 1 0px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 10rem;
+  min-width: 40rem;
 }
 
-.AlbumList > div div.thumbnail {
+.AlbumList > div button {
+  display: flex;
+  position: relative;
+  gap: 1rem;
+  cursor: pointer;
+  width: 100%;
+  height: 10rem;
+  text-align: left;
+  font-size: 100%;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.AlbumList > div button div.thumbnail {
+  padding: none;
+  margin: none;
   width: 10rem;
   height: 10rem;
   background-size: cover;
   background-color: black;
   background-repeat: no-repeat;
-  position: absolute;
-  left: 0;
-  top: 0;
 }
 
-.AlbumList > div button {
-  cursor: pointer;
-  width: 30rem;
-  height: 10rem;
-  text-align: left;
-  font-size: 100%;
-  border: none;
+.AlbumList > div button div.body {
+  padding-top: 1rem;
 }
-.AlbumList > div h1 {
-  margin: 0;
+.AlbumList > div button div.body h1 {
   padding: 0;
+  margin: 1rem 0;
   font-weight: bold;
   font-size: 2rem;
 }
-.AlbumList li p {
-  margin-top: 0;
+.AlbumList > div button div.body p.date {
+  margin: 0;
+  padding: 0;
 }
-.AlbumList > div p.date {
-  margin-top: 0;
-  position:absolute;
-  top:1.5rem;
-  width: 30rem;
-  left: 10rem;
-  font-size:5.5rem;
-  color:rgba(0,0,0,0.1);
-  text-align: center;
+.AlbumList > div button div.body p.desc {
+  margin: 0;
+  padding: 0;
 }

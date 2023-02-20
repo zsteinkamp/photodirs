@@ -7,38 +7,6 @@ const path = require('path');
 const C = require('./constants');
 const utils = require('./utils');
 
-const getAlbumObj = async (dirName, options = {}) => {
-  let albumDate = new Date();
-  const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
-  if (matches) {
-    albumDate = new Date(matches[0]);
-  }
-  // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
-  const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
-  const album = {
-    type: C.TYPE_ALBUM,
-    title: path.basename(dirName).replace(/^\//, ''),
-    date: albumDate.toISOString(),
-    path: path.join('/', uriPath),
-    apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
-    description: null
-  };
-
-  // Merge meta with album object
-  await utils.fetchAndMergeMeta(album, dirName);
-
-  if (album.thumbnail) {
-    // fixup with directory name
-    album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(album.thumbnail));
-  } else {
-    if (options.thumbnail) {
-      const thumbFname = await utils.getAlbumDefaultThumbnailFilename(dirName);
-      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
-    }
-  }
-  return album;
-};
-
 const getFileObj = async (fileName, albumPath, options) => {
   const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
   const uriFileName = encodeURIComponent(fileName);
@@ -56,7 +24,7 @@ const getFileObj = async (fileName, albumPath, options) => {
 };
 
 const getAlbumPayload = async (albumPath) => {
-  const result = await getAlbumObj(albumPath);
+  const result = await utils.getAlbumObj(albumPath);
   const dirs = [];
   const files = [];
   (await fsp.readdir(path.join(C.ALBUMS_ROOT, albumPath), { withFileTypes: true })).forEach((dirEnt) => {
@@ -72,7 +40,7 @@ const getAlbumPayload = async (albumPath) => {
   result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
 
   // TODO: Pagination / caching this metadata
-  const albumPromises = dirs.map((dir) => getAlbumObj(path.join('/', albumPath, dir.name), { thumbnail: true }));
+  const albumPromises = dirs.map((dir) => utils.getAlbumObj(path.join('/', albumPath, dir.name), { thumbnail: true }));
   const albumResult = await Promise.all(albumPromises);
   result.albums = albumResult;
 

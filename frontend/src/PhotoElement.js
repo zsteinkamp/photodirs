@@ -16,6 +16,7 @@ export default function PhotoElement(props) {
   const returnToAlbum = () => { props.browseTo(parentPath, parentApiPath) };
   const goToPrevPhoto = () => { props.browseTo(prevPhoto.path, prevPhoto.apiPath) };
   const goToNextPhoto = () => { props.browseTo(nextPhoto.path, nextPhoto.apiPath) };
+  const downloadOriginal = () => { window.location.href=data.photoPath + "?size=orig"; }
 
   const keyCodeToAction = {
       27: returnToAlbum,
@@ -55,7 +56,8 @@ export default function PhotoElement(props) {
         </dl>
         <div className="tag">EXIF DATA</div>
       </div>
-      <button className="closeBtn" onClick={ returnToAlbum }>X</button>
+      <button title="Return to Album" className="closeBtn" onClick={ returnToAlbum }>X</button>
+      <button title="Download Original" className="downloadBtn" onClick={ downloadOriginal }>V</button>
     </div>
   );
 }

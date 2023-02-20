@@ -78,7 +78,7 @@ export default function Browse() {
       </div>
       <footer>
         <div>
-          Check out out <a href="https://github.com/zsteinkamp/photodirs" target="_blank">
+          Check out out <a rel="noreferrer" href="https://github.com/zsteinkamp/photodirs" target="_blank">
             Photodirs on GitHub
           </a>.
         </div>

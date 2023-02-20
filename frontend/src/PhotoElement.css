@@ -16,6 +16,21 @@
   transform: translateX(-50%) translateY(-50%);
   border: 2rem solid black;
 }
+.PhotoElement .downloadBtn {
+  position: absolute;
+  cursor: pointer;
+  right: 1rem;
+  top: 4rem;
+  background: rgba(0,0,0,0);
+  color: rgba(0,255,0,1);
+  border-radius: 0.5rem;
+  border: 2px solid rgba(0,255,0,1);
+  font-size:2rem;
+  opacity: 0.25;
+}
+.PhotoElement .downloadBtn:hover {
+  opacity: 1;
+}
 .PhotoElement .closeBtn {
   position: absolute;
   cursor: pointer;
