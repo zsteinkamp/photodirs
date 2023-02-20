@@ -4,6 +4,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
 const utils = require('./utils');
+const { pipeline } = require('stream/promises');
 
 const C = require('./constants');
 
@@ -44,11 +45,21 @@ module.exports = async (filePath, size, crop, res) => {
   // getCachedImagePath is also responsible for resizing the image and caching it
   const cachedImagePath = await utils.getCachedImagePath(filePath, resizeOptions);
 
+  if (!cachedImagePath) {
+    // must have been an error
+    return res.status(500).send();
+  }
   const readStream = fs.createReadStream(cachedImagePath);
   const transform = utils.getSharpTransform(cachedImagePath, resizeOptions);
 
   // Set the correct Content-Type header
   res.type(`image/${utils.getOutputTypeForFile(cachedImagePath)}`);
   // Stream the image through the transformer and out to the response.
-  return readStream.pipe(transform).pipe(res);
+  async function plumbing() {
+    await pipeline(readStream, transform, res);
+  }
+  await plumbing().catch((err) => {
+    console.error('IMG CACHE PIPELINE ERROR', err);
+    res.end();
+  });
 };

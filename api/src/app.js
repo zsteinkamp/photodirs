@@ -15,14 +15,24 @@ app.get(new RegExp('^/api/?$'), async (req, res) => {
 
 // handles album, and file metadata requests
 app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
-  const [status, body] = await handlers.apiGet(req.params[0] || '/');
-  res.status(status).send(body);
+  try {
+    const [status, body] = await handlers.apiGet(req.params[0] || '/');
+    res.status(status).send(body);
+  } catch (e) {
+    console.error(e.message);
+    return res.status(500).send(e.message);
+  }
 });
 
 // handles photo requests
 app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
-  // sends the response on its own
-  handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
+  try {
+    // sends the response on its own
+    handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
+  } catch (e) {
+    console.error(e.message);
+    //return res.status(500).send(e.message);
+  }
 });
 
 app.listen(port, () => {

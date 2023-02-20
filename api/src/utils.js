@@ -56,11 +56,15 @@ const utils = module.exports = {
    * Returns a Sharp transformer appropriate for the supplied file's type
    */
   getSharpTransform: (filePath, resizeOptions) => {
-    return {
+    const transformer = {
       jpg: sharp().jpeg().rotate().resize(resizeOptions),
       gif: sharp().resize(resizeOptions),
       png: sharp().resize(resizeOptions)
     }[utils.getOutputTypeForFile(filePath)];
+    //transformer.on('error', (err) => {
+    //  console.error('SHARP ERROR 2', err.message, err);
+    //});
+    return transformer;
   },
 
   /*
@@ -104,7 +108,14 @@ const utils = module.exports = {
       // When we cache the intermediate size, use `sharp.fit.outside` to scale to the short side to facilitate cropping
       const transform = utils.getSharpTransform(filePath, { height: cacheHeight, width: cacheWidth, fit: sharp.fit.outside });
       const outStream = fs.createWriteStream(cachePath);
-      await pipeline(readStream, transform, outStream);
+
+      async function plumbing() {
+        await pipeline(readStream, transform, outStream);
+      }
+      await plumbing().catch((err) => {
+        console.error('IMG CACHE PIPELINE ERROR', err.message);
+        return null;
+      });
     }
     return cachePath;
   },
@@ -126,8 +137,15 @@ const utils = module.exports = {
     // file using dcraw and pipelining it through Sharp to get a JPEG.
     const tiffPipe = utils.rawToTiffPipe(filePath);
     const outStream = fs.createWriteStream(cachePath);
-    await pipeline(tiffPipe, sharp().rotate().jpeg(), outStream);
+    const transform = sharp().rotate().jpeg();
 
+    async function plumbing() {
+      await pipeline(tiffPipe, transform, outStream);
+    }
+    await plumbing().catch((err) => {
+      console.error('RAW CONVERT PIPELINE ERROR', err.message);
+      return null;
+    });
     // Return the path to the cached JPEG
     return cachePath;
   },
@@ -219,8 +237,7 @@ const utils = module.exports = {
     return utils.isJpeg(filePath) ||
       utils.isHeif(filePath) ||
       utils.isRaw(filePath) ||
-      utils.isPng(filePath) ||
-      utils.isGif(filePath);
+      utils.isPng(filePath);
   },
   /*
    * Return whether a filename is for a JPEG file
