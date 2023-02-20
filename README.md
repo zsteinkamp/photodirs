@@ -143,7 +143,7 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 * [node-tdd-base](https://github.com/zsteinkamp/node-tdd-base) - The most primitive framework for a nice Node.js dev experience
 
 ## Requirements
-The ability to run x86_64 Docker images and an Internet connection.
+The ability to run x86_64 Docker images.
 
 ## Running the App
 ```
@@ -160,3 +160,10 @@ You can still request any image size, and Photodirs will use the cached image th
 docker compose up
 ```
 The source files are mounted read/write in the frontend and API containers and the services are run in "watch" mode, so any edits you make to the source files are immediately reflected in the UI or API.
+
+## TODO
+Random dumping ground / rough sort of pending features or ideas. Put yours here too!
+
+* Breadcrumb nav
+* Prettify UI
+* Pre-generator service. Start with RAW conversion. Then enhance to a fixed set of pre-configured sizes. Perhaps look into statistical analysis of sizes in use and pre-generating those with modes in the distribution.
