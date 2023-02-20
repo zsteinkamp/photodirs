@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Breadcrumb from "./Breadcrumb";
 
 export default function Browse() {
   const makeApiPath = (path) => {
@@ -13,11 +14,12 @@ export default function Browse() {
   let navigate = useNavigate();
 
   const browseTo = (path, apiPath) => {
-    navigate(path);
     setApiPath(apiPath || makeApiPath(path));
+    navigate(path);
   };
 
   useEffect(() => {
+    console.log('In useEffect()');
     const getData = async () => {
       try {
         const response = await fetch(apiPath);
@@ -52,7 +54,6 @@ export default function Browse() {
   if (data.type === 'photo') {
     pageBody = (
       <>
-        <div className="album_nav"><button onClick={ () => browseTo(data.album.path) }>{ data.album.title }</button></div>
         <div className="photo">
           <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
         </div>
@@ -88,7 +89,7 @@ export default function Browse() {
   return (
     <div className="album">
       <h1>{ data.title }</h1>
-      <div className="album_nav"><button onClick={ () => browseTo('/') }>Albums</button></div>
+      <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
       { pageBody }
     </div>
   );

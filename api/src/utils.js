@@ -13,6 +13,33 @@ const C = require('./constants');
 
 const utils = module.exports = {
   /*
+   * Given a reqPath (i.e. the path root is the album root), return an array of
+   * breadcrumb nodes, from the root to the current node.  Nodes have a title
+   * and path.
+   */
+  getBreadcrumbForPath: async (reqPath) => {
+    const pushPaths = [];
+    let pathParts = [];
+    if (reqPath === '/') {
+      pathParts = [''];
+    } else {
+      pathParts = reqPath.split('/');
+    }
+    const breadcrumbPromises = pathParts.map(async (token) => {
+      pushPaths.push(token);
+      const currPath = pushPaths.join('/');
+      const dirMeta = await utils.getAlbumMeta(currPath);
+      const breadcrumbNode = {
+        title: dirMeta.title || token,
+        path: path.join('/', currPath),
+        apiPath: path.join(C.API_BASE, 'albums', currPath)
+      };
+      return breadcrumbNode;
+    });
+    const retArr = await Promise.all(breadcrumbPromises);
+    return retArr;
+  },
+  /*
    * Returns a Sharp transformer appropriate for the supplied file's type
    */
   getSharpTransform: (filePath, resizeOptions) => {

@@ -32,22 +32,27 @@ const getAlbumObj = async (dirName) => {
   return album;
 };
 
-const getFileObj = async (fileName, albumPath) => {
+const getFileObj = async (fileName, albumPath, options) => {
   const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
   const uriFileName = encodeURIComponent(fileName);
-  return {
+  const retObj = {
     type: C.TYPE_PHOTO,
     name: fileName,
     path: path.join('/', uriAlbumPath, uriFileName),
     photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
     apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
   };
+  if (options.breadcrumb) {
+    retObj.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
+  }
+  return retObj;
 };
 
 const apiGetAlbum = async (albumPath) => {
   const result = await getAlbumObj(albumPath);
   result.albums = [];
   result.files = [];
+  result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
 
   const dirs = [];
   const files = [];
@@ -69,7 +74,7 @@ const apiGetAlbum = async (albumPath) => {
 
   // TODO: metadata caching and/or pagination
   files.forEach(async (file) => {
-    const fileObj = await getFileObj(file.name, albumPath);
+    const fileObj = await getFileObj(file.name, albumPath, { breadcrumb: false });
     result.files.push(fileObj);
   });
 
@@ -78,7 +83,7 @@ const apiGetAlbum = async (albumPath) => {
 
 const apiGetFile = async (reqPath) => {
   const albumPath = path.dirname(reqPath);
-  const result = await getFileObj(path.basename(reqPath), albumPath);
+  const result = await getFileObj(path.basename(reqPath), albumPath, { breadcrumb: true });
   // Add parent album to the payload
   result.album = await getAlbumObj(albumPath);
 
