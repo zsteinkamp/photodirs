@@ -1,19 +1,22 @@
 .AlbumList {
-  clear: both;
-  padding: 2rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-.AlbumList li {
-  list-style-type: none;
-  width: 30rem;
-  float: left;
+.AlbumList > div {
   min-height: 10rem;
+  min-width: 20rem;
   position: relative;
   padding-left: 10rem;
-  margin: 0 3rem 1rem 0;
 }
 
-.AlbumList li div.thumbnail {
+.AlbumList > div div.thumbnail {
   width: 10rem;
   height: 10rem;
   background-size: cover;
@@ -24,7 +27,7 @@
   top: 0;
 }
 
-.AlbumList li button {
+.AlbumList > div button {
   cursor: pointer;
   width: 30rem;
   height: 10rem;
@@ -32,7 +35,7 @@
   font-size: 100%;
   border: none;
 }
-.AlbumList li h1 {
+.AlbumList > div h1 {
   margin: 0;
   padding: 0;
   font-weight: bold;
@@ -41,7 +44,7 @@
 .AlbumList li p {
   margin-top: 0;
 }
-.AlbumList li p.date {
+.AlbumList > div p.date {
   margin-top: 0;
   position:absolute;
   top:1.5rem;

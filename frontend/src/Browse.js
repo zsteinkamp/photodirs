@@ -72,11 +72,20 @@ export default function Browse() {
     <div className="Browse">
       <header>
         <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
-        photodirs
       </header>
       <div className="pageBody">
         { pageBody }
       </div>
+      <footer>
+        <div>
+          Check out out <a href="https://github.com/zsteinkamp/photodirs" target="_blank">
+            Photodirs on GitHub
+          </a>.
+        </div>
+        <div>
+          by <a href="https://steinkamp.us/">Zack Steinkamp</a>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -5,17 +5,17 @@ export default function FileList(props) {
 
   if (props.files && props.files.length > 0) {
     const fileListItems = props.files.map((file) => (
-      <li key={file.photoPath}>
+      <div key={file.photoPath}>
         <button onClick={ ()=> props.browseTo(file.path) }>
           <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
         </button>
         <p>{file.name}</p>
-      </li>
+      </div>
     ));
     fileList = (
-      <ul className="FileList">
+      <div className="FileList">
         { fileListItems }
-      </ul>
+      </div>
     );
   }
 

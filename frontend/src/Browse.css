@@ -1,15 +1,32 @@
 .Browse {
 }
 .Browse header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   background-color: #282c34;
   height: 3rem;
-  line-height: 3rem;
   font-size: calc(10px + 2vmin);
   color: white;
-  text-align: right;
-  padding: 0 1rem;
-  margin-top: -2rem;
+  padding: 0 2rem;
+  line-height: 3rem;
 }
 .Browse .pageBody {
   margin: 0 2rem;
+  min-height: 80vh;
+}
+.Browse footer {
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #282c34;
+  height: 3rem;
+  font-size: 1rem;
+  color: white;
+  padding: 0 2rem;
+  line-height: 3rem;
+}
+.Browse footer a {
+  color: #99a;
 }

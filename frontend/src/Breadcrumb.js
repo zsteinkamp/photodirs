@@ -17,14 +17,14 @@ export default function Breadcrumb(props) {
       );
     }
     return (
-      <li key={ crumb.path }>
+      <div key={ crumb.path }>
         { itemMarkup }
-      </li>
+      </div>
     );
   });
   return (
-    <ul className="Breadcrumb">
+    <div className="Breadcrumb">
       { crumbArr }
-    </ul>
+    </div>
   );
 }
