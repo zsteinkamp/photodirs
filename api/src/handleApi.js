@@ -7,7 +7,7 @@ const path = require('path');
 const C = require('./constants');
 const utils = require('./utils');
 
-const getAlbumObj = async (dirName) => {
+const getAlbumObj = async (dirName, options) => {
   let albumDate = new Date();
   if (dirName.match(/^\d{4}-\d{2}-\d{2}/)) {
     albumDate = new Date(dirName.substr(0, 10));
@@ -26,8 +26,13 @@ const getAlbumObj = async (dirName) => {
   // Merge meta with album object
   await utils.fetchAndMergeMeta(album, dirName);
 
-  if (!album.thumbnail) {
-    album.thumbnail = null; // TODO: pick the first image
+  if (album.thumbnail) {
+    // fixup with directory name
+    album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(album.thumbnail));
+  } else {
+    if (options.thumbnail) {
+      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(options.thumbnail.name));
+    }
   }
   return album;
 };
@@ -49,11 +54,6 @@ const getFileObj = async (fileName, albumPath, options) => {
 };
 
 const apiGetAlbum = async (albumPath) => {
-  const result = await getAlbumObj(albumPath);
-  result.albums = [];
-  result.files = [];
-  result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
-
   const dirs = [];
   const files = [];
   (await fsp.readdir(path.join(C.ALBUMS_ROOT, albumPath), { withFileTypes: true })).forEach((dirEnt) => {
@@ -66,9 +66,14 @@ const apiGetAlbum = async (albumPath) => {
     }
   });
 
+  const result = await getAlbumObj(albumPath);
+  result.albums = [];
+  result.files = [];
+  result.breadcrumb = await utils.getBreadcrumbForPath(albumPath);
+
   // TODO: Pagination / caching this metadata
   await dirs.forEach(async (dir) => {
-    const album = await getAlbumObj(path.join('/', dir.name));
+    const album = await getAlbumObj(path.join('/', dir.name), { thumbnail: files[0] });
     result.albums.push(album);
   });
 

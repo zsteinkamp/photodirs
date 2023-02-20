@@ -1,6 +1,9 @@
+import './Browse.css';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Breadcrumb from "./Breadcrumb";
+import AlbumList from "./AlbumList";
+import FileList from "./FileList";
 
 export default function Browse() {
   const makeApiPath = (path) => {
@@ -53,42 +56,21 @@ export default function Browse() {
 
   if (data.type === 'photo') {
     pageBody = (
-      <>
-        <div className="photo">
-          <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
-        </div>
-      </>
+      <div className="photo">
+        <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
+      </div>
     );
   } else if (data.type === 'album') {
     pageBody = (
-      <>
-        <ul>
-          { data.albums &&
-            data.albums.map((album) => (
-              <li key={album.apiPath}>
-                <h3 className="album_title"><button onClick={ () => browseTo(album.path, album.apiPath) }>{album.title}</button></h3>
-                <p className="album_desc">{album.description}</p>
-              </li>
-            ))}
-        </ul>
-        <ul>
-          {data && data.files &&
-            data.files.map((file) => (
-              <li key={file.photoPath}>
-                <button onClick={ ()=> browseTo(file.path) }>
-                  <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
-                </button>
-                <p>{file.name}</p>
-              </li>
-            ))}
-        </ul>
-      </>
+      <div className="album">
+        <AlbumList browseTo={ browseTo } albums={ data.albums } />
+        <FileList browseTo={ browseTo } files={ data.files } />
+      </div>
     );
   }
 
   return (
-    <div className="album">
-      <h1>{ data.title }</h1>
+    <div className="Browse">
       <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
       { pageBody }
     </div>
