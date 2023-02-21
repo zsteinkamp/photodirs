@@ -15,6 +15,7 @@
   "author": "Zack Steinkamp",
   "license": "ISC",
   "dependencies": {
+    "chokidar": "^3.5.3",
     "exifreader": "^4.9.1",
     "express": "^4.18.2",
     "js-yaml": "^4.1.0",
