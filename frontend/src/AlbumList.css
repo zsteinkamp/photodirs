@@ -15,7 +15,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   height: 10rem;
-  min-width: 40rem;
+  min-width: 25rem;
 }
 
 .AlbumList > div button {
@@ -37,6 +37,7 @@
   margin: none;
   width: 10rem;
   height: 10rem;
+  background-position: center;
   background-size: cover;
   background-color: black;
   background-repeat: no-repeat;
