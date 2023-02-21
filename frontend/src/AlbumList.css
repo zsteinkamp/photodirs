@@ -43,6 +43,7 @@
 }
 
 .AlbumList > div button div.body {
+  width: 100%;
   padding-top: 1rem;
 }
 .AlbumList > div button div.body h1 {

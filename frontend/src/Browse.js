@@ -1,6 +1,6 @@
 import './Browse.css';
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
 import FileList from "./FileList";
@@ -15,15 +15,18 @@ export default function Browse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const location = useLocation();
+  useEffect(() => {
+    setApiPath(makeApiPath(location.pathname));
+  }, [location]);
+
   let navigate = useNavigate();
 
   const browseTo = (path, apiPath) => {
-    setApiPath(apiPath || makeApiPath(path));
     navigate(path);
   };
 
   useEffect(() => {
-    console.log('In useEffect()');
     const getData = async () => {
       try {
         const response = await fetch(apiPath);
