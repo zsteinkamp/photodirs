@@ -16,6 +16,7 @@ module.exports = async (filePath, size, crop, res) => {
   if (typeof size === 'string') {
     if (size === 'orig') {
       // Return original file ... express takes care of Content-Type!
+      res.set('Cache-control', 'public, max-age=86400');
       return res.sendFile(filePath);
     }
 
@@ -54,6 +55,7 @@ module.exports = async (filePath, size, crop, res) => {
 
   // Set the correct Content-Type header
   res.type(`image/${utils.getOutputTypeForFile(cachedImagePath)}`);
+  res.set('Cache-control', 'public, max-age=86400');
   // Stream the image through the transformer and out to the response.
   async function plumbing() {
     await pipeline(readStream, transform, res);
