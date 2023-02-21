@@ -10,7 +10,7 @@ Photodirs was made with the following design goals:
 * Publicly accessible (no authentication requried)
 * Your directory structure is your album structure
 * Directories can be nested arbitrarily deep
-* New files or directories are immediately available
+* New files or directories are immediately available, and popular resizing is triggered by file create
 * Directories can have an optional YAML metadata file to override title
 (directory name is default), provide a description, specify an album image,
     disable display, control photo sort order, optional file includelist, or anything else you would like to include
@@ -23,7 +23,23 @@ TODO
 
 ## Running photodirs
 
-Photodirs requires Docker Compose to run. To start the service, clone this repo then run:
+Photodirs requires Docker Compose to run.
+
+You will need to edit the `/albums` volume in the `docker-compose.yml` file to point to your album root. See the last line here:
+
+```
+  api:
+    build: ./api
+    environment:
+      TERM: xterm
+    volumes:
+      - ./api:/app
+      - api_node_modules:/app/node_modules
+      - cache:/cache
+      - /PATH/TO/YOUR/ALBUMS:/albums
+```
+
+To start the service, run:
 
 ```
 docker compose up
