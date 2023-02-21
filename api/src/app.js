@@ -20,10 +20,18 @@ chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', (event, path) =
   }
   chokidarDebounce[path] = setTimeout(async (event, path) => {
     if (event === 'add' || event === 'change') {
-      if (utils.isRaw(path)) {
-        // convert raw file
-        const cachePath = await utils.jpegFileForRaw(path);
-        console.log('PRE-CONVERT RAW', { path, cachePath });
+      if (utils.isSupportedImageFile(path)) {
+        if (utils.isRaw(path)) {
+          // convert raw file
+          const cachePath = await utils.jpegFileForRaw(path);
+          console.log('PRE-CONVERT RAW', { path, cachePath });
+          path = cachePath;
+        }
+
+        // now cache the 400x400 and 1000x1000 size
+        const resized400Path = await utils.getCachedImagePath(path, { height: 400, width: 400 });
+        const resized1000Path = await utils.getCachedImagePath(path, { height: 1000, width: 1000 });
+        console.log('RESIZED', { path, resized400Path, resized1000Path });
       }
     }
     chokidarDebounce[path] = null;
