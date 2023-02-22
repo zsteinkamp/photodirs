@@ -2,7 +2,7 @@
 
 if [ "production" == "$NODE_ENV" ]
 then
-  npm run start
+  exec npm run start
 else
-  npm run watch:dev
+  exec npm run watch:dev
 fi

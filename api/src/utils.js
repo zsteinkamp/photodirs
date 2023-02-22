@@ -17,7 +17,11 @@ const utils = module.exports = {
    */
   getAlbumObj: async (dirName, options = {}) => {
     let albumDate = new Date();
-    const albumTitle = path.basename(dirName).replace(/^\//, '').replace(/_/g, ' ').replace(/^\d{4}-\d{2}-\d{2}/, '');
+    const albumTitle = path.basename(dirName)
+      .replace(/^\//, '')
+      .replace(/_/g, ' ')
+      .replace(/^\d{4}-\d{2}-\d{2}/, '')
+      .trim();
     const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
     if (matches) {
       albumDate = new Date(matches[0]);
