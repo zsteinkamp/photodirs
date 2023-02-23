@@ -7,29 +7,28 @@ const path = require('path');
 const utils = require('./utils');
 const C = require('./constants');
 
-const start = () => {
-  // run initial deep scan
-  deepScan().then(watch);
-};
-
-const deepScan = async () => {
-  console.log('DEEP SCAN METHOD');
-  await scanDirectory('/');
-};
-
 const scanDirectory = async (dirName) => {
   console.log('TOP', dirName);
   // do a depth-first traversal so we can build the directory metadata from the bottom up
   const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory());
   for (const dirEnt of subdirs) {
-    console.log('DIRENTNAME', dirEnt.name);
     await scanDirectory(path.join(dirName, dirEnt.name));
   }
-  // now do some work
-  const albumObj = await utils.getAlbumObj(dirName, { thumbnail: true });
-  const outFname = path.join(C.CACHE_ROOT, 'albums', dirName, 'album.json');
-  await fsp.writeFile(outFname, JSON.stringify(albumObj));
-  console.log(outFname);
+  // write the standard album obj
+  const albumObj = await utils.getAlbumObj(dirName);
+  // write the extended album obj
+  await utils.getExtendedAlbumObj(albumObj);
+
+  const dirFiles = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
+    .filter((dirEnt) => dirEnt.isFile());
+  for (const dirEnt of dirFiles) {
+    if (utils.isSupportedImageFile(dirEnt.name)) {
+      // this method will also write out the result in cache
+      const fileObj = await utils.getFileObj(dirName, dirEnt.name);
+      // this method will also write out the result in cache
+      await utils.getExtendedFileObj(fileObj);
+    }
+  };
 };
 
 /*
@@ -70,7 +69,13 @@ const watch = () => {
   });
 };
 
-module.exports = {
-  deepScan,
-  start
+const watcher = module.exports = {
+  start: () => {
+    // run initial deep scan
+    watcher.deepScan().then(watch);
+  },
+  deepScan: async () => {
+    console.log('DEEP SCAN METHOD');
+    await scanDirectory('/');
+  }
 };

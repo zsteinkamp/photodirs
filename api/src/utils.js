@@ -12,10 +12,113 @@ const yaml = require('js-yaml');
 const C = require('./constants');
 
 const utils = module.exports = {
+  getExtendedFileObj: async (fileObj) => {
+    const extFileFname = path.join(C.CACHE_ROOT, 'albums', fileObj.path + '.extended.json');
+    if (await utils.fileExists(extFileFname)) {
+      const metaStat = await fsp.stat(extFileFname);
+      const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, fileObj.path));
+      if (metaStat.mtime >= fileStat.mtime) {
+        console.log('RETURN CACHE', extFileFname);
+        return JSON.parse(await fsp.readFile(extFileFname, { encoding: 'utf8' }));
+      }
+    }
+    fileObj.breadcrumb = await utils.getBreadcrumbForPath(fileObj.albumPath);
+    fileObj.exif = await utils.getExifForFile(fileObj.path);
+
+    // write out the file for next time
+    await fsp.writeFile(extFileFname, JSON.stringify(fileObj));
+
+    return fileObj;
+  },
+  /*
+   * returns the standard File object
+   */
+  getFileObj: async (albumPath, fileName) => {
+    const stdFileFname = path.join(C.CACHE_ROOT, 'albums', albumPath, fileName + '.json');
+
+    if (await utils.fileExists(stdFileFname)) {
+      const metaStat = await fsp.stat(stdFileFname);
+      const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
+      if (metaStat.mtime >= fileStat.mtime) {
+        console.log('RETURN CACHE', stdFileFname);
+        return JSON.parse(await fsp.readFile(stdFileFname, { encoding: 'utf8' }));
+      }
+    }
+    const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
+    const uriFileName = encodeURIComponent(fileName);
+    const fileObj = {
+      type: C.TYPE_PHOTO,
+      title: fileName,
+      fileName: fileName,
+      albumPath: albumPath,
+      path: path.join('/', albumPath, fileName),
+      uriPath: path.join('/', uriAlbumPath, uriFileName),
+      photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
+      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
+    };
+
+    // write out the file for next time
+    await fsp.writeFile(stdFileFname, JSON.stringify(fileObj));
+
+    return fileObj;
+  },
+
+  /*
+   * returns the extended album object
+   */
+  getExtendedAlbumObj: async (extAlbumObj) => {
+    const extAlbumFname = path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.extended.json');
+    if (await utils.fileExists(extAlbumFname)) {
+      const metaStat = await fsp.stat(extAlbumFname);
+      const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, extAlbumObj.path));
+      if (metaStat.mtime >= dirStat.mtime) {
+        console.log('RETURN CACHE', extAlbumFname);
+        return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
+      }
+    }
+    const dirs = [];
+    const files = [];
+    (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true })).forEach((dirEnt) => {
+      if (dirEnt.isDirectory()) {
+        dirs.push(dirEnt);
+      } else if (dirEnt.isFile()) {
+        if (utils.isSupportedImageFile(dirEnt.name)) {
+          files.push(dirEnt);
+        }
+      }
+    });
+
+    extAlbumObj.breadcrumb = await utils.getBreadcrumbForPath(extAlbumObj.path);
+
+    // TODO: Pagination / caching this metadata
+    const albumPromises = dirs.map((dir) => utils.getAlbumObj(path.join('/', extAlbumObj.path, dir.name)));
+    const albumResult = await Promise.all(albumPromises);
+    extAlbumObj.albums = albumResult;
+
+    // TODO: metadata caching and/or pagination
+    const filePromises = files.map((file) => utils.getFileObj(extAlbumObj.path, file.name));
+    const fileResult = await Promise.all(filePromises);
+    extAlbumObj.files = fileResult;
+
+    // write out the file for next time
+    await fsp.writeFile(extAlbumFname, JSON.stringify(extAlbumObj));
+
+    return extAlbumObj;
+  },
+
   /*
    * returns the standard album object
    */
-  getAlbumObj: async (dirName, options = {}) => {
+  getAlbumObj: async (dirName) => {
+    const stdAlbumFname = path.join(C.CACHE_ROOT, 'albums', dirName, 'album.json');
+    if (await utils.fileExists(stdAlbumFname)) {
+      const metaStat = await fsp.stat(stdAlbumFname);
+      const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, dirName));
+      if (metaStat.mtime >= dirStat.mtime) {
+        console.log('RETURN CACHE', stdAlbumFname);
+        return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
+      }
+    }
     let albumDate = new Date();
     const albumTitle = path.basename(dirName)
       .replace(/^\//, '')
@@ -28,28 +131,31 @@ const utils = module.exports = {
     }
     // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
     const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
-    const album = {
+    const albumObj = {
       type: C.TYPE_ALBUM,
       title: albumTitle,
       date: albumDate.toISOString(),
-      path: path.join('/', uriPath),
+      path: path.join('/', dirName),
+      uriPath: path.join('/', uriPath),
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
       description: null
     };
 
     // Merge meta with album object
-    await utils.fetchAndMergeMeta(album, dirName);
+    await utils.fetchAndMergeMeta(albumObj, dirName);
 
-    if (album.thumbnail) {
+    if (albumObj.thumbnail) {
       // fixup with directory name
-      album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(album.thumbnail));
+      albumObj.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(albumObj.thumbnail));
     } else {
-      if (options.thumbnail) {
-        const thumbFname = await utils.getAlbumDefaultThumbnailFilename(dirName);
-        album.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
-      }
+      const thumbFname = await utils.getAlbumDefaultThumbnailFilename(dirName);
+      albumObj.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
     }
-    return album;
+
+    // write out the file for next time
+    await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
+
+    return albumObj;
   },
 
   /*
@@ -65,6 +171,7 @@ const utils = module.exports = {
     }
     return null;
   },
+
   /*
    * Given a reqPath (i.e. the path root is the album root), return an array of
    * breadcrumb nodes, from the root to the current node.  Nodes have a title
@@ -84,7 +191,7 @@ const utils = module.exports = {
       const albumObj = await utils.getAlbumObj(currPath);
       const breadcrumbNode = {
         title: albumObj.title || token,
-        path: albumObj.path,
+        path: albumObj.uriPath,
         apiPath: albumObj.apiPath
       };
       return breadcrumbNode;
@@ -92,6 +199,7 @@ const utils = module.exports = {
     const retArr = await Promise.all(breadcrumbPromises);
     return retArr;
   },
+
   /*
    * Returns a Sharp transformer appropriate for the supplied file's type
    */
@@ -101,9 +209,6 @@ const utils = module.exports = {
       gif: sharp().resize(resizeOptions),
       png: sharp().resize(resizeOptions)
     }[utils.getOutputTypeForFile(filePath)];
-    //transformer.on('error', (err) => {
-    //  console.error('SHARP ERROR 2', err.message, err);
-    //});
     return transformer;
   },
 
@@ -119,6 +224,7 @@ const utils = module.exports = {
     }
     return 'jpg';
   },
+
   /*
    * Rather than caching every single size a client requests, cache in
    * increments of 200px. The final output is produced by resizing the cached
@@ -131,6 +237,7 @@ const utils = module.exports = {
     const cacheHeight = 200 * Math.ceil(resizeOptions.height / 200);
     return [cacheWidth, cacheHeight];
   },
+
   /*
    * Locate the cached image closest to what the client is requesting. If it's
    * not found, then create it and return the filename.
@@ -159,6 +266,7 @@ const utils = module.exports = {
     }
     return cachePath;
   },
+
   /*
    * Convert a camera raw image to JPEG, cache it, and return the cache filename.
    * If already cached, then just return the cache filename.
@@ -189,6 +297,7 @@ const utils = module.exports = {
     // Return the path to the cached JPEG
     return cachePath;
   },
+
   /*
    * Return the cache path for a given file and size
    */
@@ -202,6 +311,7 @@ const utils = module.exports = {
     // e.g. /cache/albums/album_hawaii/hawaii.CR2^1200x800.jpg
     return `${filePath}^${width}x${height}.${utils.getOutputTypeForFile(filePath)}`;
   },
+
   /*
    * Read raw files and return a pipe of TIFF data. This can then be pipelined
    * into our existing stream methodology using Sharp.
@@ -220,6 +330,7 @@ const utils = module.exports = {
     // We just want the stdout socket to pipeline from
     return dcrawProcess.stdout;
   },
+
   /*
    * Pull some EXIF data from supported files
    */
@@ -239,6 +350,7 @@ const utils = module.exports = {
     }
     return ret;
   },
+
   /*
    * Merge metadata into an object, usually from `album.yml` or `{image_name}.yml` files.
    */
@@ -249,6 +361,7 @@ const utils = module.exports = {
     });
     return dest;
   },
+
   /*
    * Fetch metadata from `album.yml` file in a given path.
    */
@@ -269,6 +382,7 @@ const utils = module.exports = {
     }
     return meta;
   },
+
   /*
    * Return whether a given directory entry is a supported type of image.
    * TODO: do more than look at extension
@@ -279,36 +393,42 @@ const utils = module.exports = {
       utils.isRaw(filePath) ||
       utils.isPng(filePath);
   },
+
   /*
    * Return whether a filename is for a JPEG file
    */
   isJpeg: (filePath) => {
     return !!filePath.match(/(jpeg|jpg)$/i);
   },
+
   /*
    * Return whether a filename is for a HEIC file
    */
   isHeif: (filePath) => {
     return !!filePath.match(/(heif|heic)$/i);
   },
+
   /*
    * Return whether a filename is for a GIF file
    */
   isGif: (filePath) => {
     return !!filePath.match(/(gif)$/i);
   },
+
   /*
    * Return whether a filename is for a PNG file
    */
   isPng: (filePath) => {
     return !!filePath.match(/(png)$/i);
   },
+
   /*
    * Return whether a filename is for a RAW file
    */
   isRaw: (filePath) => {
     return !!filePath.match(/(crw|cr2|dng|arw)$/i);
   },
+
   /*
    * Return whether a given file or directory exists and is readable. Not sure
    * why this isn't just in the fs lib as a boolean function not requiring

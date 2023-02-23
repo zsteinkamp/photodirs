@@ -4,7 +4,7 @@ import { useEffect, Fragment } from "react";
 export default function PhotoElement(props) {
   const data = props.data;
 
-  const parentPath = data.album.path;
+  const parentPath = data.album.uriPath;
   const parentApiPath = data.album.apiPath;
 
   const albumFiles = props.data.album.files;
@@ -14,8 +14,8 @@ export default function PhotoElement(props) {
   console.log({ thisPos, prevPhoto, nextPhoto });
 
   const returnToAlbum = () => { props.browseTo(parentPath, parentApiPath) };
-  const goToPrevPhoto = () => { props.browseTo(prevPhoto.path, prevPhoto.apiPath) };
-  const goToNextPhoto = () => { props.browseTo(nextPhoto.path, nextPhoto.apiPath) };
+  const goToPrevPhoto = () => { props.browseTo(prevPhoto.uriPath, prevPhoto.apiPath) };
+  const goToNextPhoto = () => { props.browseTo(nextPhoto.uriPath, nextPhoto.apiPath) };
   const downloadOriginal = () => { window.location.href=data.photoPath + "?size=orig"; }
 
   const keyCodeToAction = {

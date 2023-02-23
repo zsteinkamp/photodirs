@@ -12,6 +12,7 @@ RUN apt-get install -y \
 		ninja-build \
 		python3-pip \
 		bc \
+		jq \
 		wget
 
 # we need meson for libvips build

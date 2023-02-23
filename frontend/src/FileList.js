@@ -6,7 +6,7 @@ export default function FileList(props) {
   if (props.files && props.files.length > 0) {
     const fileListItems = props.files.map((file) => (
       <div key={file.photoPath}>
-        <button onClick={ ()=> props.browseTo(file.path) }>
+        <button onClick={ ()=> props.browseTo(file.uriPath) }>
           <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
         </button>
         <p>{file.name}</p>
