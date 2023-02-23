@@ -8,7 +8,6 @@ const utils = require('./utils');
 const C = require('./constants');
 
 const scanDirectory = async (dirName) => {
-  console.log('TOP', dirName);
   // do a depth-first traversal so we can build the directory metadata from the bottom up
   const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory());
   for (const dirEnt of subdirs) {
@@ -29,6 +28,7 @@ const scanDirectory = async (dirName) => {
       await utils.getExtendedFileObj(fileObj);
     }
   };
+  console.log('checked/wrote metadatas in', dirName);
 };
 
 /*
@@ -36,29 +36,35 @@ const scanDirectory = async (dirName) => {
  */
 const watch = () => {
   const chokidarDebounce = {};
-  const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', (event, path) => {
-    console.log('WATCH', { event, path });
-    if (chokidarDebounce[path]) {
-      clearTimeout(chokidarDebounce[path]);
+  const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', (event, evtPath) => {
+    console.log('WATCH', { event, evtPath });
+    if (chokidarDebounce[evtPath]) {
+      clearTimeout(chokidarDebounce[evtPath]);
     }
-    chokidarDebounce[path] = setTimeout(async (event, path) => {
+    chokidarDebounce[evtPath] = setTimeout(async (event, evtPath) => {
+      const albumPath = evtPath.replace(/^\/albums/, '');
       if (event === 'add' || event === 'change') {
-        if (utils.isSupportedImageFile(path)) {
-          if (utils.isRaw(path)) {
+        if (utils.isSupportedImageFile(evtPath)) {
+          // update metadata
+          const fileObj = await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
+          utils.getExtendedFileObj(fileObj);
+          console.log('UPDATE METADATA FOR', { evtPath });
+
+          if (utils.isRaw(evtPath)) {
             // convert raw file
-            const cachePath = await utils.jpegFileForRaw(path);
-            console.log('PRE-CONVERT RAW', { path, cachePath });
-            path = cachePath;
+            const cachePath = await utils.jpegFileForRaw(evtPath);
+            console.log('PRE-CONVERT RAW', { evtPath, cachePath });
+            evtPath = cachePath;
           }
 
           // now cache the 400x400 and 1000x1000 size
-          const resized400Path = await utils.getCachedImagePath(path, { height: 400, width: 400 });
-          const resized1000Path = await utils.getCachedImagePath(path, { height: 1000, width: 1000 });
-          console.log('RESIZED', { path, resized400Path, resized1000Path });
+          const resized400Path = await utils.getCachedImagePath(evtPath, { height: 400, width: 400 });
+          const resized1000Path = await utils.getCachedImagePath(evtPath, { height: 1000, width: 1000 });
+          console.log('RESIZED', { evtPath, resized400Path, resized1000Path });
         }
       }
-      delete chokidarDebounce[path];
-    }, 1000, event, path); // last args are passed as args to callback
+      delete chokidarDebounce[evtPath];
+    }, 1000, event, evtPath); // last args are passed as args to callback
   });
   process.on('SIGINT', () => { console.log('SIGINT'); });
   process.on('SIGQUIT', () => { console.log('SIGQUIT'); });

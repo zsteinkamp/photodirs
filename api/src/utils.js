@@ -18,7 +18,7 @@ const utils = module.exports = {
       const metaStat = await fsp.stat(extFileFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, fileObj.path));
       if (metaStat.mtime >= fileStat.mtime) {
-        console.log('RETURN CACHE', extFileFname);
+        //console.log('RETURN CACHE', extFileFname);
         return JSON.parse(await fsp.readFile(extFileFname, { encoding: 'utf8' }));
       }
     }
@@ -40,7 +40,7 @@ const utils = module.exports = {
       const metaStat = await fsp.stat(stdFileFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
       if (metaStat.mtime >= fileStat.mtime) {
-        console.log('RETURN CACHE', stdFileFname);
+        //console.log('RETURN CACHE', stdFileFname);
         return JSON.parse(await fsp.readFile(stdFileFname, { encoding: 'utf8' }));
       }
     }
@@ -72,7 +72,7 @@ const utils = module.exports = {
       const metaStat = await fsp.stat(extAlbumFname);
       const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, extAlbumObj.path));
       if (metaStat.mtime >= dirStat.mtime) {
-        console.log('RETURN CACHE', extAlbumFname);
+        //console.log('RETURN CACHE', extAlbumFname);
         return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
       }
     }
@@ -115,7 +115,7 @@ const utils = module.exports = {
       const metaStat = await fsp.stat(stdAlbumFname);
       const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, dirName));
       if (metaStat.mtime >= dirStat.mtime) {
-        console.log('RETURN CACHE', stdAlbumFname);
+        //console.log('RETURN CACHE', stdAlbumFname);
         return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
       }
     }
