@@ -26,7 +26,7 @@ module.exports = {
   photoGet: async (reqPath, size, crop, res) => {
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
     if (!(await utils.fileExists(filePath))) {
-      return [404, { error: 'directory or file not found' }];
+      return res.status(404).send({ error: 'directory or file not found' });
     }
 
     // File exists so convert/resize/send it

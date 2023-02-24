@@ -33,10 +33,9 @@ app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
 app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
   try {
     // sends the response on its own
-    handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
+    await handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
   } catch (e) {
     console.error(e.message);
-    //return res.status(500).send(e.message);
   }
 });
 

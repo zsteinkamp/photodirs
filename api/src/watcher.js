@@ -27,8 +27,7 @@ const scanDirectory = async (dirName) => {
 
   // write the extended album obj
   await utils.getExtendedAlbumObj(albumObj);
-
-  console.log('checked/wrote metadatas in', dirName);
+  //console.log('checked/wrote metadatas in', dirName);
 };
 
 /*
@@ -46,8 +45,7 @@ const watch = () => {
       if (event === 'add' || event === 'change') {
         if (utils.isSupportedImageFile(evtPath)) {
           // update metadata
-          const fileObj = await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
-          utils.getExtendedFileObj(fileObj);
+          await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
           console.log('UPDATE METADATA FOR', { evtPath });
 
           if (utils.isRaw(evtPath)) {

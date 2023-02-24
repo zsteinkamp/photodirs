@@ -33,7 +33,6 @@ const utils = module.exports = {
     const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
       .filter((dirEnt) => (dirEnt.isFile() && utils.isSupportedImageFile(dirEnt.name)))
       .map((dirEnt) => dirEnt.name);
-    console.log({ dirFiles });
     return dirFiles;
   },
 
@@ -48,6 +47,7 @@ const utils = module.exports = {
    * returns the standard File object
    */
   getFileObj: async (albumPath, fileName) => {
+    //console.log('getFileObj', { albumPath, fileName });
     const stdFileFname = utils.getFileObjMetadataFname(albumPath, fileName);
     if (await utils.fileExists(stdFileFname)) {
       const metaStat = await fsp.stat(stdFileFname);
@@ -72,7 +72,9 @@ const utils = module.exports = {
     fileObj.exif = await utils.getExifForFile(fileObj.path);
 
     // write out the file for next time
+    await fsp.mkdir(path.dirname(stdFileFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdFileFname, JSON.stringify(fileObj));
+    console.info('Write cache file', stdFileFname);
 
     return fileObj;
   },
@@ -81,12 +83,18 @@ const utils = module.exports = {
    * returns the extended album object
    */
   getExtendedAlbumObj: async (extAlbumObj) => {
+    //console.log('getExtendedAlbumObj', { path: extAlbumObj.path });
     const extAlbumFname = path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.extended.json');
     if (await utils.fileExists(extAlbumFname)) {
       const metaStat = await fsp.stat(extAlbumFname);
       const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, extAlbumObj.path));
-      // TODO also look at mtime of subdir album.json
-      if (metaStat.mtime >= dirStat.mtime) {
+      const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
+        .filter((dirEnt) => dirEnt.isDirectory());
+      const subdirAlbumJson = subdirs.map((elem) => path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, elem.name, 'album.json'));
+
+      // return cached if our metadata file is not older than the directory
+      // it's in and not older than any album.json files in subdirectories
+      if (metaStat.mtime >= dirStat.mtime && !(await utils.isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
         //console.log('RETURN CACHE', extAlbumFname);
         return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
       }
@@ -116,7 +124,9 @@ const utils = module.exports = {
     extAlbumObj.files = fileResult;
 
     // write out the file for next time
+    await fsp.mkdir(path.dirname(extAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(extAlbumFname, JSON.stringify(extAlbumObj));
+    console.info('Write cache file', extAlbumFname);
 
     return extAlbumObj;
   },
@@ -125,6 +135,7 @@ const utils = module.exports = {
    * returns the standard album object
    */
   getAlbumObj: async (dirName) => {
+    //console.log('getAlbumObj', { dirName });
     const stdAlbumFname = path.join(C.CACHE_ROOT, 'albums', dirName, 'album.json');
     if (await utils.fileExists(stdAlbumFname)) {
       const metaStat = await fsp.stat(stdAlbumFname);
@@ -135,10 +146,11 @@ const utils = module.exports = {
       const fileObjFnames = supportedFilesBare.map((fName) => utils.getFileObjMetadataFname(dirName, fName));
 
       // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
-      if (metaStat.mtime >= dirStat.mtime && !utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames)) {
+      if (metaStat.mtime >= dirStat.mtime && !(await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
         //console.log('RETURN CACHE', stdAlbumFname);
         return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
       }
+      console.log('HERE1', { msm: metaStat.mtime, sdm: dirStat.mtime, foa: (await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames)) });
     }
     let albumDate = new Date();
     const albumTitle = path.basename(dirName)
@@ -174,7 +186,9 @@ const utils = module.exports = {
     }
 
     // write out the file for next time
+    await fsp.mkdir(path.dirname(stdAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
+    console.info('Write cache file', stdAlbumFname);
 
     return albumObj;
   },
