@@ -180,6 +180,7 @@ The source files are mounted read/write in the frontend and API containers and t
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
-* Breadcrumb nav
-* Prettify UI
-* Pre-generator service. Start with RAW conversion. Then enhance to a fixed set of pre-configured sizes. Perhaps look into statistical analysis of sizes in use and pre-generating those with modes in the distribution.
+* Improve watcher for handle renames and deletes better.
+* Video support
+* Production mode (i.e. build static UI, run without watchers or livereload
+  websocket)
