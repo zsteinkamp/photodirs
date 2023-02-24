@@ -12,16 +12,17 @@ const apiGetAlbum = async (albumPath) => {
 };
 
 const apiGetFile = async (reqPath) => {
-  const albumPath = path.dirname(reqPath);
-  const fileObj = await utils.getFileObj(albumPath, path.basename(reqPath));
-  // adds breadcrumb and exif to payload
-  const extFileObj = await utils.getExtendedFileObj(fileObj);
-  // add album to payload here because the extended album contains the file
-  // list, and that creates an N! situation when files are added
-  const albumObj = await utils.getAlbumObj(extFileObj.albumPath);
-  extFileObj.album = await utils.getExtendedAlbumObj(albumObj);
+  // get the fileObj
+  const fileObj = await utils.getFileObj(path.dirname(reqPath), path.basename(reqPath));
 
-  return [200, extFileObj];
+  // add album to fileObj
+  const albumObj = await utils.getAlbumObj(fileObj.albumPath);
+  fileObj.album = await utils.getExtendedAlbumObj(albumObj);
+
+  // add breadcrumb
+  fileObj.breadcrumb = await utils.getBreadcrumbForPath(fileObj.albumPath);
+
+  return [200, fileObj];
 };
 
 module.exports = {

@@ -12,30 +12,43 @@ const yaml = require('js-yaml');
 const C = require('./constants');
 
 const utils = module.exports = {
-  getExtendedFileObj: async (fileObj) => {
-    const extFileFname = path.join(C.CACHE_ROOT, 'albums', fileObj.path + '.extended.json');
-    if (await utils.fileExists(extFileFname)) {
-      const metaStat = await fsp.stat(extFileFname);
-      const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, fileObj.path));
-      if (metaStat.mtime >= fileStat.mtime) {
-        //console.log('RETURN CACHE', extFileFname);
-        return JSON.parse(await fsp.readFile(extFileFname, { encoding: 'utf8' }));
+  /*
+   * returns whether the given testFile is older than any of the files in compareArr
+   */
+  isFileOlderThanAny: async (testFile, compareArr) => {
+    const testFileMtime = (await fsp.stat(testFile)).mtime;
+    for (const compareFile of compareArr) {
+      if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
+        return true;
       }
     }
-    fileObj.breadcrumb = await utils.getBreadcrumbForPath(fileObj.albumPath);
-    fileObj.exif = await utils.getExifForFile(fileObj.path);
-
-    // write out the file for next time
-    await fsp.writeFile(extFileFname, JSON.stringify(fileObj));
-
-    return fileObj;
+    return false;
   },
+
+  /*
+   * return a list of filenames of supported files in the given dirName
+   */
+  getSupportedFiles: async (dirName) => {
+    const albumDir = path.join(C.ALBUMS_ROOT, dirName);
+    const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
+      .filter((dirEnt) => (dirEnt.isFile() && utils.isSupportedImageFile(dirEnt.name)))
+      .map((dirEnt) => dirEnt.name);
+    console.log({ dirFiles });
+    return dirFiles;
+  },
+
+  /*
+   * returns the cache path for a given file's metadata
+   */
+  getFileObjMetadataFname: (albumPath, fileName) => {
+    return path.join(C.CACHE_ROOT, 'albums', albumPath, fileName + '.json');
+  },
+
   /*
    * returns the standard File object
    */
   getFileObj: async (albumPath, fileName) => {
-    const stdFileFname = path.join(C.CACHE_ROOT, 'albums', albumPath, fileName + '.json');
-
+    const stdFileFname = utils.getFileObjMetadataFname(albumPath, fileName);
     if (await utils.fileExists(stdFileFname)) {
       const metaStat = await fsp.stat(stdFileFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
@@ -56,6 +69,7 @@ const utils = module.exports = {
       photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
     };
+    fileObj.exif = await utils.getExifForFile(fileObj.path);
 
     // write out the file for next time
     await fsp.writeFile(stdFileFname, JSON.stringify(fileObj));
@@ -71,6 +85,7 @@ const utils = module.exports = {
     if (await utils.fileExists(extAlbumFname)) {
       const metaStat = await fsp.stat(extAlbumFname);
       const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, extAlbumObj.path));
+      // TODO also look at mtime of subdir album.json
       if (metaStat.mtime >= dirStat.mtime) {
         //console.log('RETURN CACHE', extAlbumFname);
         return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
@@ -114,7 +129,13 @@ const utils = module.exports = {
     if (await utils.fileExists(stdAlbumFname)) {
       const metaStat = await fsp.stat(stdAlbumFname);
       const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, dirName));
-      if (metaStat.mtime >= dirStat.mtime) {
+
+      // get the path in the `/cache` directory of the supported file metadatas
+      const supportedFilesBare = await utils.getSupportedFiles(dirName);
+      const fileObjFnames = supportedFilesBare.map((fName) => utils.getFileObjMetadataFname(dirName, fName));
+
+      // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
+      if (metaStat.mtime >= dirStat.mtime && !utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames)) {
         //console.log('RETURN CACHE', stdAlbumFname);
         return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
       }

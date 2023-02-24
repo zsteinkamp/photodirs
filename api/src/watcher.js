@@ -13,21 +13,21 @@ const scanDirectory = async (dirName) => {
   for (const dirEnt of subdirs) {
     await scanDirectory(path.join(dirName, dirEnt.name));
   }
+  // get the list of supported files in this directory
+  const dirFiles = await utils.getSupportedFiles(dirName);
+
+  // first write the file objs
+  for (const fName of dirFiles) {
+    // this method will also write out the result in cache
+    await utils.getFileObj(dirName, fName);
+  }
+
   // write the standard album obj
   const albumObj = await utils.getAlbumObj(dirName);
+
   // write the extended album obj
   await utils.getExtendedAlbumObj(albumObj);
 
-  const dirFiles = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
-    .filter((dirEnt) => dirEnt.isFile());
-  for (const dirEnt of dirFiles) {
-    if (utils.isSupportedImageFile(dirEnt.name)) {
-      // this method will also write out the result in cache
-      const fileObj = await utils.getFileObj(dirName, dirEnt.name);
-      // this method will also write out the result in cache
-      await utils.getExtendedFileObj(fileObj);
-    }
-  };
   console.log('checked/wrote metadatas in', dirName);
 };
 
