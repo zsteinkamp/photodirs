@@ -41,12 +41,37 @@ const watch = () => {
       clearTimeout(chokidarDebounce[evtPath]);
     }
     chokidarDebounce[evtPath] = setTimeout(async (event, evtPath) => {
-      const albumPath = evtPath.replace(/^\/albums/, '');
-      if (event === 'add' || event === 'change') {
+      const albumPath = evtPath.substr(C.ALBUMS_ROOT.length);
+      if (event === 'unlinkDir') {
+        // directory removed -- so just nuke it in cache then rebuild the parent
+        await fsp.rm(path.join(C.CACHE_ROOT, 'albums', albumPath), { recursive: true, force: true });
+        // write out album metadata for the parent dir
+        const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
+        await utils.getExtendedAlbumObj(albumObj);
+      } else if (event === 'unlink') {
         if (utils.isSupportedImageFile(evtPath)) {
-          // update metadata
+          // make sure the cache file still exists (may be deleted already if the dir was removed)
+          if (!(await utils.fileExists(path.join(C.CACHE_ROOT, 'albums', albumPath)))) {
+            console.log('Ignoring ... cache file already removed');
+            return;
+          }
+          // clean up cache files and resizers
+          await utils.cleanUpCacheFor(albumPath);
+          // update album metadata
+          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
+          // write the extended album obj
+          await utils.getExtendedAlbumObj(albumObj);
+        }
+      } else if (event === 'add' || event === 'change') {
+        if (utils.isSupportedImageFile(evtPath)) {
+          // update file metadata
           await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
           console.log('UPDATE METADATA FOR', { evtPath });
+
+          // update album metadata
+          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
+          // write the extended album obj
+          await utils.getExtendedAlbumObj(albumObj);
 
           if (utils.isRaw(evtPath)) {
             // convert raw file

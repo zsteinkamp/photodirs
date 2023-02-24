@@ -13,6 +13,7 @@ RUN apt-get install -y \
 		python3-pip \
 		bc \
 		jq \
+		less \
 		wget
 
 # we need meson for libvips build
@@ -62,5 +63,9 @@ RUN npm ci
 ## HACK to get sharp/VIPS to work for HEIF support
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ## END HACK
+
+# ergonomics
+RUN echo "alias ll='ls -la'" >> /root/.bashrc
+RUN echo "alias ..='cd ..'" >> /root/.bashrc
 
 CMD [ "/app/start.sh" ]

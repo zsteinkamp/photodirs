@@ -1,6 +1,7 @@
 'use strict';
 
 const exifReader = require('exifreader');
+const glob = require('glob');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
@@ -12,6 +13,22 @@ const yaml = require('js-yaml');
 const C = require('./constants');
 
 const utils = module.exports = {
+  /*
+   * given a path to something in `/albums` dir, clean up files in the `/cache` dir
+   */
+  cleanUpCacheFor: async (albumPath) => {
+    const files = await (new Promise((resolve, reject) => {
+      glob(path.join(C.CACHE_ROOT, 'albums', `${albumPath}*`), (err, files) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(files);
+        }
+      });
+    }));
+    await Promise.all(files.map((file) => fsp.rm(file)));
+    console.log('Deleted cache files', { files });
+  },
   /*
    * returns whether the given testFile is older than any of the files in compareArr
    */

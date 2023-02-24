@@ -18,6 +18,7 @@
     "chokidar": "^3.5.3",
     "exifreader": "^4.9.1",
     "express": "^4.18.2",
+    "glob": "^8.1.0",
     "js-yaml": "^4.1.0",
     "mocha": "^9.1.3",
     "nodemon": "^2.0.14",
