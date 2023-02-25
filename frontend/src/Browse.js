@@ -1,6 +1,6 @@
 import './Browse.css';
 
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -8,6 +8,9 @@ import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
 import FileList from "./FileList";
 import PhotoElement from "./PhotoElement";
+
+var utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 
 export default function Browse() {
   const makeApiPath = (path) => {
@@ -70,7 +73,7 @@ export default function Browse() {
     if (data.type === 'album') {
       return (
         <div className="album">
-          { data.path !== "/" ? (<p className="date">{ moment(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
+          { data.path !== "/" ? (<p className="date">{ dayjs(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
           <p className="desc">{ data.description }</p>
           <AlbumList browseTo={ browseTo } albums={ data.albums } />
           <FileList browseTo={ browseTo } files={ data.files } />

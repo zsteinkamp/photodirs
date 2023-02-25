@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18 AS dev
 
 RUN apt-get update && apt-get install -y dcraw
 
@@ -68,4 +68,10 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 RUN echo "alias ll='ls -la'" >> /root/.bashrc
 RUN echo "alias ..='cd ..'" >> /root/.bashrc
 
-CMD [ "/app/start.sh" ]
+CMD [ "npm", "run", "watch:dev" ]
+
+## PRODUCTION BUILD BELOW
+FROM dev AS prod
+ENV NODE_ENV=production
+COPY ./src/ ./src/
+CMD [ "npm", "run", "start" ]

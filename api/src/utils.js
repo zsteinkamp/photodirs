@@ -396,6 +396,7 @@ const utils = module.exports = {
 
       async function plumbing() {
         await pipeline(readStream, transform, outStream);
+        console.log('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath });
       }
       await plumbing().catch(async (err) => {
         console.error('IMG CACHE PIPELINE ERROR', err.message);
@@ -430,9 +431,10 @@ const utils = module.exports = {
 
     async function plumbing() {
       await pipeline(tiffPipe, transform, outStream);
+      console.log('JPEG_FILE_FOR_RAW:WROTE_JPG', { filePath, cachePath });
     }
     await plumbing().catch(async (err) => {
-      console.error('RAW CONVERT PIPELINE ERROR', err.message);
+      console.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', { err });
       // make sure we don't leave a zero-length file
       await fsp.rm(cachePath, { force: true });
       return null;

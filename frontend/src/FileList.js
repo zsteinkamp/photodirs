@@ -5,7 +5,7 @@ export default function FileList(props) {
 
   if (props.files && props.files.length > 0) {
     const fileListItems = props.files.map((file) => {
-      console.log(file.photoPath);
+      //console.log(file.photoPath);
       return (
         <div key={ file.apiPath }>
           <button onClick={ ()=> props.browseTo(file.uriPath) }>
