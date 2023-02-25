@@ -43,7 +43,7 @@ export default function PhotoElement(props) {
 
   return (
     <div className="PhotoElement">
-      <img src={ data.photoPath + "?size=1000x1000" } alt={ data.title } />
+      <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
       <p className="title">{ data.title }</p>
       <div className="exif">
         <dl>
