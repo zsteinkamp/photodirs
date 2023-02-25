@@ -14,29 +14,39 @@ const C = require('./constants');
 
 const utils = module.exports = {
   /*
-   * given a path to something in `/albums` dir, clean up files in the `/cache` dir
+   * promisify glob
    */
-  cleanUpCacheFor: async (albumPath) => {
-    const files = await (new Promise((resolve, reject) => {
-      glob(path.join(C.CACHE_ROOT, 'albums', `${albumPath}*`), (err, files) => {
+  globPromise: async (pattern) => {
+    return new Promise((resolve, reject) => {
+      glob(pattern, (err, files) => {
         if (err) {
           reject(err);
         } else {
           resolve(files);
         }
       });
-    }));
+    });
+  },
+
+  /*
+   * given a path to something in `/albums` dir, clean up files in the `/cache` dir
+   */
+  cleanUpCacheFor: async (albumPath) => {
+    const files = await (utils.globPromise(path.join(C.CACHE_ROOT, 'albums', `${albumPath}*`)));
     await Promise.all(files.map((file) => fsp.rm(file)));
     console.log('Deleted cache files', { files });
   },
+
   /*
    * returns whether the given testFile is older than any of the files in compareArr
    */
   isFileOlderThanAny: async (testFile, compareArr) => {
-    const testFileMtime = (await fsp.stat(testFile)).mtime;
-    for (const compareFile of compareArr) {
-      if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
-        return true;
+    if (await utils.fileExists(testFile)) {
+      const testFileMtime = (await fsp.stat(testFile)).mtime;
+      for (const compareFile of compareArr) {
+        if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
+          return true;
+        }
       }
     }
     return false;
@@ -50,6 +60,7 @@ const utils = module.exports = {
     const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
       .filter((dirEnt) => (dirEnt.isFile() && utils.isSupportedImageFile(dirEnt.name)))
       .map((dirEnt) => dirEnt.name);
+    //console.log('getSupportedFiles', { dirName, dirFiles });
     return dirFiles;
   },
 
@@ -91,7 +102,7 @@ const utils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdFileFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdFileFname, JSON.stringify(fileObj));
-    console.info('Write cache file', stdFileFname);
+    console.info('Wrote cache file', stdFileFname);
 
     return fileObj;
   },
@@ -103,24 +114,29 @@ const utils = module.exports = {
     //console.log('getExtendedAlbumObj', { path: extAlbumObj.path });
     const extAlbumFname = path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.extended.json');
     if (await utils.fileExists(extAlbumFname)) {
-      const metaStat = await fsp.stat(extAlbumFname);
-      const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, extAlbumObj.path));
       const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
         .filter((dirEnt) => dirEnt.isDirectory());
       const subdirAlbumJson = subdirs.map((elem) => path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, elem.name, 'album.json'));
 
       // return cached if our metadata file is not older than the directory
       // it's in and not older than any album.json files in subdirectories
-      if (metaStat.mtime >= dirStat.mtime && !(await utils.isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
+      if (!(await utils.isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
         //console.log('RETURN CACHE', extAlbumFname);
         return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
       }
     }
     const dirs = [];
     const files = [];
-    (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true })).forEach((dirEnt) => {
+    const albumPath = path.join(C.ALBUMS_ROOT, extAlbumObj.path);
+    (await fsp.readdir(albumPath, { withFileTypes: true })).forEach(async (dirEnt) => {
+      //console.log('ZZZZZZZZZ', { dirEnt });
       if (dirEnt.isDirectory()) {
-        dirs.push(dirEnt);
+        // ensure the directory isn't empty
+        const supportedFiles = await utils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
+        //console.log('SUPPORTED FILES', { path: extAlbumObj.path, supportedFiles });
+        if (supportedFiles.length > 0) {
+          dirs.push(dirEnt);
+        }
       } else if (dirEnt.isFile()) {
         if (utils.isSupportedImageFile(dirEnt.name)) {
           files.push(dirEnt);
@@ -143,7 +159,7 @@ const utils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(extAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(extAlbumFname, JSON.stringify(extAlbumObj));
-    console.info('Write cache file', extAlbumFname);
+    console.info('Wrote cache file', extAlbumFname);
 
     return extAlbumObj;
   },
@@ -155,36 +171,27 @@ const utils = module.exports = {
     //console.log('getAlbumObj', { dirName });
     const stdAlbumFname = path.join(C.CACHE_ROOT, 'albums', dirName, 'album.json');
     if (await utils.fileExists(stdAlbumFname)) {
-      const metaStat = await fsp.stat(stdAlbumFname);
-      const dirStat = await fsp.stat(path.join(C.ALBUMS_ROOT, dirName));
-
       // get the path in the `/cache` directory of the supported file metadatas
       const supportedFilesBare = await utils.getSupportedFiles(dirName);
       const fileObjFnames = supportedFilesBare.map((fName) => utils.getFileObjMetadataFname(dirName, fName));
 
       // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
-      if (metaStat.mtime >= dirStat.mtime && !(await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
+      if (!(await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
         //console.log('RETURN CACHE', stdAlbumFname);
         return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
       }
-      console.log('HERE1', { msm: metaStat.mtime, sdm: dirStat.mtime, foa: (await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames)) });
     }
-    let albumDate = new Date();
+
+    // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
+    const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
     const albumTitle = path.basename(dirName)
       .replace(/^\//, '')
       .replace(/_/g, ' ')
       .replace(/^\d{4}-\d{2}-\d{2}/, '')
       .trim();
-    const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
-    if (matches) {
-      albumDate = new Date(matches[0]);
-    }
-    // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
-    const uriPath = dirName.split('/').map(encodeURIComponent).join('/');
     const albumObj = {
       type: C.TYPE_ALBUM,
       title: albumTitle,
-      date: albumDate.toISOString(),
       path: path.join('/', dirName),
       uriPath: path.join('/', uriPath),
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriPath),
@@ -193,6 +200,40 @@ const utils = module.exports = {
 
     // Merge meta with album object
     await utils.fetchAndMergeMeta(albumObj, dirName);
+
+    // now divine the date if it was not set in the album.yml file
+    if (!albumObj.date) {
+      // let's try to come up with a date
+      // 1) If the directory name has a date
+      const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
+      if (matches) {
+        albumObj.date = new Date(matches[0]).toISOString();
+      }
+      if (!albumObj.date) {
+        // 2) Next get the exif data for files inside and use the oldest
+        let leastDate = null;
+        const exifPromises = (await utils.getSupportedFiles(dirName)).map((fName) => utils.getExifForFile(path.join(C.ALBUMS_ROOT, dirName, fName)));
+        const exifArr = await Promise.all(exifPromises);
+        console.log({ dirName, exifArr });
+        for (const exif of exifArr) {
+          if (exif.DateTime) {
+            const exifDate = new Date(exif.DateTime);
+            if (!leastDate || exifDate < leastDate) {
+              leastDate = exifDate;
+            }
+          }
+        }
+        if (leastDate) {
+          // 3) it got set to something
+          albumObj.date = leastDate.toISOString();
+        }
+      }
+    }
+
+    if (!albumObj.date) {
+      // gotta put something, so put today
+      albumObj.date = (new Date()).toISOString();
+    }
 
     if (albumObj.thumbnail) {
       // fixup with directory name
@@ -205,7 +246,7 @@ const utils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
-    console.info('Write cache file', stdAlbumFname);
+    console.info('Wrote cache file', stdAlbumFname);
 
     return albumObj;
   },
@@ -298,7 +339,7 @@ const utils = module.exports = {
     // First look for cached file that is close to the size we want
     const [cacheWidth, cacheHeight] = utils.getCachedImageSizes(resizeOptions);
 
-    const cachePath = utils.makeCachePath(filePath, cacheWidth, cacheHeight);
+    const cachePath = utils.makeResizeCachePath(filePath, cacheWidth, cacheHeight);
 
     if (!(await utils.fileExists(cachePath))) {
       // Now cache the intermediate size
@@ -325,6 +366,7 @@ const utils = module.exports = {
    */
   jpegFileForRaw: async (filePath) => {
     const cachePath = path.join(C.CACHE_ROOT, filePath + '.jpg');
+    console.log('jpegFileForRaw', { filePath, cachePath });
     if (await utils.fileExists(cachePath)) {
       // Return existing jpg
       return cachePath;
@@ -351,9 +393,19 @@ const utils = module.exports = {
   },
 
   /*
+   * Generate standard resizes
+   */
+  preResize: async (absFname) => {
+    return Promise.all([
+      utils.getCachedImagePath(absFname, { height: 400, width: 400 }),
+      utils.getCachedImagePath(absFname, { height: 1600, width: 1600 })
+    ]);
+  },
+
+  /*
    * Return the cache path for a given file and size
    */
-  makeCachePath: (filePath, height, width) => {
+  makeResizeCachePath: (filePath, height, width) => {
     if (!filePath.startsWith(C.CACHE_ROOT)) {
       // If this was a raw conversion, the filePath with already have the
       // CACHE_ROOT, so we need to protect against making it

@@ -10,24 +10,27 @@ const C = require('./constants');
 const scanDirectory = async (dirName) => {
   // do a depth-first traversal so we can build the directory metadata from the bottom up
   const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory());
-  for (const dirEnt of subdirs) {
-    await scanDirectory(path.join(dirName, dirEnt.name));
-  }
+  // recurse into subdirs before continuing
+  await Promise.all(subdirs.map((dirEnt) => scanDirectory(path.join(dirName, dirEnt.name))));
+
   // get the list of supported files in this directory
   const dirFiles = await utils.getSupportedFiles(dirName);
 
   // first write the file objs
-  for (const fName of dirFiles) {
-    // this method will also write out the result in cache
-    await utils.getFileObj(dirName, fName);
-  }
+  await Promise.all(dirFiles.map((fName) => utils.getFileObj(dirName, fName)));
+
+  // now cache the 400x400 and 1000x1000 size
+  await Promise.all(dirFiles.map(async (fName) => {
+    const absFname = path.join('/albums', dirName, fName);
+    await utils.preResize(absFname);
+  }));
 
   // write the standard album obj
   const albumObj = await utils.getAlbumObj(dirName);
 
   // write the extended album obj
   await utils.getExtendedAlbumObj(albumObj);
-  //console.log('checked/wrote metadatas in', dirName);
+  console.log('checked/wrote metadatas in', dirName);
 };
 
 /*
@@ -41,6 +44,7 @@ const watch = () => {
       clearTimeout(chokidarDebounce[evtPath]);
     }
     chokidarDebounce[evtPath] = setTimeout(async (event, evtPath) => {
+      // remove `/albums` from evtPath
       const albumPath = evtPath.substr(C.ALBUMS_ROOT.length);
       if (event === 'unlinkDir') {
         // directory removed -- so just nuke it in cache then rebuild the parent
@@ -68,10 +72,25 @@ const watch = () => {
           await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
           console.log('UPDATE METADATA FOR', { evtPath });
 
-          // update album metadata
-          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
-          // write the extended album obj
-          await utils.getExtendedAlbumObj(albumObj);
+          // TODO THIS NEEDS FIXING ...
+          // test case:
+          // - create a new empty subdir
+          //    - should not show up in listing
+          // - add a new file to the subdir
+          //    - now should show up as sub-album
+          let albumDir = albumPath;
+
+          // walk up the album tree to update metadata
+          do {
+            albumDir = path.dirname(albumDir);
+            console.log('WALKER TOP', { albumDir });
+            // update album metadata
+            const albumObj = await utils.getAlbumObj(albumDir);
+            // write the extended album obj
+            await utils.getExtendedAlbumObj(albumObj);
+            console.log('WALKER UPDATE METADATA FOR', { albumDir });
+            // chop off the last part of the path
+          } while (albumDir !== '/');
 
           if (utils.isRaw(evtPath)) {
             // convert raw file
@@ -80,10 +99,7 @@ const watch = () => {
             evtPath = cachePath;
           }
 
-          // now cache the 400x400 and 1000x1000 size
-          const resized400Path = await utils.getCachedImagePath(evtPath, { height: 400, width: 400 });
-          const resized1000Path = await utils.getCachedImagePath(evtPath, { height: 1000, width: 1000 });
-          console.log('RESIZED', { evtPath, resized400Path, resized1000Path });
+          await utils.preResize(evtPath);
         }
       }
       delete chokidarDebounce[evtPath];

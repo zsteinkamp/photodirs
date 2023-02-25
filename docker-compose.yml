@@ -28,7 +28,7 @@ services:
     volumes:
       - ./api:/app
       - api_node_modules:/app/node_modules
-      - ./api/test-images:/albums
+      - ./api/test-images:/albums:ro
       - cache:/cache
 
 volumes:
