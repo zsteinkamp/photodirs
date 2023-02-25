@@ -51,6 +51,7 @@ const watch = () => {
     }
     chokidarDebounce = setTimeout(async () => {
       await scanDirectory('/');
+      console.log('SCAN COMPLETE');
       chokidarDebounce = null;
     }, 2000);
   });
@@ -67,7 +68,8 @@ const watcher = module.exports = {
     watcher.deepScan().then(watch);
   },
   deepScan: async () => {
-    console.log('DEEP SCAN METHOD');
+    console.log('STARTING UP ... INITIAL SCAN');
     await scanDirectory('/');
+    console.log('SCAN COMPLETE');
   }
 };
