@@ -19,6 +19,7 @@ const scanDirectory = async (dirName) => {
   // first write the file objs
   await Promise.all(dirFiles.map((fName) => utils.getFileObj(dirName, fName)));
 
+  // TODO: look at all promise.all and do it in batches with the new util function
   // now cache the 400x400 and 1000x1000 size
   await Promise.all(dirFiles.map(async (fName) => {
     let absFname = path.join('/albums', dirName, fName);
@@ -44,8 +45,20 @@ const scanDirectory = async (dirName) => {
  */
 const watch = () => {
   let chokidarDebounce = null;
-  const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', (event, evtPath) => {
+  const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', async (event, evtPath) => {
     console.log('WATCHER ACTIVITY', { event, evtPath });
+
+    const albumPath = path.dirname(evtPath).substr(C.ALBUMS_ROOT.length);
+    // clean up cache on directory and file deletions
+    if (event === 'unlinkDir') {
+      // directory removed -- so just nuke it in cache then rebuild the parent
+      await fsp.rm(path.join(C.CACHE_ROOT, 'albums', albumPath), { recursive: true, force: true });
+    } else if (event === 'unlink') {
+      if (utils.isSupportedImageFile(evtPath)) {
+        await utils.cleanUpCacheFor(albumPath);
+      }
+    }
+
     if (chokidarDebounce) {
       clearTimeout(chokidarDebounce);
     }
