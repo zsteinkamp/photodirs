@@ -21,7 +21,13 @@ const scanDirectory = async (dirName) => {
 
   // now cache the 400x400 and 1000x1000 size
   await Promise.all(dirFiles.map(async (fName) => {
-    const absFname = path.join('/albums', dirName, fName);
+    let absFname = path.join('/albums', dirName, fName);
+    if (utils.isRaw(absFname)) {
+      // convert raw file
+      const cachePath = await utils.jpegFileForRaw(absFname);
+      console.log('PRE-CONVERT RAW', { absFname, cachePath });
+      absFname = cachePath;
+    }
     await utils.preResize(absFname);
   }));
 
@@ -34,89 +40,20 @@ const scanDirectory = async (dirName) => {
 };
 
 /*
- * Set up album directory watcher. Currently pre-generates jpegs from raw files.
+ * Set up album directory watcher. Wait for 2 seconds of calm after activity to rescan.
  */
 const watch = () => {
-  const chokidarDebounce = {};
+  let chokidarDebounce = null;
   const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', (event, evtPath) => {
-    console.log('WATCH', { event, evtPath });
-    if (chokidarDebounce[evtPath]) {
-      clearTimeout(chokidarDebounce[evtPath]);
+    console.log('WATCHER ACTIVITY', { event, evtPath });
+    if (chokidarDebounce) {
+      clearTimeout(chokidarDebounce);
     }
-    chokidarDebounce[evtPath] = setTimeout(async (event, evtPath) => {
-      // remove `/albums` from evtPath
-      const albumPath = evtPath.substr(C.ALBUMS_ROOT.length);
-      if (event === 'unlinkDir') {
-        // directory removed -- so just nuke it in cache then rebuild the parent
-        await fsp.rm(path.join(C.CACHE_ROOT, 'albums', albumPath), { recursive: true, force: true });
-        // write out album metadata for the parent dir
-        const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
-        await utils.getExtendedAlbumObj(albumObj);
-      } else if (event === 'unlink') {
-        if (utils.isSupportedImageFile(evtPath)) {
-          // make sure the cache file still exists (may be deleted already if the dir was removed)
-          if (!(await utils.fileExists(path.join(C.CACHE_ROOT, 'albums', albumPath)))) {
-            console.log('Ignoring ... cache file already removed');
-            return;
-          }
-          // clean up cache files and resizers
-          await utils.cleanUpCacheFor(albumPath);
-          // update album metadata
-          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
-          // write the extended album obj
-          await utils.getExtendedAlbumObj(albumObj);
-        }
-      } else if (event === 'add' || event === 'change') {
-        if (utils.isSupportedImageFile(evtPath)) {
-          // update file metadata
-          await utils.getFileObj(path.dirname(albumPath), path.basename(albumPath));
-          console.log('UPDATE METADATA FOR', { evtPath });
-
-          // TODO THIS NEEDS FIXING ...
-          // test case:
-          // - create a new empty subdir
-          //    - should not show up in listing
-          // - add a new file to the subdir
-          //    - now should show up as sub-album
-          let albumDir = albumPath;
-
-          // walk up the album tree to update metadata
-          do {
-            albumDir = path.dirname(albumDir);
-            console.log('WALKER TOP', { albumDir });
-            // update album metadata
-            const albumObj = await utils.getAlbumObj(albumDir);
-            // write the extended album obj
-            await utils.getExtendedAlbumObj(albumObj);
-            console.log('WALKER UPDATE METADATA FOR', { albumDir });
-            // chop off the last part of the path
-          } while (albumDir !== '/');
-
-          if (utils.isRaw(evtPath)) {
-            // convert raw file
-            const cachePath = await utils.jpegFileForRaw(evtPath);
-            console.log('PRE-CONVERT RAW', { evtPath, cachePath });
-            evtPath = cachePath;
-          }
-
-          await utils.preResize(evtPath);
-        } else if (evtPath.match(/\/album.yml$/)) {
-          console.log('ALBUM.YML UPDATE', { evtPath, albumPath });
-          // write out album metadata for the current dir
-          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
-          await utils.getExtendedAlbumObj(albumObj);
-          if (albumPath !== '/') {
-            // write out album metadata for the parent dir
-            const parentAlbumObj = await utils.getAlbumObj(path.dirname(albumObj.path));
-            await utils.getExtendedAlbumObj(parentAlbumObj);
-          }
-        }
-      }
-      delete chokidarDebounce[evtPath];
-    }, 1000, event, evtPath); // last args are passed as args to callback
+    chokidarDebounce = setTimeout(async () => {
+      await scanDirectory('/');
+      chokidarDebounce = null;
+    }, 2000);
   });
-  process.on('SIGINT', () => { console.log('SIGINT'); });
-  process.on('SIGQUIT', () => { console.log('SIGQUIT'); });
   process.on('SIGTERM', (sig) => {
     console.log('SIGTERM STOPPING WATCHER', sig);
     watcher.close();
