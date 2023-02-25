@@ -100,6 +100,16 @@ const watch = () => {
           }
 
           await utils.preResize(evtPath);
+        } else if (evtPath.match(/\/album.yml$/)) {
+          console.log('ALBUM.YML UPDATE', { evtPath, albumPath });
+          // write out album metadata for the current dir
+          const albumObj = await utils.getAlbumObj(path.dirname(albumPath));
+          await utils.getExtendedAlbumObj(albumObj);
+          if (albumPath !== '/') {
+            // write out album metadata for the parent dir
+            const parentAlbumObj = await utils.getAlbumObj(path.dirname(albumObj.path));
+            await utils.getExtendedAlbumObj(parentAlbumObj);
+          }
         }
       }
       delete chokidarDebounce[evtPath];

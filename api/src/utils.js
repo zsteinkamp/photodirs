@@ -44,8 +44,10 @@ const utils = module.exports = {
     if (await utils.fileExists(testFile)) {
       const testFileMtime = (await fsp.stat(testFile)).mtime;
       for (const compareFile of compareArr) {
-        if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
-          return true;
+        if (await utils.fileExists(compareFile)) {
+          if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
+            return true;
+          }
         }
       }
     }
@@ -149,6 +151,12 @@ const utils = module.exports = {
     // TODO: Pagination / caching this metadata
     const albumPromises = dirs.map((dir) => utils.getAlbumObj(path.join('/', extAlbumObj.path, dir.name)));
     const albumResult = await Promise.all(albumPromises);
+
+    // Sort albums in descending date order
+    albumResult.sort((a, b) => {
+      // b-a for descending order
+      return (new Date(b.date)) - (new Date(a.date));
+    });
     extAlbumObj.albums = albumResult;
 
     // TODO: metadata caching and/or pagination
@@ -174,6 +182,8 @@ const utils = module.exports = {
       // get the path in the `/cache` directory of the supported file metadatas
       const supportedFilesBare = await utils.getSupportedFiles(dirName);
       const fileObjFnames = supportedFilesBare.map((fName) => utils.getFileObjMetadataFname(dirName, fName));
+      // make sure we also compare with the album.yml file in the album dir
+      fileObjFnames.push(path.join(C.ALBUMS_ROOT, dirName, 'album.yml'));
 
       // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
       if (!(await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
@@ -336,6 +346,7 @@ const utils = module.exports = {
    * not found, then create it and return the filename.
    */
   getCachedImagePath: async (filePath, resizeOptions) => {
+    //console.log('GetCachedImagePath', { filePath, resizeOptions });
     // First look for cached file that is close to the size we want
     const [cacheWidth, cacheHeight] = utils.getCachedImageSizes(resizeOptions);
 
