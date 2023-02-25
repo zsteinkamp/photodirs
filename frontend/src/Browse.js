@@ -34,8 +34,9 @@ export default function Browse() {
       try {
         const response = await fetch(apiPath);
         if (!response.ok) {
+          const body = await response.json();
           throw new Error(
-            `HTTP error ${response.status}: ${response.body}`
+            `HTTP error ${response.status}: ${JSON.stringify(body)}`
           );
         }
         let actualData = await response.json();
@@ -51,38 +52,49 @@ export default function Browse() {
     getData();
   }, [apiPath])
 
-  if (loading) {
-    return (<div>Loading...</div>);
-  }
+  const getPageBody = (loading, error, browseTo, data) => {
+    if (loading) {
+      return (<div className="loading">Loading...</div>);
+    }
 
-  if (error) {
-    return (<div>{`There is a problem fetching the data - ${error}`}</div>);
-  }
+    if (error) {
+      return (<div className="error">{`There is a problem fetching the data - ${error}`}</div>);
+    }
 
-  let pageBody = (<div>Hmm not sure</div>);
+    if (data.type === 'photo') {
+      return (
+        <PhotoElement browseTo={ browseTo } data={ data } />
+      );
+    }
 
-  if (data.type === 'photo') {
-    pageBody = (
-      <PhotoElement browseTo={ browseTo } data={ data } />
+    if (data.type === 'album') {
+      return (
+        <div className="album">
+          { data.path !== "/" ? (<p className="date">{ moment(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
+          <p className="desc">{ data.description }</p>
+          <AlbumList browseTo={ browseTo } albums={ data.albums } />
+          <FileList browseTo={ browseTo } files={ data.files } />
+        </div>
+      );
+    }
+
+    return (
+      <div className="error">Unknown type <pre>{ data.type }</pre>.</div>
     );
-  } else if (data.type === 'album') {
-    pageBody = (
-      <div className="album">
-        { data.path !== "/" ? (<p className="date">{ moment(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
-        <p className="desc">{ data.description }</p>
-        <AlbumList browseTo={ browseTo } albums={ data.albums } />
-        <FileList browseTo={ browseTo } files={ data.files } />
-      </div>
-    );
-  }
+  };
+
+  const errorBreadcrumb = [
+    { title: "Home", path: "/", apiPath: "/api/albums/" },
+    { title: "Error", path: "/", apiPath: "/api/albums/" }
+  ];
 
   return (
     <div className="Browse">
       <header>
-        <Breadcrumb browseTo={ browseTo } crumbs={ data.breadcrumb } />
+        <Breadcrumb browseTo={ browseTo } crumbs={ data ? data.breadcrumb : errorBreadcrumb } />
       </header>
       <div className="pageBody">
-        { pageBody }
+        { getPageBody(loading, error, browseTo, data) }
       </div>
       <footer>
         <div>

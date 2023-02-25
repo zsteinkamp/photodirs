@@ -33,7 +33,7 @@ const utils = module.exports = {
    */
   cleanUpCacheFor: async (albumPath) => {
     const files = await (utils.globPromise(path.join(C.CACHE_ROOT, 'albums', `${albumPath}*`)));
-    await Promise.all(files.map((file) => fsp.rm(file)));
+    await Promise.all(files.map((file) => fsp.rm(file, { force: true })));
     console.log('Deleted cache files', { files });
   },
 
