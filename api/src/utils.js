@@ -99,7 +99,6 @@ const utils = module.exports = {
       photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
     };
-    fileObj.exif = await utils.getExifForFile(fileObj.path);
 
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdFileFname), { recursive: true, mode: 755 });
@@ -119,6 +118,8 @@ const utils = module.exports = {
       const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
         .filter((dirEnt) => dirEnt.isDirectory());
       const subdirAlbumJson = subdirs.map((elem) => path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, elem.name, 'album.json'));
+      // make sure to check the local `album.json` too
+      subdirAlbumJson.push(path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.json'));
 
       // return cached if our metadata file is not older than the directory
       // it's in and not older than any album.json files in subdirectories
@@ -199,7 +200,7 @@ const utils = module.exports = {
       .replace(/_/g, ' ')
       .replace(/^\d{4}-\d{2}-\d{2}/, '')
       .trim();
-    const albumObj = {
+    let albumObj = {
       type: C.TYPE_ALBUM,
       title: albumTitle,
       path: path.join('/', dirName),
@@ -209,7 +210,7 @@ const utils = module.exports = {
     };
 
     // Merge meta with album object
-    await utils.fetchAndMergeMeta(albumObj, dirName);
+    albumObj = await utils.fetchAndMergeMeta(albumObj, dirName);
 
     // now divine the date if it was not set in the album.yml file
     if (!albumObj.date) {
@@ -474,6 +475,7 @@ const utils = module.exports = {
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
+    console.log('META', { path, meta, dest });
     return dest;
   },
 

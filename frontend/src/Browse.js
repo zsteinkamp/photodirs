@@ -1,6 +1,9 @@
 import './Browse.css';
+
+import moment from 'moment';
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
 import FileList from "./FileList";
@@ -65,6 +68,8 @@ export default function Browse() {
   } else if (data.type === 'album') {
     pageBody = (
       <div className="album">
+        { data.path !== "/" ? (<p className="date">{ moment(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
+        <p className="desc">{ data.description }</p>
         <AlbumList browseTo={ browseTo } albums={ data.albums } />
         <FileList browseTo={ browseTo } files={ data.files } />
       </div>

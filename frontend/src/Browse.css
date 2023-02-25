@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #282c34;
   height: 3rem;
   font-size: calc(10px + 2vmin);
   color: white;
@@ -12,15 +11,16 @@
   line-height: 3rem;
 }
 .Browse .pageBody {
-  margin: 0 2rem;
+  margin: 0 0;
+  padding: 1rem 2rem;
   min-height: 80vh;
+  background-color: white;
 }
 .Browse footer {
-  margin-top: 5rem;
+  margin-top: 0rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #282c34;
   height: 3rem;
   font-size: 1rem;
   color: white;

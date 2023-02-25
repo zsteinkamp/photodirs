@@ -18,6 +18,7 @@ const apiGetFile = async (reqPath) => {
   // add album to fileObj
   const albumObj = await utils.getAlbumObj(fileObj.albumPath);
   fileObj.album = await utils.getExtendedAlbumObj(albumObj);
+  fileObj.exif = await utils.getExifForFile(fileObj.path);
 
   // add breadcrumb
   fileObj.breadcrumb = await utils.getBreadcrumbForPath(fileObj.albumPath);

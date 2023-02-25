@@ -11,7 +11,7 @@ export default function PhotoElement(props) {
   const thisPos = albumFiles.findIndex( (file) => { return file.title === props.data.title; } );
   const prevPhoto = albumFiles[(thisPos + albumFiles.length - 1) % albumFiles.length];
   const nextPhoto = albumFiles[(thisPos + albumFiles.length + 1) % albumFiles.length];
-  console.log({ thisPos, prevPhoto, nextPhoto });
+  //console.log({ thisPos, prevPhoto, nextPhoto });
 
   const returnToAlbum = () => { props.browseTo(parentPath, parentApiPath) };
   const goToPrevPhoto = () => { props.browseTo(prevPhoto.uriPath, prevPhoto.apiPath) };
