@@ -8,20 +8,22 @@ const utils = require('./utils');
 const C = require('./constants');
 
 const scanDirectory = async (dirName) => {
+  //console.log('SCAN_DIRECTORY:TOP', { dirName });
   // do a depth-first traversal so we can build the directory metadata from the bottom up
   const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory());
   // recurse into subdirs before continuing
-  await Promise.all(subdirs.map((dirEnt) => scanDirectory(path.join(dirName, dirEnt.name))));
+  await utils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
 
   // get the list of supported files in this directory
   const dirFiles = await utils.getSupportedFiles(dirName);
 
-  // first write the file objs
-  await Promise.all(dirFiles.map((fName) => utils.getFileObj(dirName, fName)));
+  //console.log('SCAN_DIRECTORY:MID', { dirName, dirFiles });
 
-  // TODO: look at all promise.all and do it in batches with the new util function
+  // first write the file objs
+  await utils.promiseAllInBatches(dirFiles, (fName) => utils.getFileObj(dirName, fName), 10);
+
   // now cache the 400x400 and 1000x1000 size
-  await Promise.all(dirFiles.map(async (fName) => {
+  await utils.promiseAllInBatches(dirFiles, async (fName) => {
     let absFname = path.join('/albums', dirName, fName);
     if (utils.isRaw(absFname)) {
       // convert raw file
@@ -30,7 +32,7 @@ const scanDirectory = async (dirName) => {
       absFname = cachePath;
     }
     await utils.preResize(absFname);
-  }));
+  }, 10);
 
   // write the standard album obj
   const albumObj = await utils.getAlbumObj(dirName);
@@ -48,14 +50,19 @@ const watch = () => {
   const watcher = chokidar.watch(C.ALBUMS_ROOT, { ignoreInitial: true }).on('all', async (event, evtPath) => {
     console.log('WATCHER ACTIVITY', { event, evtPath });
 
-    const albumPath = path.dirname(evtPath).substr(C.ALBUMS_ROOT.length);
     // clean up cache on directory and file deletions
     if (event === 'unlinkDir') {
       // directory removed -- so just nuke it in cache then rebuild the parent
-      await fsp.rm(path.join(C.CACHE_ROOT, 'albums', albumPath), { recursive: true, force: true });
+      const cachePath = path.join(C.CACHE_ROOT, evtPath);
+      console.log('UNLINK_DIR', { cachePath });
+      await fsp.rm(cachePath, { recursive: true, force: true });
+      // also remove parent album jsons
+      await fsp.rm(path.join(path.dirname(cachePath), 'album.json'), { force: true });
+      await fsp.rm(path.join(path.dirname(cachePath), 'album.extended.json'), { force: true });
     } else if (event === 'unlink') {
+      const albumFilePath = evtPath.substr(C.ALBUMS_ROOT.length);
       if (utils.isSupportedImageFile(evtPath)) {
-        await utils.cleanUpCacheFor(albumPath);
+        await utils.cleanUpCacheFor(albumFilePath);
       }
     }
 

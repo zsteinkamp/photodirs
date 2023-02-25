@@ -24,15 +24,15 @@ const utils = module.exports = {
    * @param {int} batchSize
    * @returns {Promise<B[]>}
    */
-  async function promiseAllInBatches(task, items, batchSize) {
-      let position = 0;
-      let results = [];
-      while (position < items.length) {
-          const itemsForBatch = items.slice(position, position + batchSize);
-          results = [...results, ...await Promise.all(itemsForBatch.map(item => task(item)))];
-          position += batchSize;
-      }
-      return results;
+  promiseAllInBatches: async (items, task, batchSize) => {
+    let position = 0;
+    let results = [];
+    while (position < items.length) {
+      const itemsForBatch = items.slice(position, position + batchSize);
+      results = [...results, ...await Promise.all(itemsForBatch.map(item => task(item)))];
+      position += batchSize;
+    }
+    return results;
   },
 
   /*
@@ -53,10 +53,13 @@ const utils = module.exports = {
   /*
    * given a path to something in `/albums` dir, clean up files in the `/cache` dir
    */
-  cleanUpCacheFor: async (albumPath) => {
-    const files = await (utils.globPromise(path.join(C.CACHE_ROOT, 'albums', `${albumPath}*`)));
-    await Promise.all(files.map((file) => fsp.rm(file, { force: true })));
-    console.log('Deleted cache files', { files });
+  cleanUpCacheFor: async (albumFilePath) => {
+    const files = await (utils.globPromise(path.join(C.CACHE_ROOT, 'albums', `${albumFilePath}*`)));
+    const albumPath = path.dirname(albumFilePath);
+    files.push(path.join(C.CACHE_ROOT, 'albums', albumPath, 'album.json'));
+    files.push(path.join(C.CACHE_ROOT, 'albums', albumPath, 'album.extended.json'));
+    //console.log('CleanUpCacheFor', { files });
+    await utils.promiseAllInBatches(files, (file) => fsp.rm(file, { force: true }), 10);
   },
 
   /*
@@ -100,15 +103,20 @@ const utils = module.exports = {
    */
   getFileObj: async (albumPath, fileName) => {
     //console.log('getFileObj', { albumPath, fileName });
-    const stdFileFname = utils.getFileObjMetadataFname(albumPath, fileName);
-    if (await utils.fileExists(stdFileFname)) {
-      const metaStat = await fsp.stat(stdFileFname);
+    const fileObjMetaFname = utils.getFileObjMetadataFname(albumPath, fileName);
+    //console.log('GET_FILE_OBJ:TOP', { fileObjMetaFname, albumPath, fileName });
+    if (await utils.fileExists(fileObjMetaFname)) {
+      //console.log('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
+      const metaStat = await fsp.stat(fileObjMetaFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
+      //console.log('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, useCache: metaStat.mtime >= fileStat.mtime });
+      // check to see if the cached metadata file is not older than the album file it relates to
       if (metaStat.mtime >= fileStat.mtime) {
-        //console.log('RETURN CACHE', stdFileFname);
-        return JSON.parse(await fsp.readFile(stdFileFname, { encoding: 'utf8' }));
+        //console.log('RETURN CACHE', fileObjMetaFname);
+        return JSON.parse(await fsp.readFile(fileObjMetaFname, { encoding: 'utf8' }));
       }
     }
+    //console.log('GET_FILE_OBJ:NOCACHE', { fileObjMetaFname, albumPath, fileName });
     const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
     const uriFileName = encodeURIComponent(fileName);
     const fileObj = {
@@ -123,9 +131,9 @@ const utils = module.exports = {
     };
 
     // write out the file for next time
-    await fsp.mkdir(path.dirname(stdFileFname), { recursive: true, mode: 755 });
-    await fsp.writeFile(stdFileFname, JSON.stringify(fileObj));
-    console.info('Wrote cache file', stdFileFname);
+    await fsp.mkdir(path.dirname(fileObjMetaFname), { recursive: true, mode: 755 });
+    await fsp.writeFile(fileObjMetaFname, JSON.stringify(fileObj));
+    console.info('GET_FILE_OBJ', 'Wrote cache file', fileObjMetaFname);
 
     return fileObj;
   },
@@ -154,11 +162,11 @@ const utils = module.exports = {
     const files = [];
     const albumPath = path.join(C.ALBUMS_ROOT, extAlbumObj.path);
     (await fsp.readdir(albumPath, { withFileTypes: true })).forEach(async (dirEnt) => {
-      //console.log('ZZZZZZZZZ', { dirEnt });
+      //console.log('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
       if (dirEnt.isDirectory()) {
         // ensure the directory isn't empty
         const supportedFiles = await utils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
-        //console.log('SUPPORTED FILES', { path: extAlbumObj.path, supportedFiles });
+        //console.log('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
         if (supportedFiles.length > 0) {
           dirs.push(dirEnt);
         }
@@ -172,8 +180,7 @@ const utils = module.exports = {
     extAlbumObj.breadcrumb = await utils.getBreadcrumbForPath(extAlbumObj.path);
 
     // TODO: Pagination / caching this metadata
-    const albumPromises = dirs.map((dir) => utils.getAlbumObj(path.join('/', extAlbumObj.path, dir.name)));
-    const albumResult = await Promise.all(albumPromises);
+    const albumResult = await utils.promiseAllInBatches(dirs, (dir) => utils.getAlbumObj(path.join('/', extAlbumObj.path, dir.name)), 10);
 
     // Sort albums in descending date order
     albumResult.sort((a, b) => {
@@ -183,8 +190,7 @@ const utils = module.exports = {
     extAlbumObj.albums = albumResult;
 
     // TODO: metadata caching and/or pagination
-    const filePromises = files.map((file) => utils.getFileObj(extAlbumObj.path, file.name));
-    const fileResult = await Promise.all(filePromises);
+    const fileResult = await utils.promiseAllInBatches(files, (file) => utils.getFileObj(extAlbumObj.path, file.name), 10);
     extAlbumObj.files = fileResult;
 
     // write out the file for next time
@@ -207,6 +213,7 @@ const utils = module.exports = {
       const fileObjFnames = supportedFilesBare.map((fName) => utils.getFileObjMetadataFname(dirName, fName));
       // make sure we also compare with the album.yml file in the album dir
       fileObjFnames.push(path.join(C.ALBUMS_ROOT, dirName, 'album.yml'));
+      //console.log('GET_ALBUM_OBJ', { fileObjFnames });
 
       // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
       if (!(await utils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
@@ -245,11 +252,14 @@ const utils = module.exports = {
       if (!albumObj.date) {
         // 2) Next get the exif data for files inside and use the oldest
         let leastDate = null;
-        const exifPromises = (await utils.getSupportedFiles(dirName)).map((fName) => utils.getExifForFile(path.join(C.ALBUMS_ROOT, dirName, fName)));
-        const exifArr = await Promise.all(exifPromises);
-        console.log({ dirName, exifArr });
+        const supportedFiles = await utils.getSupportedFiles(dirName);
+        const exifArr = await utils.promiseAllInBatches(supportedFiles, (fName) => utils.getExifForFile(path.join(dirName, fName)), 10);
+        //console.log('GET_ALBUM_OBJ', { dirName, exifArr });
         for (const exif of exifArr) {
           if (exif.DateTime) {
+            //console.log('GET_ALBUM_OBJ:EXIF', { dt: exif.DateTime });
+            // sometimes the dates look like 2020:03:21 and so the colons need to be changed to slashes
+            exif.DateTime = exif.DateTime.replace(/^(\d{4}):(\d{2}):(\d{2}) /, '$1/$2/$3 ');
             const exifDate = new Date(exif.DateTime);
             if (!leastDate || exifDate < leastDate) {
               leastDate = exifDate;
@@ -279,7 +289,7 @@ const utils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
-    console.info('Wrote cache file', stdAlbumFname);
+    console.info('GET_ALBUM_OBJ', 'Wrote cache file', stdAlbumFname);
 
     return albumObj;
   },
@@ -378,6 +388,7 @@ const utils = module.exports = {
     if (!(await utils.fileExists(cachePath))) {
       // Now cache the intermediate size
       await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
+      //console.log('GET_CACHED_IMAGE_PATH', { filePath, cachePath, resizeOptions });
       const readStream = fs.createReadStream(filePath);
       // When we cache the intermediate size, use `sharp.fit.outside` to scale to the short side to facilitate cropping
       const transform = utils.getSharpTransform(filePath, { height: cacheHeight, width: cacheWidth, fit: sharp.fit.outside });
@@ -386,8 +397,10 @@ const utils = module.exports = {
       async function plumbing() {
         await pipeline(readStream, transform, outStream);
       }
-      await plumbing().catch((err) => {
+      await plumbing().catch(async (err) => {
         console.error('IMG CACHE PIPELINE ERROR', err.message);
+        // make sure we don't leave a zero-length file
+        await fsp.rm(cachePath, { force: true });
         return null;
       });
     }
@@ -418,8 +431,10 @@ const utils = module.exports = {
     async function plumbing() {
       await pipeline(tiffPipe, transform, outStream);
     }
-    await plumbing().catch((err) => {
+    await plumbing().catch(async (err) => {
       console.error('RAW CONVERT PIPELINE ERROR', err.message);
+      // make sure we don't leave a zero-length file
+      await fsp.rm(cachePath, { force: true });
       return null;
     });
     // Return the path to the cached JPEG
@@ -430,6 +445,7 @@ const utils = module.exports = {
    * Generate standard resizes
    */
   preResize: async (absFname) => {
+    //console.log('PRE_RESIZE', { absFname });
     return Promise.all([
       utils.getCachedImagePath(absFname, { height: 400, width: 400 }),
       utils.getCachedImagePath(absFname, { height: 1600, width: 1600 })
@@ -476,6 +492,7 @@ const utils = module.exports = {
     const ret = {};
 
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    //console.log('GET_EXIF_FOR_FILE', { filePath });
     if (!(utils.isJpeg(filePath) || utils.isHeif(filePath) || utils.isRaw(filePath))) {
       return ret;
     }
@@ -497,7 +514,7 @@ const utils = module.exports = {
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
-    console.log('META', { path, meta, dest });
+    //console.log('META', { path, meta, dest });
     return dest;
   },
 
