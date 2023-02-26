@@ -8,11 +8,11 @@ services:
       - '3333:3333'
     restart: unless-stopped
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx.conf:/etc/nginx/nginx.conf
 
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       target: prod
     environment:
       NODE_ENV: production
@@ -20,11 +20,11 @@ services:
 
   api:
     build:
-      context: ./api
+      context: ../api
       target: prod
     restart: unless-stopped
     volumes:
-      - ./api/test-images:/albums:ro
+      - /mnt/shared/photos:/albums:ro
       - prod_cache:/cache
 
 volumes:

@@ -247,7 +247,11 @@ const utils = module.exports = {
       // 1) If the directory name has a date
       const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/);
       if (matches) {
-        albumObj.date = new Date(matches[0]).toISOString();
+        try {
+          albumObj.date = new Date(matches[0]).toISOString();
+        } catch (e) {
+          console.log('INVALID DATE', { matched: matches[0], dirName });
+        }
       }
       if (!albumObj.date) {
         // 2) Next get the exif data for files inside and use the oldest
