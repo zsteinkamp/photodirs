@@ -2,6 +2,7 @@
 
 // requires
 const fs = require('fs');
+const path = require('path');
 const sharp = require('sharp');
 const utils = require('./utils');
 const { pipeline } = require('stream/promises');
@@ -16,7 +17,8 @@ module.exports = async (filePath, size, crop, res) => {
   if (typeof size === 'string') {
     if (size === 'orig') {
       // Return original file ... express takes care of Content-Type!
-      res.set('Cache-control', 'public, max-age=86400');
+      res.set('Cache-Control', 'public, max-age=86400');
+      res.set('Content-Disposition', `attachment; filename="${path.basename(filePath)}"`);
       return res.sendFile(filePath);
     }
 

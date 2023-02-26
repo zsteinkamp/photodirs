@@ -21,13 +21,8 @@
   position: absolute;
   cursor: pointer;
   right: 1rem;
-  top: 4rem;
-  background: rgba(0,0,0,0);
-  color: rgba(0,255,0,1);
-  border-radius: 0.5rem;
-  border: 2px solid rgba(0,255,0,1);
-  font-size:2rem;
-  opacity: 0.25;
+  top: 1rem;
+  opacity: 0.5;
 }
 .PhotoElement .downloadBtn:hover {
   opacity: 1;
@@ -35,17 +30,21 @@
 .PhotoElement .closeBtn {
   position: absolute;
   cursor: pointer;
-  right: 1rem;
+  left: 1rem;
   top: 1rem;
-  background: rgba(0,0,0,0);
-  color: rgba(255,0,0,1);
-  border-radius: 0.5rem;
-  border: 2px solid rgba(255,0,0,1);
-  font-size:2rem;
-  opacity: 0.25;
+  opacity: 0.5;
 }
 .PhotoElement .closeBtn:hover {
   opacity: 1;
+}
+.PhotoElement .closeBtn svg,
+.PhotoElement .downloadBtn svg {
+  width: 2em;
+  height: 2em;
+}
+.PhotoElement .downloadBtn svg g path,
+.PhotoElement .closeBtn svg g path {
+  fill: white;
 }
 .PhotoElement .exif {
   background: white;
