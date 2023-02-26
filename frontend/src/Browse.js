@@ -19,7 +19,7 @@ export default function Browse() {
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname));
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(false);
 
   const location = useLocation();
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function Browse() {
   return (
     <div className="Browse">
       <header>
-        <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } />
+        { !loading && <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } /> }
       </header>
       <div className="pageBody">
         { getPageBody(loading, error, data) }
