@@ -14,14 +14,20 @@
   margin:0 1rem 0 0; 
   padding:0; 
 }
-.Breadcrumb > div button {
+.Breadcrumb > div a:visited {
+  color: #99a;
+}
+.Breadcrumb > div a:hover {
+  color: #eef;
+}
+.Breadcrumb > div a {
   font-size: inherit;
   cursor: pointer;
   background: none;
   border: none;
   text-decoration: underline;
   color: #99a;
-  font-weight: bold;
   padding: 0;
   margin: 0 1rem 0 0;
+  transition: color 0.2s;
 }

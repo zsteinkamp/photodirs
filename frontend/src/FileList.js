@@ -1,5 +1,7 @@
 import './FileList.css';
 
+import { Link } from "react-router-dom";
+
 export default function FileList(props) {
   let fileList = null;
 
@@ -8,9 +10,9 @@ export default function FileList(props) {
       //console.log(file.photoPath);
       return (
         <div key={ file.apiPath }>
-          <button onClick={ ()=> props.browseTo(file.uriPath) }>
+          <Link to={ file.uriPath }>
             <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
-          </button>
+          </Link>
           <p>{file.name}</p>
         </div>
       )

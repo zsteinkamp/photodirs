@@ -15,6 +15,7 @@
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
   border: 2rem solid black;
+  border-radius: 1rem;
 }
 .PhotoElement .downloadBtn {
   position: absolute;
@@ -51,12 +52,13 @@
   width: 20rem;
   position: absolute;
   top: 50%;
-  left: -21.5rem;
+  left: -22rem;
   max-height: 90vh;
   transform: translateY(-50%);
   padding: 1rem;
-  transition: left 0.2s;
-  opacity:0.9;
+  transition: left 0.2s, opacity 0.2s;
+  opacity:0.2;
+  border-radius: 0 1rem 1rem 0;
 }
 .PhotoElement .exif dl {
   width: 20rem;
@@ -64,7 +66,9 @@
   overflow: scroll;
 }
 .PhotoElement .exif:hover {
+  background: white;
   left: 0;
+  opacity:0.9;
 }
 .PhotoElement .exif .tag {
   position: absolute;
@@ -72,9 +76,14 @@
   transform: translateY(-50%) rotate(270deg);
   white-space: nowrap;
   background: white;
-  left:19rem;
-  padding: 0.5rem 1rem;
+  line-height: 0.5rem;
+  left:19.5rem;
+  padding: 1rem 1rem;
   border-radius: 0 0 1rem 1rem;
+  transition: opacity 0.2s;
+}
+.PhotoElement .exif:hover .tag {
+  opacity: 0;
 }
 
 .PhotoElement .exif dt {

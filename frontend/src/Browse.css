@@ -4,29 +4,55 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: 3rem;
-  font-size: calc(10px + 2vmin);
+  height: calc(0.2rem + 2vmin);
+  line-height: calc(1rem + 2vmin);
+  font-size: calc(1rem + 2vmin);
   color: white;
   padding: 0 2rem;
-  line-height: 3rem;
 }
 .Browse .pageBody {
   margin: 1rem 0;
   padding: 1rem 2rem;
   min-height: 80vh;
-  background-color: white;
+  background-color: #888;
+}
+.Browse .pageBody > .album > .desc {
+  color: white;
+  margin-left: 20rem;
+}
+.Browse .pageBody .album .header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.Browse .pageBody .album .header .date {
+  white-space: nowrap;
+  line-height: 1.5rem;
+  color: black;
+  font-weight: bold;
+  padding-right: 0.4rem;
+}
+.Browse .pageBody .album .header .desc {
+  color:white;
+  line-height: 1.5rem;
+  max-width: 40rem;
 }
 .Browse footer {
   margin-top: 0rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: 3rem;
-  font-size: 1rem;
+  height: 2.5rem;
+  font-size: calc(0.6rem + 0.5vmin);
+  line-height: calc(0.6rem + 0.5vmin);
   color: white;
   padding: 0 2rem;
   line-height: 3rem;
 }
 .Browse footer a {
   color: #99a;
+  transition: color 0.2s;
+}
+.Browse footer a:hover {
+  color: #ccd;
 }

@@ -5,33 +5,50 @@
   justify-content: space-evenly;
   align-items: flex-start;
   align-content: flex-start;
-  gap: 2rem;
+  gap: 3.75rem;
   margin-top: 2rem;
 }
 
 .AlbumList > div {
   display: flex;
+  flex: 1 1 0px;
   flex-direction: row;
   flex-wrap: nowrap;
   height: 10rem;
-  width: 30rem;
+  min-width: 30rem;
+  margin: 0 0;
 }
 
-.AlbumList > div button {
+.AlbumList > div > a:visited {
+  color: #000;
+}
+.AlbumList > div > a {
+  text-decoration: none;
+  background-color: #eee;
+  color: #000;
   display: flex;
   position: relative;
   gap: 1rem;
   cursor: pointer;
   width: 100%;
   height: 10rem;
-  text-align: left;
-  font-size: 100%;
-  border: none;
-  padding: 0;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  border-right: 1px solid rgba(0,0,0,0.07);
+  border-bottom: 1px solid rgba(0,0,0,0.12);
+  border-right: 1px solid rgba(0,0,0,0.07);
+  padding: 0.75rem;
+  border-radius: 1rem;
+  filter: drop-shadow(0 0.25rem 0.5rem rgba(0, 0, 0, 0.1));
   margin: 0;
+  border: 8px solid rgba(0,0,0,0);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.AlbumList > div > a:hover {
+  background-color: #fff;
+  border-color: rgba(0,0,0,0.15);
 }
 
-.AlbumList > div button div.thumbnail {
+.AlbumList > div a div.thumbnail {
   padding: none;
   margin: none;
   width: 10rem;
@@ -40,23 +57,35 @@
   background-size: cover;
   background-color: black;
   background-repeat: no-repeat;
+  border-radius: 0.75rem;
 }
 
-.AlbumList > div button div.body {
+.AlbumList > div a div.body {
   width: 100%;
-  padding-top: 1rem;
 }
-.AlbumList > div button div.body h1 {
+.AlbumList > div a div.body h1 {
   padding: 0;
   margin: 1rem 0;
   font-weight: bold;
-  font-size: 1.75rem;
+  font-size: calc(10px + 1vmin);
 }
-.AlbumList > div button div.body p.date {
+.AlbumList > div a div.body p.date {
   margin: 0;
+  font-weight: bold;
+  font-size: 0.75rem;
   padding: 0;
+  opacity: 0.8;
 }
-.AlbumList > div button div.body p.desc {
+.AlbumList > div a div.body p.desc {
   margin: 0;
-  padding: 0;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0 1rem 0 0;
+  opacity: 0.5;
+  max-height: 4.5rem;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  text-overflow: ellipsis;
+  display: block;
 }

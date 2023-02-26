@@ -1,5 +1,7 @@
 import './Breadcrumb.css';
 
+import { Link } from "react-router-dom";
+
 export default function Breadcrumb(props) {
   const crumbArr = props.crumbs.map((crumb, idx) => {
     let itemMarkup;
@@ -11,9 +13,9 @@ export default function Breadcrumb(props) {
       );
     } else {
       itemMarkup = (
-        <button onClick={ () => props.browseTo(crumb.path, crumb.apiPath) }>
+        <Link to={ crumb.path }>
           { crumb.title }
-        </button>
+        </Link>
       );
     }
     return (

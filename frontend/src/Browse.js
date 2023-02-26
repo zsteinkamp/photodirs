@@ -2,7 +2,7 @@ import './Browse.css';
 
 import dayjs from 'dayjs';
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
@@ -25,12 +25,6 @@ export default function Browse() {
   useEffect(() => {
     setApiPath(makeApiPath(location.pathname));
   }, [location]);
-
-  let navigate = useNavigate();
-
-  const browseTo = (path, apiPath) => {
-    navigate(path);
-  };
 
   useEffect(() => {
     const getData = async () => {
@@ -55,7 +49,7 @@ export default function Browse() {
     getData();
   }, [apiPath])
 
-  const getPageBody = (loading, error, browseTo, data) => {
+  const getPageBody = (loading, error, data) => {
     if (loading) {
       return (<div className="loading">Loading...</div>);
     }
@@ -66,17 +60,19 @@ export default function Browse() {
 
     if (data.type === 'photo') {
       return (
-        <PhotoElement browseTo={ browseTo } data={ data } />
+        <PhotoElement data={ data } />
       );
     }
 
     if (data.type === 'album') {
       return (
         <div className="album">
-          { data.path !== "/" ? (<p className="date">{ dayjs(data.date).utc().format("YYYY-MM-DD") }</p>) : null }
-          <p className="desc">{ data.description }</p>
-          <AlbumList browseTo={ browseTo } albums={ data.albums } />
-          <FileList browseTo={ browseTo } files={ data.files } />
+          <div className="header">
+              { data.path !== "/" && (<div className="date">{ dayjs(data.date).utc().format("YYYY-MM-DD (dddd)") }</div>) }
+              <div className="desc">{ data.description }</div>
+          </div>
+          <AlbumList albums={ data.albums } />
+          <FileList files={ data.files } />
         </div>
       );
     }
@@ -94,10 +90,10 @@ export default function Browse() {
   return (
     <div className="Browse">
       <header>
-        <Breadcrumb browseTo={ browseTo } crumbs={ data ? data.breadcrumb : errorBreadcrumb } />
+        <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } />
       </header>
       <div className="pageBody">
-        { getPageBody(loading, error, browseTo, data) }
+        { getPageBody(loading, error, data) }
       </div>
       <footer>
         <div>
