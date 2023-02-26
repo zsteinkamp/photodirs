@@ -4,20 +4,16 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  height: calc(0.2rem + 2vmin);
-  line-height: calc(1rem + 2vmin);
-  font-size: calc(1rem + 2vmin);
+  font-size: calc(0.5rem + 2vmin);
+  line-height: calc(1.5rem + 2vmin);
   color: white;
-  padding: 0 2rem;
 }
 .Browse .pageBody {
-  margin: 1rem 0;
   padding: 1rem 2rem;
   min-height: 80vh;
-  background-color: #888;
+  background-color: #dcdcdc;
 }
 .Browse .pageBody > .album > .desc {
-  color: white;
   margin-left: 20rem;
 }
 .Browse .pageBody .album .header {
@@ -33,7 +29,6 @@
   padding-right: 0.4rem;
 }
 .Browse .pageBody .album .header .desc {
-  color:white;
   line-height: 1.5rem;
   max-width: 40rem;
 }
@@ -55,4 +50,9 @@
 }
 .Browse footer a:hover {
   color: #ccd;
+}
+@media only screen and (max-width: 600px) {
+  .Browse .pageBody {
+    padding: 1rem 0.75rem;
+  }
 }

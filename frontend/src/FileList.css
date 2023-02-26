@@ -18,22 +18,19 @@
   padding: 1rem;
   display: block;
   background: #eee;
-  border: none;
   cursor: pointer;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   filter: drop-shadow(0 0.25rem 0.5rem rgba(0, 0, 0, 0.1));
-  border: 8px solid rgba(0,0,0,0);
-  transition: background-color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s;
 }
 .FileList > div a:hover {
-  border-color: rgba(1,1,1,0.1);
   background-color:#fff;
-  border-color: rgba(0,0,0,0.15);
 }
 
 .FileList > div a img {
   height: 100%;
   width: 100%;
+  border-radius: 0.5rem;
 }
 .FileList li p {
   margin-top: 0.25rem;

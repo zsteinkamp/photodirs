@@ -1,17 +1,14 @@
 .Breadcrumb {
-  display:flex;
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
-  font-size: calc(10px + 1vmin);
+  margin-left: 0.5em;
 }
-
 .Breadcrumb > div {
 }
 .Breadcrumb > div::before {
   content: '/';
   color: rgba(255,255,255,0.3);
-  margin:0 1rem 0 0; 
+  margin:0 0.5em 0 0; 
   padding:0; 
 }
 .Breadcrumb > div a:visited {
@@ -21,13 +18,12 @@
   color: #eef;
 }
 .Breadcrumb > div a {
-  font-size: inherit;
   cursor: pointer;
   background: none;
   border: none;
   text-decoration: underline;
   color: #99a;
   padding: 0;
-  margin: 0 1rem 0 0;
+  margin: 0 0.5em 0 0;
   transition: color 0.2s;
 }
