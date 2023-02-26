@@ -36,20 +36,55 @@ You will need to edit the `/albums` volume in the `docker-compose.yml` file to p
       - ./api:/app
       - api_node_modules:/app/node_modules
       - cache:/cache
-      - /PATH/TO/YOUR/ALBUMS:/albums
+      - /PATH/TO/YOUR/ALBUMS:/albums:ro
 ```
 
-To start the service, run:
+### Production Mode
+Use this mode if you are not actively developing on Photodirs. It will build an
+optimized, static version of the frontend code. The backend code runs mostly the
+same as development mode, just without auto-reloading.
+
+You will need to edit the `docker-compose.yml` file in the `prod/` directory to
+use the correct path to your albums directory. Note that this is mounted "Read
+Only" so even if I had a terrible bug in my code, I could not mess up your
+originals.
+
+After you have changed the `/albums` mount source, then you can start in
+Production mode.
+
+To start Photodirs in PRODUCTION mode, run:
+```
+cd prod
+docker compose up -d
+```
+
+If you want to monitor the log output, then you can run:
+```
+docker logs -f
+```
+
+### Development Mode
+This brings up all the servers in "watch" mode and mounts the repo into the
+container. Use your text editor of choice and get auto-reloading without
+installing anything but Docker on your computer.
+
+To start the service in DEVELOPMENT mode, run:
 
 ```
 docker compose up
 ```
 
-This will start the necessary backend services and an nginx proxy listening on port 3333.
+To get a shell in the `api` container, you can run:
+```
+docker compose exec api bash
+```
+
+This also works the same for the `frontend` and `nginx` contaainers.
+
 
 ## Fetching Photos
 
-### GET /:path-to-image?:options
+### GET /photo/:path?:options or :photoPath?:options
 Returns a file, with options honored. Images can even be in the root directory.
 
 Options can include:
@@ -57,13 +92,12 @@ Options can include:
 * `crop` - fill the box of the specified size, cropping the image
 
 Examples:
-* `/2023-03-01_hawaii/CRW_1000.CR2?size=orig` Will return a JPEG image with
-dimensions the same as the original.
-* `/2023-03-01_hawaii/CRW_1000.CR2?size=200x200&crop`
-Will always return a 200x200px JPEG image, cropping the long side if it is not
-square.
-* `/2023-03-01_hawaii/CRW_1000.CR2?size=1000x1000`
-Will return JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
+* `/photo/2023-03-01_hawaii/CRW_1000.CR2?size=orig`  
+Will return the original image file. RAW originals are downloaded as RAW.
+* `/photo/2023-03-01_hawaii/IMG_1001.JPG?size=200x200&crop`  
+Will always return a 200x200px JPEG image, cropping the long side if it is not square.
+* `/photo/2023-03-01_hawaii/IMG_1002.HEIC?size=1000x1000`  
+Will return a JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
 
 
 ## REST API
@@ -84,18 +118,21 @@ Return photo albums and any supported files in the given path. Note the HATEOS-f
       "date": "2023-03-01T00:00:00.000Z",
       "apiPath": "/api/album/2023-03-01_hawaii",
       "path": "/2023-03-01_hawaii",
+      "uriPath": "/2023-03-01_hawaii",
       "description": "Some cool photos",
       "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-    },
-    ...
-  ],
+    }, ...  ],
   "files": [
     {
-      type: "photo"
-      name: "greydangle.jpg"
-      apiPath: "/api/albums/2023-02-03_foggo_dangles/greydangle.jpg"
-      path: "/2023-02-03_foggo_dangles/greydangle.jpg"
-      photoPath: "/photo/2023-02-03_foggo_dangles/greydangle.jpg"
+      type: "photo",
+      name: "greydangle.jpg",
+      apiPath: "/api/albums/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg",
+      path: "/2023-02-10 Yahoo with Ben/greydangle.jpg",
+      photoPath: "/photo/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg",
+      albumPath: "/2023-02-10 Yahoo with Ben",
+      fileName: "greydangle.jpg",
+      title : "greydangle.jpg",
+      uriPath: "/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg"
     }, 
     ...
   ]
@@ -111,18 +148,13 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 {
   "type": "photo",
   "name": "IMG_7809.JPG",
-  "path": "/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
+  "path": "/2023-02-10_yahoo_with ben/IMG_7809.JPG",
+  "albumPath": "/2023-02-10_yahoo_with%20ben",
   "photoPath": "/photo/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
   "apiPath": "/api/albums/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
-  "album": {
-    "type": "album",
-    "title": "2023-02-10_yahoo_with ben",
-    "date": "2023-02-19T18:48:13.452Z",
-    "path": "/2023-02-10_yahoo_with%20ben",
-    "apiPath": "/api/albums/2023-02-10_yahoo_with%20ben",
-    "description": "Food! Bars! Bazzd!",
-    "thumbnail": null
-  },
+  "fileName": "IMG_7809.JPG",
+  "title": "IMG_7809.JPG",
+  "uriPath": "/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
   "exif": {
     "Make": "Apple",
     "Model": "iPhone 12 Pro",
@@ -149,6 +181,16 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
     "GPSSpeed": "0",
     "GPSSpeedRef": "Kilometers per hour",
     "GPSImgDirection": "126.96919263456091"
+  },
+  "album": {
+    "type": "album",
+    "title": "Hawaii Vacation 2023",
+    "date": "2023-03-01T00:00:00.000Z",
+    "apiPath": "/api/album/2023-03-01_hawaii",
+    "path": "/2023-03-01_hawaii",
+    "uriPath": "/2023-03-01_hawaii",
+    "description": "Some cool photos",
+    "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
   }
 }
 ```
