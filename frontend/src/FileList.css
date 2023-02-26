@@ -10,9 +10,8 @@
 }
 
 .FileList > div {
-  max-width: 20rem;
-  max-height: 20rem;
-  flex: 1 0 1px;
+  width: 20rem;
+  height: 20rem;
 }
 
 .FileList > div a {

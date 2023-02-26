@@ -10,7 +10,7 @@ export default function FileList(props) {
       //console.log(file.photoPath);
       return (
         <div key={ file.apiPath }>
-          <Link to={ file.uriPath }>
+          <Link title={file.title} to={ file.uriPath }>
             <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} />
           </Link>
           <p>{file.name}</p>
