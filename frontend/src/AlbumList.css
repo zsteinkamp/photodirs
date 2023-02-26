@@ -50,8 +50,8 @@
 .AlbumList > div a div.thumbnail {
   padding: none;
   margin: none;
-  width: 14rem;
-  height: 10rem;
+  min-width: 10rem;
+  min-height: 10rem;
   background-position: center;
   background-size: cover;
   background-color: black;
@@ -60,7 +60,6 @@
 }
 
 .AlbumList > div a div.body {
-  width: 100%;
 }
 .AlbumList > div a div.body h1 {
   padding: 0;

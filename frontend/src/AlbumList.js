@@ -12,7 +12,7 @@ export default function AlbumList(props) {
     const albumListItems = props.albums.map((album) => (
       <div key={album.apiPath}>
         <Link to={ album.uriPath }>
-          <div className='thumbnail' style={{ backgroundImage: `url(${album.thumbnail}?size=200x200&crop)` }} />
+          <div className='thumbnail' style={{ backgroundImage: `url(${album.thumbnail}?size=300x300&crop)` }} />
           <div className='body'>
             <p className='date'>{dayjs(album.date).utc().format("YYYY-MM-DD")}</p>
             <h1>{album.title}</h1>
