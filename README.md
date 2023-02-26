@@ -9,17 +9,22 @@ Photodirs was made with the following design goals:
 * Ergonomic photo URLs (i.e. no UUIDs anywhere)
 * Publicly accessible (no authentication requried)
 * Your directory structure is your album structure
+* Your originals are mounted read-only in the container so there is no possibility of anything happening to them.
 * Directories can be nested arbitrarily deep
-* New files or directories are immediately available, and popular resizing is triggered by file create
+* New files or directories are immediately available, and popular resizing is triggered by file create, making for a lightning fast experience.
+* If files or directories are deleted from the originals, the cached resized files are cleaned up.
 * Directories can have an optional YAML metadata file to override title
 (directory name is default), provide a description, specify an album image,
     disable display, control photo sort order, optional file includelist, or anything else you would like to include
 * Support for EXIF/XMP metadata as well as a simple YAML sidecar format
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
-* Converted/scaled images are cached locally
+* Converted/scaled images are cached locally, and preserved between server restarts.
 
 TODO
 * Support for video (transcoding?)
+
+## Requirements
+The ability to run x86_64/amd64 Docker images.
 
 ## Running photodirs
 
@@ -29,15 +34,17 @@ You will need to edit the `/albums` volume in the `docker-compose.yml` file to p
 
 ```
   api:
-    build: ./api
-    environment:
-      TERM: xterm
+    build:
+      context: ./api
+      target: prod
+    restart: unless-stopped
     volumes:
-      - ./api:/app
-      - api_node_modules:/app/node_modules
-      - cache:/cache
-      - /PATH/TO/YOUR/ALBUMS:/albums:ro
+      - prod_cache:/cache
+      - /PATH/TO/YOUR/PHOTOS:/albums:ro
 ```
+
+Note that `/albums` is mounted Read Only (`:ro`). There is no chance Photodirs
+can do anything to your original files or directory structure.
 
 ### Production Mode
 Use this mode if you are not actively developing on Photodirs. It will build an
@@ -54,9 +61,9 @@ Production mode.
 
 To start Photodirs in PRODUCTION mode, run:
 ```
-cd prod
 docker compose up -d
 ```
+The containers are configured to start on boot, unless explicitly stopped.
 
 If you want to monitor the log output, then you can run:
 ```
@@ -69,8 +76,8 @@ container. Use your text editor of choice and get auto-reloading without
 installing anything but Docker on your computer.
 
 To start the service in DEVELOPMENT mode, run:
-
 ```
+cd dev
 docker compose up
 ```
 
@@ -79,7 +86,7 @@ To get a shell in the `api` container, you can run:
 docker compose exec api bash
 ```
 
-This also works the same for the `frontend` and `nginx` contaainers.
+This also works the same for the `frontend` and `nginx` containers.
 
 
 ## Fetching Photos
@@ -200,29 +207,17 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 * [dcraw](https://www.dechifro.org/dcraw/) - Convert RAW to TIFF for ingestion by Sharp to make a JPEG
 * [node-tdd-base](https://github.com/zsteinkamp/node-tdd-base) - The most primitive framework for a nice Node.js dev experience
 
-## Requirements
-The ability to run x86_64 Docker images.
-
-## Running the App
-```
-NODE_ENV=production docker compose up
-```
-
 ## Caching
-Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodirs caches converted/resized images in 200 pixel increments, up to 3000px. This protects against a bad actor filling your cache disk by requesting every possible image size.
+Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodirs caches converted/resized images in 200 pixel increments, up to 3000px. This helps to protect against a bad actor filling your cache disk by requesting every possible image size.
 
 You can still request any image size, and Photodirs will use the cached image that is equal to or greater than the size you are requesting to fulfill your request, resizing it on-the-fly to your specification. The `Cache-control: public` header is sent with images, so that intermediate web caches, CDNs, and browsers will cache the final output.
-
-## Developing
-```
-docker compose up
-```
-The source files are mounted read/write in the frontend and API containers and the services are run in "watch" mode, so any edits you make to the source files are immediately reflected in the UI or API.
 
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
-* Improve watcher for handle renames and deletes better.
 * Video support
-* Production mode (i.e. build static UI, run without watchers or livereload
-  websocket)
+* UI Polish
+  * More keboard controls, e.g. up-arrow to go up a folder level
+  * Prettier EXIF display
+  * Row of album thumbnails in image display (API already provides data for this)
+  * Move to <a> from <button>
