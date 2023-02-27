@@ -60,22 +60,39 @@ export default function PhotoElement(props) {
     </svg>
   );
 
+  const thumbContainer = (
+    <div className="thumbContainer">
+      {
+        data.album.files.map( (file) => (
+          <Link className={ file.uriPath === data.uriPath ? 'sel' : null } key={ file.uriPath } to={ file.uriPath } title={ file.title }>
+            <img src={ `${file.photoPath}?size=300x300&crop` } alt={ file.title }/>
+          </Link>
+        ))
+      }
+    </div>
+  );
+
   return (
     <div className="PhotoElement">
-      <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
-      <div className="exif">
-        <dl>
-            <dt>Title</dt>
-            <dd>{ data.title }</dd>
-            { Object.entries(data.exif).map(([key, val]) => (
-                <Fragment key={ key }>
-                  <dt>{ key }</dt>
-                  <dd>{ val }</dd>
-                </Fragment>
-              ))}
-        </dl>
-        <div className="tag">EXIF / INFO</div>
+      <div className="flexContainer">
+        <div className="imageContainer">
+          <div className="exif">
+            <div className="exifInner">
+              <h2>{ data.title }</h2>
+              <dl>
+                { Object.entries(data.exif).map(([key, val]) => (
+                    <Fragment key={ key }>
+                      <dt>{ key }</dt>
+                      <dd>{ val }</dd>
+                    </Fragment>
+                  ))}
+              </dl>
+            </div>
+            <div className="tag">EXIF / INFO</div>
+          </div>
+          <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } /></div>
       </div>
+      { thumbContainer }
       <Link title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
       <Link title="Download Orig" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
     </div>

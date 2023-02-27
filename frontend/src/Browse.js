@@ -58,12 +58,6 @@ export default function Browse() {
       return (<div className="error">{`There is a problem fetching the data - ${error}`}</div>);
     }
 
-    if (data.type === 'photo') {
-      return (
-        <PhotoElement data={ data } />
-      );
-    }
-
     if (data.type === 'album') {
       return (
         <div className="album">
@@ -86,6 +80,12 @@ export default function Browse() {
     { title: "Home", path: "/", apiPath: "/api/albums/" },
     { title: "Error", path: "/", apiPath: "/api/albums/" }
   ];
+
+  if (!error && !loading && data.type === 'photo') {
+    return (
+      <PhotoElement data={ data } />
+    );
+  }
 
   return (
     <div className="Browse">

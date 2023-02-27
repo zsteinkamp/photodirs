@@ -1,22 +1,122 @@
 .PhotoElement {
-  position: absolute;
   background:#111;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
 }
-.PhotoElement img {
-  display: block;
-  position: absolute;
-  max-height: 90vh;
-  max-width: 90vw;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
+.PhotoElement .flexContainer {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  max-height: 100vh;
+  max-width: 100vw;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+.PhotoElement .imageContainer {
+  min-height: calc(100vh - 12rem);
+  min-width: 100vw;
+  display: flex;
+  flex-direction: row;
+  box-sizing: border-box;
+  justify-content: center;
+}
+.PhotoElement .imageContainer img {
+  box-sizing: border-box;
+  max-height: calc(100vh - 12rem);
+  max-width: 100vw;
   border: 2rem solid black;
   border-radius: 1rem;
+  margin: auto;
 }
+.PhotoElement .imageContainer .exif {
+  background: white;
+  width: 0rem;
+  max-height: calc(90vh - 12rem);
+  margin-top: 4rem;
+  transition: width 0.2s, padding 0.2s, opacity 0.2s;
+  opacity:0.25;
+  border-radius: 0 1rem 1rem 0;
+  position: relative;
+  box-sizing: border-box;
+}
+.PhotoElement .imageContainer .exif:hover {
+  background: white;
+  width: 20rem;
+  opacity:0.9;
+}
+.PhotoElement .imageContainer .exif .tag {
+  position: absolute;
+  top: 50%;
+  right: -4.75rem;
+  transform: translateY(-50%) rotate(270deg);
+  white-space: nowrap;
+  background: white;
+  line-height: 0.5rem;
+  padding: 1rem 1rem;
+  border-radius: 0 0 1rem 1rem;
+  border: 1px solid white;
+  transition: opacity 0.2s;
+}
+.PhotoElement .imageContainer .exif:hover .tag {
+  opacity: 0;
+}
+
+.PhotoElement .imageContainer .exif .exifInner {
+  padding: 2rem;
+  width: 17rem;
+  margin-left: -20rem;
+  transition: margin-left 0.2s;
+}
+.PhotoElement .imageContainer .exif:hover .exifInner {
+  margin-left: 0;
+}
+
+.PhotoElement .imageContainer .exif h2 {
+  margin: 0;
+  padding: 0;
+}
+.PhotoElement .imageContainer .exif dl {
+  max-height: calc(90vh - 17rem);
+  overflow: auto;
+}
+.PhotoElement .imageContainer .exif dt {
+  text-transform: uppercase;
+  font-size:1rem;
+}
+.PhotoElement .imageContainer .exif dd {
+  font-weight: bold;
+  font-size:1rem;
+}
+
+.PhotoElement .thumbContainer {
+  height: 12rem;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+.PhotoElement .thumbContainer a {
+  display: block;
+  box-sizing: border-box;
+  border: 0.5rem solid black;
+}
+.PhotoElement .thumbContainer a.sel {
+  border-color: #999;
+}
+.PhotoElement .thumbContainer a:hover {
+  border-color: #444;
+}
+.PhotoElement .thumbContainer img {
+  max-height: 9rem;
+  max-width: 9rem;
+}
+
 .PhotoElement .downloadBtn {
   position: absolute;
   cursor: pointer;
@@ -46,50 +146,4 @@
 .PhotoElement .closeBtn svg g path {
   fill: white;
 }
-.PhotoElement .exif {
-  background: white;
-  width: 20rem;
-  position: absolute;
-  top: 50%;
-  left: -22rem;
-  max-height: 90vh;
-  transform: translateY(-50%);
-  padding: 1rem;
-  transition: left 0.2s, opacity 0.2s;
-  opacity:0.2;
-  border-radius: 0 1rem 1rem 0;
-}
-.PhotoElement .exif dl {
-  width: 20rem;
-  height: 90vh;
-  overflow: scroll;
-}
-.PhotoElement .exif:hover {
-  background: white;
-  left: 0;
-  opacity:0.9;
-}
-.PhotoElement .exif .tag {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%) rotate(270deg);
-  white-space: nowrap;
-  background: white;
-  line-height: 0.5rem;
-  left:19.5rem;
-  padding: 1rem 1rem;
-  border-radius: 0 0 1rem 1rem;
-  transition: opacity 0.2s;
-}
-.PhotoElement .exif:hover .tag {
-  opacity: 0;
-}
 
-.PhotoElement .exif dt {
-  text-transform: uppercase;
-  font-size:1rem;
-}
-.PhotoElement .exif dd {
-  font-weight: bold;
-  font-size:1rem;
-}
