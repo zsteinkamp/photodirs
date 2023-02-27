@@ -63,7 +63,7 @@ module.exports = async (filePath, size, crop, res) => {
     await pipeline(readStream, transform, res);
   }
   await plumbing().catch((err) => {
-    console.error('IMG CACHE PIPELINE ERROR', err);
+    console.error('IMG CACHE PIPELINE ERROR', { filePath, cachedImagePath, err });
     res.end();
   });
 };

@@ -389,7 +389,16 @@ const utils = module.exports = {
 
     const cachePath = utils.makeResizeCachePath(filePath, cacheWidth, cacheHeight);
 
-    if (!(await utils.fileExists(cachePath))) {
+    const cacheStat = await fsp.stat(cachePath);
+
+    if (typeof cacheStat.size !== 'undefined' && cacheStat.size === 0) {
+      console.log('Zero length file found. Regenerating.', { cachePath, cacheStat });
+    }
+
+    // Generate the file if it doesn't exist or has a zero length.
+    // Zero length files can happen due to a shortcoming in the pre-generator
+    // that is a TODO.
+    if (cacheStat.code === 'ENOENT' || cacheStat.size === 0) {
       // Now cache the intermediate size
       await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
       //console.log('GET_CACHED_IMAGE_PATH', { filePath, cachePath, resizeOptions });
@@ -403,7 +412,7 @@ const utils = module.exports = {
         console.log('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath });
       }
       await plumbing().catch(async (err) => {
-        console.error('IMG CACHE PIPELINE ERROR', err.message);
+        console.error('IMG CACHE PIPELINE ERROR', { filePath, cachePath, err });
         // make sure we don't leave a zero-length file
         await fsp.rm(cachePath, { force: true });
         return null;
