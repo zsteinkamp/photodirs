@@ -94,7 +94,7 @@ export default function PhotoElement(props) {
       </div>
       { thumbContainer }
       <Link title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
-      <Link title="Download Orig" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
+      <Link title="Download Original" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
     </div>
   );
 }
