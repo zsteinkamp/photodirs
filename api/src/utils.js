@@ -389,16 +389,24 @@ const utils = module.exports = {
 
     const cachePath = utils.makeResizeCachePath(filePath, cacheWidth, cacheHeight);
 
-    const cacheStat = await fsp.stat(cachePath);
+    let cacheStat = {};
+
+    try {
+      cacheStat = await fsp.stat(cachePath);
+    } catch (e) {
+      if (e.code !== 'ENOENT') {
+        console.error('CACHESTAT returned error', { e });
+      }
+    }
 
     if (typeof cacheStat.size !== 'undefined' && cacheStat.size === 0) {
       console.log('Zero length file found. Regenerating.', { cachePath, cacheStat });
     }
 
     // Generate the file if it doesn't exist or has a zero length.
-    // Zero length files can happen due to a shortcoming in the pre-generator
+    // Zero length files can happen due to a bug in the pre-generator
     // that is a TODO.
-    if (cacheStat.code === 'ENOENT' || cacheStat.size === 0) {
+    if (typeof cacheStat.size === 'undefined' || cacheStat.size === 0) {
       // Now cache the intermediate size
       await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
       //console.log('GET_CACHED_IMAGE_PATH', { filePath, cachePath, resizeOptions });

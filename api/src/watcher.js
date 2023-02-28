@@ -28,9 +28,10 @@ const scanDirectory = async (dirName) => {
     if (utils.isRaw(absFname)) {
       // convert raw file
       const cachePath = await utils.jpegFileForRaw(absFname);
-      console.log('PRE-CONVERT RAW', { absFname, cachePath });
+      //console.log('PRE-CONVERT RAW', { absFname, cachePath });
       absFname = cachePath;
     }
+    // resize the file to common sizes
     await utils.preResize(absFname);
   }, 10);
 
