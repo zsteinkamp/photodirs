@@ -43,12 +43,16 @@
 .AlbumList > div a div.thumbnail {
   padding: none;
   margin: none;
+  width: 10rem;
   min-width: 10rem;
+  height: 10rem;
   min-height: 10rem;
-  background-position: center;
-  background-size: cover;
-  background-color: black;
-  background-repeat: no-repeat;
+}
+.AlbumList > div a div.thumbnail img {
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  object-fit: cover;
   border-radius: 0.5rem;
 }
 
