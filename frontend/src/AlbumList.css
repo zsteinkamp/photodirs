@@ -9,7 +9,7 @@
   margin-top: 1rem;
 }
 
-.AlbumList > div {
+.AlbumList .AlbumItem {
   display: flex;
   flex: 0 1 0px;
   flex-direction: row;
@@ -17,10 +17,10 @@
   min-width: 35rem;
   margin: 0 0;
 }
-.AlbumList > div > a:visited {
+.AlbumList .AlbumItem > a:visited {
   color: #000;
 }
-.AlbumList > div > a {
+.AlbumList .AlbumItem > a {
   text-decoration: none;
   background-color: #eee;
   color: #000;
@@ -36,11 +36,11 @@
   margin: 0;
   transition: background-color 0.2s;
 }
-.AlbumList > div > a:hover {
+.AlbumList .AlbumItem > a:hover {
   background-color: #fff;
 }
 
-.AlbumList > div a div.thumbnail {
+.AlbumList .AlbumItem .thumbnail {
   padding: none;
   margin: none;
   width: 10rem;
@@ -48,7 +48,7 @@
   height: 10rem;
   min-height: 10rem;
 }
-.AlbumList > div a div.thumbnail img {
+.AlbumList .AlbumItem .thumbnail img {
   position: absolute;
   width: 10rem;
   height: 10rem;
@@ -56,22 +56,22 @@
   border-radius: 0.5rem;
 }
 
-.AlbumList > div a div.body {
+.AlbumList .AlbumItem .body {
 }
-.AlbumList > div a div.body h1 {
+.AlbumList .AlbumItem .body h1 {
   padding: 0;
   margin: 1rem 0;
   font-weight: bold;
   font-size: calc(15px + 0.5vmin);
 }
-.AlbumList > div a div.body p.date {
+.AlbumList .AlbumItem .body .date {
   margin: 0;
   font-weight: bold;
   font-size: 75%;
   padding: 0;
   opacity: 0.8;
 }
-.AlbumList > div a div.body p.desc {
+.AlbumList .AlbumItem .body .desc {
   margin: 0;
   font-size: 100%;
   line-height: 1.5rem;
@@ -88,13 +88,13 @@
   .AlbumList {
     gap: 1rem;
   }
-  .AlbumList > div {
+  .AlbumList .AlbumItem {
     min-width: 100%;
   }
-  .AlbumList > div > a {
+  .AlbumList .AlbumItem > a {
   }
-  .AlbumList > div a div.thumbnail {
-    min-width: 8rem;
-    min-height: 8rem;
+  .AlbumList .AlbumItem a .thumbnail {
+    min-width: 10rem;
+    min-height: 10rem;
   }
 }

@@ -7,13 +7,14 @@ RUN apt-get update && apt-get install -y dcraw
 # mostly from https://github.com/jcupitt/docker-builds/blob/master/libvips-ubuntu20.04/Dockerfile
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y \
-		build-essential \
-		software-properties-common \
-		ninja-build \
-		python3-pip \
 		bc \
+		build-essential \
+    ffmpeg \
 		jq \
 		less \
+		ninja-build \
+		python3-pip \
+		software-properties-common \
 		wget
 
 # we need meson for libvips build
