@@ -3,25 +3,27 @@
 // requires
 const path = require('path');
 
-const utils = require('./utils');
+const albumObjUtils = require('./util/albumObj');
+const fileObjUtils = require('./util/fileObj');
+const imageUtils = require('./util/image');
 
 const apiGetAlbum = async (albumPath) => {
-  const albumObj = await utils.getAlbumObj(albumPath);
-  const extAlbumObj = await utils.getExtendedAlbumObj(albumObj);
+  const albumObj = await albumObjUtils.getAlbumObj(albumPath);
+  const extAlbumObj = await albumObjUtils.getExtendedAlbumObj(albumObj);
   return [200, extAlbumObj];
 };
 
 const apiGetFile = async (reqPath) => {
   // get the fileObj
-  const fileObj = await utils.getFileObj(path.dirname(reqPath), path.basename(reqPath));
+  const fileObj = await fileObjUtils.getFileObj(path.dirname(reqPath), path.basename(reqPath));
 
   // add album to fileObj
-  const albumObj = await utils.getAlbumObj(fileObj.albumPath);
-  fileObj.album = await utils.getExtendedAlbumObj(albumObj);
-  fileObj.exif = await utils.getExifForFile(fileObj.path);
+  const albumObj = await albumObjUtils.getAlbumObj(fileObj.albumPath);
+  fileObj.album = await albumObjUtils.getExtendedAlbumObj(albumObj);
+  fileObj.exif = await imageUtils.getExifForFile(fileObj.path);
 
   // add breadcrumb
-  fileObj.breadcrumb = await utils.getBreadcrumbForPath(fileObj.albumPath);
+  fileObj.breadcrumb = await albumObjUtils.getBreadcrumbForPath(fileObj.albumPath);
 
   return [200, fileObj];
 };

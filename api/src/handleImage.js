@@ -4,10 +4,11 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
-const utils = require('./utils');
 const { pipeline } = require('stream/promises');
 
 const C = require('./constants');
+const fileTypes = require('./util/fileTypes');
+const imageUtils = require('./util/image');
 
 module.exports = async (filePath, size, crop, res) => {
   // Initialize these here up top
@@ -39,24 +40,24 @@ module.exports = async (filePath, size, crop, res) => {
     fit: crop ? sharp.fit.cover : sharp.fit.inside
   };
 
-  if (utils.isRaw(filePath)) {
+  if (fileTypes.isRaw(filePath)) {
     // RAW handling -- convert to JPEG, cache, and return JPEG filename.
     // Will return JPEG filename immediately if already cached.
-    filePath = await utils.jpegFileForRaw(filePath);
+    filePath = await imageUtils.jpegFileForRaw(filePath);
   }
 
   // getCachedImagePath is also responsible for resizing the image and caching it
-  const cachedImagePath = await utils.getCachedImagePath(filePath, resizeOptions);
+  const cachedImagePath = await imageUtils.getCachedImagePath(filePath, resizeOptions);
 
   if (!cachedImagePath) {
     // must have been an error
     return res.status(500).send();
   }
   const readStream = fs.createReadStream(cachedImagePath);
-  const transform = utils.getSharpTransform(cachedImagePath, resizeOptions);
+  const transform = imageUtils.getSharpTransform(cachedImagePath, resizeOptions);
 
   // Set the correct Content-Type header
-  res.type(`image/${utils.getOutputTypeForFile(cachedImagePath)}`);
+  res.type(`image/${fileTypes.getOutputTypeForFile(cachedImagePath)}`);
   res.set('Cache-control', 'public, max-age=86400');
   // Stream the image through the transformer and out to the response.
   async function plumbing() {
