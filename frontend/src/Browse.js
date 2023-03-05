@@ -38,6 +38,14 @@ export default function Browse() {
         }
         let actualData = await response.json();
         setData(actualData);
+
+        // set page title
+        if (actualData.album && actualData.album.title && actualData.title) {
+          document.title = [actualData.album.title, actualData.title].join(' / ');
+        } else if (actualData.title) {
+          document.title = actualData.title;
+        }
+
         setError(null);
       } catch(err) {
         setError(err.message);
