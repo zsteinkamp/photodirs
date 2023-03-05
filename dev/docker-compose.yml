@@ -6,7 +6,6 @@ services:
       - api
     ports:
       - '4444:3333'
-    restart: unless-stopped
     stop_signal: SIGKILL
     volumes:
       - ../nginx.conf:/etc/nginx/nginx.conf:ro
@@ -17,7 +16,6 @@ services:
       target: dev
     environment:
       WDS_SOCKET_PORT: 0
-    restart: unless-stopped
     volumes:
       - ../frontend:/app
       - frontend_node_modules:/app/node_modules
@@ -28,7 +26,6 @@ services:
       target: dev
     environment:
       TERM: xterm
-    restart: unless-stopped
     volumes:
       - ../api:/app
       - api_node_modules:/app/node_modules
