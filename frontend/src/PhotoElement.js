@@ -60,39 +60,49 @@ export default function PhotoElement(props) {
     </svg>
   );
 
-  const thumbContainer = (
-    <div className="thumbContainer">
-      {
-        data.album.files.map( (file) => (
-          <Link className={ file.uriPath === data.uriPath ? 'sel' : null } key={ file.uriPath } to={ file.uriPath } title={ file.title }>
-            <img src={ `${file.photoPath}?size=300x300&crop` } alt={ file.title }/>
-          </Link>
-        ))
+  const thumbnails = data.album.files.map( (file) => (
+    <Link className={ file.uriPath === data.uriPath ? 'sel' : null }
+      key={ file.uriPath } to={ file.uriPath } title={ file.title }>
+      <img src={ `${file.photoPath}?size=300x300&crop` } alt={ file.title }/>
+    </Link>
+  ));
+
+  const exifDetails = Object.entries(data.exif)
+    .filter(([key, val]) => {
+      if (key === 'Object Name' || key === 'Caption/Abstract') {
+        return false;
       }
-    </div>
-  );
+      return true;
+    })
+    .map(([key, val]) => {
+      return (
+        <Fragment key={ key }>
+          <dt>{ key }</dt>
+          <dd>{ val }</dd>
+        </Fragment>
+      );
+    });
 
   return (
     <div className="PhotoElement">
-      <div className="flexContainer">
-        <div className="imageContainer">
-          <div className="exif">
-            <div className="exifInner">
-              <h2>{ data.title }</h2>
-              <dl>
-                { Object.entries(data.exif).map(([key, val]) => (
-                    <Fragment key={ key }>
-                      <dt>{ key }</dt>
-                      <dd>{ val }</dd>
-                    </Fragment>
-                  ))}
-              </dl>
-            </div>
-            <div className="tag">EXIF / INFO</div>
-          </div>
-          <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } /></div>
+      <div className="header">
+        <h1>{ data.title }</h1>
+        { data.description && <p>{ data.description }</p> }
       </div>
-      { thumbContainer }
+      <div className="imageContainer">
+        <div className="exif">
+          <div className="exifInner invisible-scrollbar">
+            <dl>{ exifDetails }</dl>
+          </div>
+          <div className="tag">EXIF / INFO</div>
+        </div>
+        <div className="image">
+          <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
+        </div>
+      </div>
+      <div className="thumbContainer invisible-scrollbar">
+        { thumbnails }
+      </div>
       <Link title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
       <Link title="Download Original" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
     </div>

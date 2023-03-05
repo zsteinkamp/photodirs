@@ -6,6 +6,7 @@ const path = require('path');
 const C = require('../constants');
 const cacheUtils = require('./cache');
 const fileUtils = require('./file');
+const imageUtils = require('./image');
 
 module.exports = {
   /*
@@ -29,12 +30,17 @@ module.exports = {
     //console.log('GET_FILE_OBJ:NOCACHE', { fileObjMetaFname, albumPath, fileName });
     const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
     const uriFileName = encodeURIComponent(fileName);
+    const reqPath = path.join('/', albumPath, fileName);
+    const fileExif = await imageUtils.getExifForFile(reqPath);
+    const fileTitle = fileExif[C.EXIF_TITLE_PROPERTY] || fileName;
+    const fileDescription = fileExif[C.EXIF_DESCRIPTION_PROPERTY] || '';
     const fileObj = {
       type: C.TYPE_PHOTO,
-      title: fileName,
+      title: fileTitle,
+      description: fileDescription,
       fileName: fileName,
       albumPath: albumPath,
-      path: path.join('/', albumPath, fileName),
+      path: reqPath,
       uriPath: path.join('/', uriAlbumPath, uriFileName),
       photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)

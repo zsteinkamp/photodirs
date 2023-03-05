@@ -4,7 +4,11 @@ module.exports = {
   ALBUMS_ROOT: '/albums',
   API_BASE: '/api',
   CACHE_ROOT: '/cache',
+  EXIF_TITLE_PROPERTY: 'Object Name',
+  EXIF_DESCRIPTION_PROPERTY: 'Caption/Abstract',
   EXIF_DESCRIPTION_PROPERTIES: [
+    'Object Name',
+    'Caption/Abstract',
     'Make',
     'Model',
     'Orientation',
