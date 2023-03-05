@@ -4,14 +4,14 @@ A photo cropping/resizing service with a basic browsing interface. Use it to ser
 
 Photodirs was made with the following design goals:
 
-* A basic browsing interface
+* A fast, lightweight album/photo browsing web UI
 * Flexible URL-based resizing and cropping options for photos
 * Ergonomic photo URLs (i.e. no UUIDs anywhere)
 * Publicly accessible (no authentication requried)
 * Your directory structure is your album structure
 * Your originals are mounted read-only in the container so there is no possibility of anything happening to them.
 * Directories can be nested arbitrarily deep
-* New files or directories are immediately available, and popular resizing is triggered by file create, making for a lightning fast experience.
+* New files or directories are immediately available, and common resizing is triggered by file create making for a lightning fast experience.
 * If files or directories are deleted from the originals, the cached resized files are cleaned up.
 * Directories can have an optional YAML metadata file to override title
 (directory name is default), provide a description, specify an album image,
@@ -19,6 +19,7 @@ Photodirs was made with the following design goals:
 * Support for EXIF/XMP metadata as well as a simple YAML sidecar format
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 * Converted/scaled images are cached locally, and preserved between server restarts.
+* CDN-friendly cache headers
 
 TODO
 * Support for video (transcoding?)
