@@ -14,9 +14,9 @@ Photodirs was made with the following design goals:
 * New files or directories are immediately available, and common resizing is triggered by file create making for a lightning fast experience.
 * If files or directories are deleted from the originals, the cached resized files are cleaned up.
 * Directories can have an optional YAML metadata file to override title
-(directory name is default), provide a description, specify an album image,
-    disable display, control photo sort order, optional file includelist, or anything else you would like to include
-* Support for EXIF/XMP metadata as well as a simple YAML sidecar format
+(directory name is default), provide a description, specify an album image.
+    * Future: disable display, control photo sort order, optional file includelist, or anything else you would like to include
+* Support for EXIF/XMP metadata
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 * Converted/scaled images are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
@@ -213,12 +213,27 @@ Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodi
 
 You can still request any image size, and Photodirs will use the cached image that is equal to or greater than the size you are requesting to fulfill your request, resizing it on-the-fly to your specification. The `Cache-control: public` header is sent with images, so that intermediate web caches, CDNs, and browsers will cache the final output.
 
+## Setting Photo Title / Description
+This repo contains a utility in `bin/exif-set` that you can use to set the correct title and description in your image files. To use it, you will need the `exiftool` command installed in your system. Install with your favorite package manager, e.g.:
+* MAC: `brew install exiftool`
+* LINUX: `sudo apt install exiftool`
+
+To use it, just run the command from the terminal (you may want to copy the script to somewhere in your `$PATH`), passing a filename as an arg:
+```
+> exif-set kimchi_hands.jpg 
+Title []: Kimchi Hands
+Description []: Hands after mixing the cabbage with the kimchi paste.
+Keywords []: 
+    1 image files updated
+Object Name                     : Kimchi Hands
+Caption-Abstract                : Hands after mixing the cabbage with the kimchi paste.
+Keywords                        : -
+```
+I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
+
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
 * Video support
 * UI Polish
   * More keboard controls, e.g. up-arrow to go up a folder level
-  * Prettier EXIF display
-  * Row of album thumbnails in image display (API already provides data for this)
-  * Move to <a> from <button>
