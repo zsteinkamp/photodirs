@@ -62,18 +62,18 @@ export default function PhotoElement(props) {
     </svg>
   );
 
-  const exifDetails = Object.entries(data.exif)
-    .map(([key, val]) => {
-      return (
-        <Fragment key={ key }>
-          <dt>{ key }</dt>
-          <dd>{ val }</dd>
-        </Fragment>
-      );
-    });
-
   let exif = null;
-  if (Object.keys(data.exif).length > 0) {
+  if (data.exif && Object.keys(data.exif).length > 0) {
+    const exifDetails = Object.entries(data.exif)
+      .map(([key, val]) => {
+        return (
+          <Fragment key={ key }>
+            <dt>{ key }</dt>
+            <dd>{ val }</dd>
+          </Fragment>
+        );
+      });
+
     exif = (
         <div className="exif">
           <div className="exifInner invisible-scrollbar">
