@@ -1,6 +1,5 @@
 'use strict';
 
-const exifReader = require('exifreader');
 const fs = require('fs');
 const fsp = require('fs/promises');
 const path = require('path');
@@ -140,26 +139,5 @@ const imageUtils = module.exports = {
 
     // We just want the stdout socket to pipeline from
     return dcrawProcess.stdout;
-  },
-
-  /*
-   * Pull some EXIF data from supported files
-   */
-  getExifForFile: async (reqPath) => {
-    const ret = {};
-
-    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
-    //console.log('GET_EXIF_FOR_FILE', { filePath });
-    if (!(fileTypes.isJpeg(filePath) || fileTypes.isHeif(filePath) || fileTypes.isRaw(filePath))) {
-      return ret;
-    }
-
-    const exif = await exifReader.load(filePath);
-    for (const prop of C.EXIF_DESCRIPTION_PROPERTIES) {
-      if (exif[prop]) {
-        ret[prop] = exif[prop] ? exif[prop].description : null;
-      }
-    }
-    return ret;
   }
 };

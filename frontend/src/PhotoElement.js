@@ -63,12 +63,6 @@ export default function PhotoElement(props) {
   );
 
   const exifDetails = Object.entries(data.exif)
-    .filter(([key, val]) => {
-      if (key === 'Object Name' || key === 'Caption/Abstract') {
-        return false;
-      }
-      return true;
-    })
     .map(([key, val]) => {
       return (
         <Fragment key={ key }>

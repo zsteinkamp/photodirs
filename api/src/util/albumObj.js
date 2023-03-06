@@ -6,9 +6,9 @@ const path = require('path');
 const C = require('../constants');
 const batchUtils = require('./batch');
 const cache = require('./cache');
-const image = require('./image');
-const fileTypes = require('./fileTypes');
+const exifUtils = require('./exif');
 const fileObj = require('./fileObj');
+const fileTypes = require('./fileTypes');
 const fileUtils = require('./file');
 const metaUtils = require('./meta');
 
@@ -160,7 +160,7 @@ const albumObjUtils = module.exports = {
         // 2) Next get the exif data for files inside and use the oldest
         let leastDate = null;
         const supportedFiles = await fileUtils.getSupportedFiles(dirName);
-        const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => image.getExifForFile(path.join(dirName, fName)), 10);
+        const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => exifUtils.getExifForFile(path.join(dirName, fName)), 10);
         //console.log('GET_ALBUM_OBJ', { dirName, exifArr });
         for (const exif of exifArr) {
           if (exif.DateTime) {

@@ -6,7 +6,7 @@ const path = require('path');
 const C = require('../constants');
 const cacheUtils = require('./cache');
 const fileUtils = require('./file');
-const imageUtils = require('./image');
+const exifUtils = require('./exif');
 
 module.exports = {
   /*
@@ -31,9 +31,13 @@ module.exports = {
     const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
     const uriFileName = encodeURIComponent(fileName);
     const reqPath = path.join('/', albumPath, fileName);
-    const fileExif = await imageUtils.getExifForFile(reqPath);
-    const fileTitle = fileExif[C.EXIF_TITLE_PROPERTY] || fileName;
-    const fileDescription = fileExif[C.EXIF_DESCRIPTION_PROPERTY] || '';
+
+    // Get exif data
+    const exifObj = await exifUtils.getExifReaderForFile(reqPath);
+    const fileTitle = exifUtils.getExifTitle(exifObj) || fileName;
+    const fileDescription = exifUtils.getExifDescription(exifObj) || '';
+    const fileExif = exifUtils.getExifDetailProps(exifObj);
+
     const fileObj = {
       type: C.TYPE_PHOTO,
       title: fileTitle,
@@ -43,7 +47,8 @@ module.exports = {
       path: reqPath,
       uriPath: path.join('/', uriAlbumPath, uriFileName),
       photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
-      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName)
+      apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName),
+      exif: fileExif
     };
 
     // write out the file for next time
