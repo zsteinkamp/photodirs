@@ -2,7 +2,7 @@ import './Browse.css';
 
 import dayjs from 'dayjs';
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
@@ -21,11 +21,47 @@ export default function Browse() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const navigate = useNavigate();
+
   const location = useLocation();
   useEffect(() => {
     setApiPath(makeApiPath(location.pathname));
   }, [location]);
 
+  /*
+   * Keyboard Controls
+   */
+  const goToParentAlbum = () => {
+    if (data && data.breadcrumb && data.breadcrumb.length > 1) { // not at root
+      navigate(data.breadcrumb[data.breadcrumb.length - 2].path);
+    }
+  };
+
+  const keyCodeToAction = {
+    27: goToParentAlbum, // escape
+    38: goToParentAlbum, // up arrow
+  };
+
+  const handleKeypress = (event) => {
+    //console.log(event.keyCode, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey);
+    if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
+      const keypressAction = keyCodeToAction[event.keyCode];
+      if (keypressAction) {
+        keypressAction();
+        event.preventDefault();
+      }
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeypress);
+    return () => {
+      window.removeEventListener("keydown", handleKeypress);
+    };
+  });
+
+  /*
+   * Fetch data when the apiPath changes
+   */
   useEffect(() => {
     const getData = async () => {
       try {
@@ -57,6 +93,26 @@ export default function Browse() {
     getData();
   }, [apiPath])
 
+  /*
+   * Something to put in breadcrumb if there is an error fetching
+   */
+  const errorBreadcrumb = [
+    { title: "Home", path: "/", apiPath: "/api/albums/" },
+    { title: "Error", path: "/", apiPath: "/api/albums/" }
+  ];
+
+  /*
+   * Received photo data on api, return a PhotoElement
+   */
+  if (!error && !loading && data.type === 'photo') {
+    return (
+      <PhotoElement data={ data } />
+    );
+  }
+
+  /*
+   * Main content section, all these cases share a layout
+   */
   const getPageBody = (loading, error, data) => {
     if (loading) {
       return (<div className="loading">Loading...</div>);
@@ -84,17 +140,9 @@ export default function Browse() {
     );
   };
 
-  const errorBreadcrumb = [
-    { title: "Home", path: "/", apiPath: "/api/albums/" },
-    { title: "Error", path: "/", apiPath: "/api/albums/" }
-  ];
-
-  if (!error && !loading && data.type === 'photo') {
-    return (
-      <PhotoElement data={ data } />
-    );
-  }
-
+  /*
+   * Common layout for album/photo lists, loading, error
+   */
   return (
     <div className="Browse">
       <header>

@@ -23,17 +23,20 @@ export default function PhotoElement(props) {
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
   const keyCodeToAction = {
-      27: returnToAlbum,
-      37: goToPrevPhoto,
-      39: goToNextPhoto
+      27: returnToAlbum, // escape
+      38: returnToAlbum, // up arrow
+      37: goToPrevPhoto, // left arrow
+      39: goToNextPhoto  // right arrow
   };
 
   const handleKeypress = (event) => {
-    const keypressAction = keyCodeToAction[event.keyCode];
-    if (keypressAction) {
-      keypressAction();
-    //} else {
-    //  console.log(event.keyCode);
+    //console.log(event.keyCode, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey);
+    if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
+      const keypressAction = keyCodeToAction[event.keyCode];
+      if (keypressAction) {
+        keypressAction();
+        event.preventDefault();
+      }
     }
   };
 
@@ -98,7 +101,7 @@ export default function PhotoElement(props) {
       </div>
       <div className="thumbContainer invisible-scrollbar">
         { data.album.files.map( (file) => (
-          <ThumbnailImg data={data} file={file} />))
+          <ThumbnailImg key={file.uriPath} data={data} file={file} />))
         }
       </div>
       <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
