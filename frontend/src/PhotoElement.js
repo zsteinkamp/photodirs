@@ -89,7 +89,7 @@ export default function PhotoElement(props) {
 
   const mainElement = data.type === 'video' ? (
     <div className="video">
-      <video controls autoplay={true} poster={data.photoPath + "?size=1600x1600"}>
+      <video controls autoPlay={true} poster={data.photoPath + "?size=1600x1600"}>
         <source src={data.videoPath} type="video/mp4" />
       </video>
     </div>
