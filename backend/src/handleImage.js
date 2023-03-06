@@ -45,6 +45,8 @@ module.exports = async (filePath, size, crop, res) => {
     // RAW handling -- convert to JPEG, cache, and return JPEG filename.
     // Will return JPEG filename immediately if already cached.
     filePath = await imageUtils.jpegFileForRaw(filePath);
+  } else if (fileTypes.isVideo(filePath)) {
+    filePath = await imageUtils.jpegFileForVideo(filePath);
   }
 
   // getCachedImagePath is also responsible for resizing the image and caching it

@@ -37,6 +37,10 @@ const scanDirectory = async (dirName) => {
       const cachePath = await imageUtils.jpegFileForRaw(absFname);
       logger.debug('PRE-CONVERT RAW', { absFname, cachePath });
       absFname = cachePath;
+    } else if (fileTypes.isVideo(absFname)) {
+      const cachePath = await imageUtils.jpegFileForVideo(absFname);
+      logger.debug('PRE-CONVERT VIDEO', { absFname, cachePath });
+      absFname = cachePath;
     }
     // resize the file to common sizes
     await imageUtils.preResize(absFname);

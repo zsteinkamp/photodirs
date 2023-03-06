@@ -104,7 +104,7 @@ export default function Browse() {
   /*
    * Received photo data on api, return a PhotoElement
    */
-  if (!error && !loading && data.type === 'photo') {
+  if (!error && !loading && (data.type === 'photo' || data.type === 'video')) {
     return (
       <PhotoElement data={ data } />
     );

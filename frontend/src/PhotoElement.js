@@ -70,9 +70,9 @@ export default function PhotoElement(props) {
     const exifDetails = Object.entries(data.exif)
       .map(([key, val]) => {
         return (
-          <Fragment key={ key }>
-            <dt>{ key }</dt>
-            <dd>{ val }</dd>
+          <Fragment key={key}>
+            <dt>{key}</dt>
+            <dd>{val}</dd>
           </Fragment>
         );
       });
@@ -80,32 +80,42 @@ export default function PhotoElement(props) {
     exif = (
         <div className="exif">
           <div className="exifInner invisible-scrollbar">
-            <dl>{ exifDetails }</dl>
+            <dl>{exifDetails}</dl>
           </div>
           <div className="tag">EXIF / INFO</div>
         </div>
     );
   }
 
+  const mainElement = data.type === 'video' ? (
+    <div className="video">
+      <video controls autoplay={true} poster={data.photoPath + "?size=1600x1600"}>
+        <source src={data.videoPath} type="video/mp4" />
+      </video>
+    </div>
+  ) : (
+    <div className="image">
+      <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
+    </div>
+  );
+
   return (
     <div className="PhotoElement">
       <div className="header">
-        <h1>{ data.title }</h1>
-        { data.description && <p>{ data.description }</p> }
+        <h1>{data.title}</h1>
+        {data.description && <p>{data.description}</p>}
       </div>
       <div className="imageContainer">
-        { exif }
-        <div className="image">
-          <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
-        </div>
+        {exif}
+        {mainElement}
       </div>
       <div className="thumbContainer invisible-scrollbar">
         { data.album.files.map( (file) => (
           <ThumbnailImg key={file.uriPath} data={data} file={file} />))
         }
       </div>
-      <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
-      <Link title="Download Original" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
+      <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={parentPath}>{closeSVG}</Link>
+      <Link title="Download Original" className="downloadBtn" onClick={downloadOriginal} to="#">{downloadSVG}</Link>
     </div>
   );
 }

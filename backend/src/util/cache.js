@@ -45,6 +45,22 @@ module.exports = {
   },
 
   /*
+   * Given a `filePath` to a video file, return the filename of the cached
+   * transcoded file.
+   */
+  cachePathForVideo: (filePath) => {
+    return path.join(C.CACHE_ROOT, filePath + '^transcoded.mp4');
+  },
+
+  /*
+   * Given a `filePath` to a video file, return the filename of the original
+   * full-size thumbnail in the cache.
+   */
+  cachePathForVideoThumbnail: (filePath) => {
+    return path.join(C.CACHE_ROOT, filePath + '^thumb.jpg');
+  },
+
+  /*
    * given a path to something in `/albums` dir, clean up files in the `/cache` dir
    */
   cleanUpCacheFor: async (albumFilePath) => {

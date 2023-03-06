@@ -7,6 +7,7 @@ const C = require('../constants');
 const logger = C.LOGGER;
 const cacheUtils = require('./cache');
 const fileUtils = require('./file');
+const fileTypes = require('./fileTypes');
 const exifUtils = require('./exif');
 
 module.exports = {
@@ -38,9 +39,10 @@ module.exports = {
     const fileTitle = exifUtils.getExifTitle(exifObj) || fileName;
     const fileDescription = exifUtils.getExifDescription(exifObj) || '';
     const fileExif = exifUtils.getExifDetailProps(exifObj);
+    const isVideo = fileTypes.isVideo(fileName);
 
     const fileObj = {
-      type: C.TYPE_PHOTO,
+      type: isVideo ? C.TYPE_VIDEO : C.TYPE_PHOTO,
       title: fileTitle,
       description: fileDescription,
       fileName: fileName,
@@ -51,6 +53,10 @@ module.exports = {
       apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName),
       exif: fileExif
     };
+
+    if (isVideo) {
+      fileObj.videoPath = path.join(C.VIDEO_URL_BASE, uriAlbumPath, uriFileName);
+    }
 
     // write out the file for next time
     await fsp.mkdir(path.dirname(fileObjMetaFname), { recursive: true, mode: 755 });

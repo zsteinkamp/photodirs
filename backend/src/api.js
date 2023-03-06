@@ -41,6 +41,17 @@ app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
     // sends the response on its own
     await handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
   } catch (e) {
+    return res.status(500).send(e.message);
+  }
+});
+
+// handles video requests
+app.get(new RegExp('^/video/(.+)'), async (req, res) => {
+  try {
+    // sends the response on its own
+    await handlers.videoGet(req.params[0], res);
+  } catch (e) {
+    return res.status(500).send(e.message);
   }
 });
 

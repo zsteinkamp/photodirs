@@ -5,7 +5,9 @@ const fsp = require('fs/promises');
 const path = require('path');
 const { pipeline } = require('stream/promises');
 const sharp = require('sharp');
+const util = require('node:util');
 const { spawn } = require('child_process');
+const execFile = util.promisify(require('child_process').execFile);
 
 const C = require('../constants');
 const logger = C.LOGGER;
@@ -108,6 +110,35 @@ const imageUtils = module.exports = {
       await fsp.rm(cachePath, { force: true });
       return null;
     });
+    // Return the path to the cached JPEG
+    return cachePath;
+  },
+
+  /*
+   * Create a JPEG thumbnail for a video file, cache it, and return the cache
+   * filename.  If already cached, then just return the cache filename.
+   */
+  jpegFileForVideo: async (filePath) => {
+    const cachePath = cacheUtils.cachePathForVideoThumbnail(filePath);
+    logger.debug('jpegFileForVideo', { filePath, cachePath });
+    if (await fileUtils.fileExists(cachePath) && (!(await fileUtils.isFileOlderThanAny(cachePath, [filePath])))) {
+      // Return existing jpg
+      return cachePath;
+    }
+
+    // Gotta give the cached file a home. Not worth checking for existence...
+    await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
+
+    // Need to generate JPEG version by asking ffmpeg to extract a thumbnail from the video into the cache
+    await execFile('/usr/bin/ffmpeg', [
+      '-i', filePath, // video file input
+      '-vf', 'thumbnail=300', // look across 300 frames
+      '-frames:v', '1', // and pick one
+      cachePath // and write to the cachePath
+    ]);
+
+    logger.info('WROTE VIDEO THUMB', { filePath, cachePath });
+
     // Return the path to the cached JPEG
     return cachePath;
   },

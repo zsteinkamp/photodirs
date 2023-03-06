@@ -6,7 +6,9 @@ const fileTypes = module.exports = {
    * Handy for some code here, such as `getSharpTransform`
    */
   getOutputTypeForFile: (filePath) => {
-    if (fileTypes.isGif(filePath)) {
+    if (fileTypes.isVideo(filePath)) {
+      return 'mp4';
+    } else if (fileTypes.isGif(filePath)) {
       return 'gif';
     } else if (fileTypes.isPng(filePath)) {
       return 'png';
@@ -22,6 +24,7 @@ const fileTypes = module.exports = {
     return fileTypes.isJpeg(filePath) ||
       fileTypes.isHeif(filePath) ||
       fileTypes.isRaw(filePath) ||
+      fileTypes.isVideo(filePath) ||
       fileTypes.isPng(filePath);
   },
 
@@ -58,5 +61,12 @@ const fileTypes = module.exports = {
    */
   isRaw: (filePath) => {
     return !!filePath.match(/(crw|cr2|dng|arw)$/i);
+  },
+
+  /*
+   * Return whether a filename is for a RAW file
+   */
+  isVideo: (filePath) => {
+    return !!filePath.match(/(avi|mov|mp4)$/i);
   }
 };

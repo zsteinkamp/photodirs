@@ -6,6 +6,7 @@ const path = require('path');
 
 const C = require('./constants');
 const handleImage = require('./handleImage');
+const handleVideo = require('./handleVideo');
 const { apiGetAlbum, apiGetFile } = require('./handleApi');
 const fileUtils = require('./util/file');
 
@@ -14,7 +15,7 @@ module.exports = {
   apiGet: async (reqPath) => {
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
     if (!(await fileUtils.fileExists(filePath))) {
-      return [404, { error: 'directory or file not found' }];
+      return [404, { error: 'API: directory or file not found' }];
     }
 
     if ((await fsp.stat(filePath)).isDirectory()) {
@@ -26,10 +27,20 @@ module.exports = {
   photoGet: async (reqPath, size, crop, res) => {
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
     if (!(await fileUtils.fileExists(filePath))) {
-      return res.status(404).send({ error: 'directory or file not found' });
+      return res.status(404).send({ error: 'PHOTO: directory or file not found' });
     }
 
     // File exists so convert/resize/send it
     handleImage(filePath, size, crop, res);
+  },
+  // For delivering video
+  videoGet: async (reqPath, res) => {
+    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    if (!(await fileUtils.fileExists(filePath))) {
+      return res.status(404).send({ error: 'VIDEO: directory or file not found' });
+    }
+
+    // File exists so send it
+    handleVideo(filePath, res);
   }
 };
