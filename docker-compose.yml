@@ -37,7 +37,7 @@ services:
     environment:
       NODE_ENV: production
     restart: unless-stopped
-    command: "npm run watcher"
+    command: "npm run start:watcher"
     volumes:
       - /mnt/shared/photos:/albums:ro
       - prod_cache:/cache
