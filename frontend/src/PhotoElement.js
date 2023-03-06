@@ -1,6 +1,8 @@
 import './PhotoElement.css'
-import { useEffect, Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+import ThumbnailImg from "./ThumbnailImg";
 
 export default function PhotoElement(props) {
   const data = props.data;
@@ -60,13 +62,6 @@ export default function PhotoElement(props) {
     </svg>
   );
 
-  const thumbnails = data.album.files.map( (file) => (
-    <Link preventScrollReset={true} className={ file.uriPath === data.uriPath ? 'sel' : null }
-      key={ file.uriPath } to={ file.uriPath } title={ file.title }>
-      <img src={ `${file.photoPath}?size=300x300&crop` } alt={ file.title }/>
-    </Link>
-  ));
-
   const exifDetails = Object.entries(data.exif)
     .filter(([key, val]) => {
       if (key === 'Object Name' || key === 'Caption/Abstract') {
@@ -108,7 +103,9 @@ export default function PhotoElement(props) {
         </div>
       </div>
       <div className="thumbContainer invisible-scrollbar">
-        { thumbnails }
+        { data.album.files.map( (file) => (
+          <ThumbnailImg data={data} file={file} />))
+        }
       </div>
       <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
       <Link title="Download Original" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
