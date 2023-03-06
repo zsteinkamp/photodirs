@@ -25,6 +25,8 @@ const videoUtils = {
       return cachePath;
     }
 
+    logger.info('TRANSCODING START', { filePath, cachePath });
+
     // Gotta give the cached file a home. Not worth checking for existence...
     await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
 
@@ -35,7 +37,7 @@ const videoUtils = {
       cachePath // and write to the cachePath
     ]);
 
-    logger.info('WROTE TRANSCODED VIDEO', { filePath, cachePath });
+    logger.info('TRANSCODING END', { filePath, cachePath });
 
     // Return the path to the cached JPEG
     return cachePath;

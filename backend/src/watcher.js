@@ -13,6 +13,13 @@ const fileObj = require('./util/fileObj');
 const fileTypes = require('./util/fileTypes');
 const fileUtils = require('./util/file');
 const imageUtils = require('./util/image');
+const videoUtils = require('./util/video');
+
+// Bring up a single-worker queue for video transcoding
+const transcodingQueue = require('fastq').promise(transcoder, 1);
+async function transcoder({ filePath }) {
+  return await videoUtils.getCachedVideoPath(filePath);
+}
 
 const scanDirectory = async (dirName) => {
   logger.info('SCAN_DIRECTORY:TOP', { dirName });
@@ -38,8 +45,9 @@ const scanDirectory = async (dirName) => {
       logger.debug('PRE-CONVERT RAW', { absFname, cachePath });
       absFname = cachePath;
     } else if (fileTypes.isVideo(absFname)) {
+      transcodingQueue.push({ filePath: absFname });
       const cachePath = await imageUtils.jpegFileForVideo(absFname);
-      logger.debug('PRE-CONVERT VIDEO', { absFname, cachePath });
+      logger.debug('PRE-GENERATE VIDEO THUMBNAIL', { absFname, cachePath });
       absFname = cachePath;
     }
     // resize the file to common sizes
