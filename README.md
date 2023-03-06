@@ -20,9 +20,7 @@ Photodirs was made with the following design goals:
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 * Converted/scaled images are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
-
-TODO
-* Support for video (transcoding?)
+* Support for video! (ffmpeg)
 
 ## Requirements
 The ability to run x86_64/amd64 Docker images.
@@ -206,6 +204,7 @@ as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 ## Utilizes / Props
 * [Sharp](https://sharp.pixelplumbing.com/) - JPEG conversion and resizing
 * [dcraw](https://www.dechifro.org/dcraw/) - Convert RAW to TIFF for ingestion by Sharp to make a JPEG
+* [ffmpeg](https://ffmpeg.org/) - Powers any video source on the internet. Should be the most stodgy library but is absolutely wonderful to learn and use. Kudos to this team for focusing on the user experience.
 * [node-tdd-base](https://github.com/zsteinkamp/node-tdd-base) - The most primitive framework for a nice Node.js dev experience
 
 ## Caching

@@ -132,7 +132,7 @@ const imageUtils = module.exports = {
     // Need to generate JPEG version by asking ffmpeg to extract a thumbnail from the video into the cache
     await execFile('/usr/bin/ffmpeg', [
       '-i', filePath, // video file input
-      '-vf', 'thumbnail=300', // look across 300 frames
+      '-vf', 'thumbnail=100', // look across 100 frames
       '-frames:v', '1', // and pick one
       cachePath // and write to the cachePath
     ]);

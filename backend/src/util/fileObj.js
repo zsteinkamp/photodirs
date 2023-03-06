@@ -25,7 +25,7 @@ module.exports = {
       logger.debug('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, useCache: metaStat.mtime >= fileStat.mtime });
       // check to see if the cached metadata file is not older than the album file it relates to
       if (metaStat.mtime >= fileStat.mtime) {
-        logger.debug('RETURN CACHE', fileObjMetaFname);
+        logger.debug('RETURN CACHE', { fileObjMetaFname });
         return JSON.parse(await fsp.readFile(fileObjMetaFname, { encoding: 'utf8' }));
       }
     }
@@ -61,7 +61,7 @@ module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(fileObjMetaFname), { recursive: true, mode: 755 });
     await fsp.writeFile(fileObjMetaFname, JSON.stringify(fileObj));
-    logger.info('GET_FILE_OBJ', 'Wrote cache file', fileObjMetaFname);
+    logger.info('GET_FILE_OBJ - Wrote cache file', { fileObjMetaFname });
 
     return fileObj;
   }
