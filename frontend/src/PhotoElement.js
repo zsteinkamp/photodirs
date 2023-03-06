@@ -61,7 +61,7 @@ export default function PhotoElement(props) {
   );
 
   const thumbnails = data.album.files.map( (file) => (
-    <Link className={ file.uriPath === data.uriPath ? 'sel' : null }
+    <Link preventScrollReset={true} className={ file.uriPath === data.uriPath ? 'sel' : null }
       key={ file.uriPath } to={ file.uriPath } title={ file.title }>
       <img src={ `${file.photoPath}?size=300x300&crop` } alt={ file.title }/>
     </Link>
@@ -83,6 +83,18 @@ export default function PhotoElement(props) {
       );
     });
 
+  let exif = null;
+  if (Object.keys(data.exif).length > 0) {
+    exif = (
+        <div className="exif">
+          <div className="exifInner invisible-scrollbar">
+            <dl>{ exifDetails }</dl>
+          </div>
+          <div className="tag">EXIF / INFO</div>
+        </div>
+    );
+  }
+
   return (
     <div className="PhotoElement">
       <div className="header">
@@ -90,12 +102,7 @@ export default function PhotoElement(props) {
         { data.description && <p>{ data.description }</p> }
       </div>
       <div className="imageContainer">
-        <div className="exif">
-          <div className="exifInner invisible-scrollbar">
-            <dl>{ exifDetails }</dl>
-          </div>
-          <div className="tag">EXIF / INFO</div>
-        </div>
+        { exif }
         <div className="image">
           <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
         </div>
@@ -103,7 +110,7 @@ export default function PhotoElement(props) {
       <div className="thumbContainer invisible-scrollbar">
         { thumbnails }
       </div>
-      <Link title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
+      <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={ parentPath }>{ closeSVG }</Link>
       <Link title="Download Original" className="downloadBtn" onClick={ downloadOriginal } to="#">{ downloadSVG }</Link>
     </div>
   );
