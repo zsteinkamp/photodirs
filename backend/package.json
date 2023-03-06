@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "npx eslint src/",
-    "start": "node src/app.js",
+    "start:api": "node src/api.js",
+    "start:watcher": "node src/watcher.js",
     "test": "mocha",
-    "watch:dev": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start'"
+    "watch:api": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:api'",
+    "watch:watcher": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:watcher'"
   },
   "mocha": {
     "spec": "src/**/*.spec.js"
@@ -18,6 +20,7 @@
     "chokidar": "^3.5.3",
     "exifreader": "^4.9.1",
     "express": "^4.18.2",
+    "express-winston": "^4.2.0",
     "glob": "^8.1.0",
     "js-yaml": "^4.1.0",
     "mocha": "^9.1.3",

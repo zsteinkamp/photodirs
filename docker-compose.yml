@@ -21,11 +21,23 @@ services:
 
   api:
     build:
-      context: ./api
+      context: ./backend
       target: prod
     environment:
       NODE_ENV: production
     restart: unless-stopped
+    volumes:
+      - /mnt/shared/photos:/albums:ro
+      - prod_cache:/cache
+
+  watcher:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    command: "npm run watcher"
     volumes:
       - /mnt/shared/photos:/albums:ro
       - prod_cache:/cache

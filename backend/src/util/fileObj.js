@@ -4,6 +4,7 @@ const fsp = require('fs/promises');
 const path = require('path');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const cacheUtils = require('./cache');
 const fileUtils = require('./file');
 const exifUtils = require('./exif');
@@ -13,21 +14,21 @@ module.exports = {
    * returns the standard File object
    */
   getFileObj: async (albumPath, fileName) => {
-    //console.log('getFileObj', { albumPath, fileName });
+    logger.debug('getFileObj', { albumPath, fileName });
     const fileObjMetaFname = cacheUtils.getFileObjMetadataFname(albumPath, fileName);
-    //console.log('GET_FILE_OBJ:TOP', { fileObjMetaFname, albumPath, fileName });
+    logger.debug('GET_FILE_OBJ:TOP', { fileObjMetaFname, albumPath, fileName });
     if (await fileUtils.fileExists(fileObjMetaFname)) {
-      //console.log('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
+      logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
       const metaStat = await fsp.stat(fileObjMetaFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
-      //console.log('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, useCache: metaStat.mtime >= fileStat.mtime });
+      logger.debug('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, useCache: metaStat.mtime >= fileStat.mtime });
       // check to see if the cached metadata file is not older than the album file it relates to
       if (metaStat.mtime >= fileStat.mtime) {
-        //console.log('RETURN CACHE', fileObjMetaFname);
+        logger.debug('RETURN CACHE', fileObjMetaFname);
         return JSON.parse(await fsp.readFile(fileObjMetaFname, { encoding: 'utf8' }));
       }
     }
-    //console.log('GET_FILE_OBJ:NOCACHE', { fileObjMetaFname, albumPath, fileName });
+    logger.debug('GET_FILE_OBJ:NOCACHE', { fileObjMetaFname, albumPath, fileName });
     const uriAlbumPath = albumPath.split('/').map(encodeURIComponent).join('/');
     const uriFileName = encodeURIComponent(fileName);
     const reqPath = path.join('/', albumPath, fileName);
@@ -54,7 +55,7 @@ module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(fileObjMetaFname), { recursive: true, mode: 755 });
     await fsp.writeFile(fileObjMetaFname, JSON.stringify(fileObj));
-    console.info('GET_FILE_OBJ', 'Wrote cache file', fileObjMetaFname);
+    logger.info('GET_FILE_OBJ', 'Wrote cache file', fileObjMetaFname);
 
     return fileObj;
   }

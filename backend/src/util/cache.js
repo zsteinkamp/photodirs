@@ -4,6 +4,7 @@ const fsp = require('fs/promises');
 const path = require('path');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const batchUtils = require('./batch');
 const fileTypes = require('./fileTypes');
 const fileUtils = require('./file');
@@ -51,7 +52,7 @@ module.exports = {
     const albumPath = path.dirname(albumFilePath);
     files.push(path.join(C.CACHE_ROOT, 'albums', albumPath, 'album.json'));
     files.push(path.join(C.CACHE_ROOT, 'albums', albumPath, 'album.extended.json'));
-    //console.log('CleanUpCacheFor', { files });
+    logger.debug('CleanUpCacheFor', { files });
     await batchUtils.promiseAllInBatches(files, (file) => fsp.rm(file, { force: true }), 10);
   }
 };

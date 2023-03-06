@@ -5,6 +5,7 @@ const path = require('path');
 const yaml = require('js-yaml');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 
 const metaUtils = module.exports = {
   /*
@@ -15,7 +16,7 @@ const metaUtils = module.exports = {
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
-    //console.log('META', { path, meta, dest });
+    logger.debug('META', { path, meta, dest });
     return dest;
   },
 

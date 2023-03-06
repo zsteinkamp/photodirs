@@ -69,10 +69,12 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 RUN echo "alias ll='ls -la'" >> /root/.bashrc
 RUN echo "alias ..='cd ..'" >> /root/.bashrc
 
-CMD [ "npm", "run", "watch:dev" ]
+# by default, start the dev api server (watches for changes and restarts itself)
+CMD [ "npm", "run", "watch:api" ]
 
 ## PRODUCTION BUILD BELOW
 FROM dev AS prod
 ENV NODE_ENV=production
 COPY ./src/ ./src/
-CMD [ "npm", "run", "start" ]
+# run the production api server (no watching)
+CMD [ "npm", "run", "start:api" ]

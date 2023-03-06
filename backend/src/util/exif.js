@@ -4,6 +4,7 @@ const exifReader = require('exifreader');
 const path = require('path');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const fileTypes = require('./fileTypes');
 
 const exifUtils = module.exports = {
@@ -22,7 +23,7 @@ const exifUtils = module.exports = {
     const ret = {};
 
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
-    //console.log('GET_EXIF_FOR_FILE', { filePath });
+    logger.debug('GET_EXIF_FOR_FILE', { filePath });
     if (!(fileTypes.isJpeg(filePath) || fileTypes.isHeif(filePath) || fileTypes.isRaw(filePath))) {
       return ret;
     }

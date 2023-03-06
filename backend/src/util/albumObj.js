@@ -4,6 +4,7 @@ const fsp = require('fs/promises');
 const path = require('path');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const batchUtils = require('./batch');
 const cache = require('./cache');
 const exifUtils = require('./exif');
@@ -45,7 +46,7 @@ const albumObjUtils = module.exports = {
    * returns the extended album object
    */
   getExtendedAlbumObj: async (extAlbumObj) => {
-    //console.log('getExtendedAlbumObj', { path: extAlbumObj.path });
+    logger.debug('getExtendedAlbumObj', { path: extAlbumObj.path });
     const extAlbumFname = path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.extended.json');
     if (await fileUtils.fileExists(extAlbumFname)) {
       const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
@@ -57,7 +58,7 @@ const albumObjUtils = module.exports = {
       // return cached if our metadata file is not older than the directory
       // it's in and not older than any album.json files in subdirectories
       if (!(await fileUtils.isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
-        //console.log('RETURN CACHE', extAlbumFname);
+        logger.debug('RETURN CACHE', extAlbumFname);
         return JSON.parse(await fsp.readFile(extAlbumFname, { encoding: 'utf8' }));
       }
     }
@@ -65,11 +66,11 @@ const albumObjUtils = module.exports = {
     const files = [];
     const albumPath = path.join(C.ALBUMS_ROOT, extAlbumObj.path);
     (await fsp.readdir(albumPath, { withFileTypes: true })).forEach(async (dirEnt) => {
-      //console.log('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
+      logger.debug('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
       if (dirEnt.isDirectory()) {
         // ensure the directory isn't empty
         const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
-        //console.log('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
+        logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
         if (supportedFiles.length > 0) {
           dirs.push(dirEnt);
         }
@@ -99,7 +100,7 @@ const albumObjUtils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(extAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(extAlbumFname, JSON.stringify(extAlbumObj));
-    console.info('Wrote cache file', extAlbumFname);
+    logger.info('Wrote cache file', extAlbumFname);
 
     return extAlbumObj;
   },
@@ -108,7 +109,7 @@ const albumObjUtils = module.exports = {
    * returns the standard album object
    */
   getAlbumObj: async (dirName) => {
-    //console.log('getAlbumObj', { dirName });
+    logger.debug('getAlbumObj', { dirName });
     const stdAlbumFname = path.join(C.CACHE_ROOT, 'albums', dirName, 'album.json');
     if (await fileUtils.fileExists(stdAlbumFname)) {
       // get the path in the `/cache` directory of the supported file metadatas
@@ -116,11 +117,11 @@ const albumObjUtils = module.exports = {
       const fileObjFnames = supportedFilesBare.map((fName) => cache.getFileObjMetadataFname(dirName, fName));
       // make sure we also compare with the album.yml file in the album dir
       fileObjFnames.push(path.join(C.ALBUMS_ROOT, dirName, 'album.yml'));
-      //console.log('GET_ALBUM_OBJ', { fileObjFnames });
+      logger.debug('GET_ALBUM_OBJ', { fileObjFnames });
 
       // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
       if (!(await fileUtils.isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
-        //console.log('RETURN CACHE', stdAlbumFname);
+        logger.debug('RETURN CACHE', stdAlbumFname);
         return JSON.parse(await fsp.readFile(stdAlbumFname, { encoding: 'utf8' }));
       }
     }
@@ -153,7 +154,7 @@ const albumObjUtils = module.exports = {
         try {
           albumObj.date = new Date(matches[0]).toISOString();
         } catch (e) {
-          console.log('INVALID DATE', { matched: matches[0], dirName });
+          logger.warn('INVALID DATE', { matched: matches[0], dirName });
         }
       }
       if (!albumObj.date) {
@@ -161,10 +162,10 @@ const albumObjUtils = module.exports = {
         let leastDate = null;
         const supportedFiles = await fileUtils.getSupportedFiles(dirName);
         const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => exifUtils.getExifForFile(path.join(dirName, fName)), 10);
-        //console.log('GET_ALBUM_OBJ', { dirName, exifArr });
+        logger.debug('GET_ALBUM_OBJ', { dirName, exifArr });
         for (const exif of exifArr) {
           if (exif.DateTime) {
-            //console.log('GET_ALBUM_OBJ:EXIF', { dt: exif.DateTime });
+            logger.debug('GET_ALBUM_OBJ:EXIF', { dt: exif.DateTime });
             // sometimes the dates look like 2020:03:21 and so the colons need to be changed to slashes
             exif.DateTime = exif.DateTime.replace(/^(\d{4}):(\d{2}):(\d{2}) /, '$1/$2/$3 ');
             const exifDate = new Date(exif.DateTime);
@@ -196,7 +197,7 @@ const albumObjUtils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
-    console.info('GET_ALBUM_OBJ', 'Wrote cache file', stdAlbumFname);
+    logger.info('GET_ALBUM_OBJ', 'Wrote cache file', stdAlbumFname);
 
     return albumObj;
   },

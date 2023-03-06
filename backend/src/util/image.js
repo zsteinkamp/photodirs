@@ -8,6 +8,7 @@ const sharp = require('sharp');
 const { spawn } = require('child_process');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const fileTypes = require('./fileTypes');
 const fileUtils = require('./file');
 const cacheUtils = require('./cache');
@@ -18,7 +19,7 @@ const imageUtils = module.exports = {
    * not found, then create it and return the filename.
    */
   getCachedImagePath: async (filePath, resizeOptions) => {
-    //console.log('GetCachedImagePath', { filePath, resizeOptions });
+    logger.debug('GetCachedImagePath', { filePath, resizeOptions });
     // First look for cached file that is close to the size we want
     const [cacheWidth, cacheHeight] = cacheUtils.getCachedImageSizes(resizeOptions);
 
@@ -30,12 +31,12 @@ const imageUtils = module.exports = {
       cacheStat = await fsp.stat(cachePath);
     } catch (e) {
       if (e.code !== 'ENOENT') {
-        console.error('CACHESTAT returned error', { e });
+        logger.error('CACHESTAT returned error', { e });
       }
     }
 
     if (typeof cacheStat.size !== 'undefined' && cacheStat.size === 0) {
-      console.log('Zero length file found. Regenerating.', { cachePath, cacheStat });
+      logger.warn('Zero length file found. Regenerating.', { cachePath, cacheStat });
     }
 
     // Generate the file if it doesn't exist or has a zero length.
@@ -44,7 +45,7 @@ const imageUtils = module.exports = {
     if (typeof cacheStat.size === 'undefined' || cacheStat.size === 0) {
       // Now cache the intermediate size
       await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
-      //console.log('GET_CACHED_IMAGE_PATH', { filePath, cachePath, resizeOptions });
+      logger.debug('GET_CACHED_IMAGE_PATH', { filePath, cachePath, resizeOptions });
       const readStream = fs.createReadStream(filePath);
       // When we cache the intermediate size, use `sharp.fit.outside` to scale to the short side to facilitate cropping
       const transform = imageUtils.getSharpTransform(filePath, { height: cacheHeight, width: cacheWidth, fit: sharp.fit.outside });
@@ -52,10 +53,10 @@ const imageUtils = module.exports = {
 
       async function plumbing() {
         await pipeline(readStream, transform, outStream);
-        console.log('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath });
+        logger.info('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath });
       }
       await plumbing().catch(async (err) => {
-        console.error('IMG CACHE PIPELINE ERROR', { filePath, cachePath, err });
+        logger.error('IMG CACHE PIPELINE ERROR', { filePath, cachePath, err });
         // make sure we don't leave a zero-length file
         await fsp.rm(cachePath, { force: true });
         return null;
@@ -82,7 +83,7 @@ const imageUtils = module.exports = {
    */
   jpegFileForRaw: async (filePath) => {
     const cachePath = path.join(C.CACHE_ROOT, filePath + '.jpg');
-    //console.log('jpegFileForRaw', { filePath, cachePath });
+    logger.debug('jpegFileForRaw', { filePath, cachePath });
     if (await fileUtils.fileExists(cachePath)) {
       // Return existing jpg
       return cachePath;
@@ -99,10 +100,10 @@ const imageUtils = module.exports = {
 
     async function plumbing() {
       await pipeline(tiffPipe, transform, outStream);
-      console.log('JPEG_FILE_FOR_RAW:WROTE_JPG', { filePath, cachePath });
+      logger.info('JPEG_FILE_FOR_RAW:WROTE_JPG', { filePath, cachePath });
     }
     await plumbing().catch(async (err) => {
-      console.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', { err });
+      logger.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', { err });
       // make sure we don't leave a zero-length file
       await fsp.rm(cachePath, { force: true });
       return null;
@@ -115,7 +116,7 @@ const imageUtils = module.exports = {
    * Generate standard resizes
    */
   preResize: async (absFname) => {
-    //console.log('PRE_RESIZE', { absFname });
+    logger.debug('PRE_RESIZE', { absFname });
     return Promise.all([
       imageUtils.getCachedImagePath(absFname, { height: 400, width: 400 }),
       imageUtils.getCachedImagePath(absFname, { height: 1600, width: 1600 })

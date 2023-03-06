@@ -23,12 +23,26 @@ services:
 
   api:
     build:
-      context: ../api
+      context: ../backend
       target: dev
+    command: "npm run watch:api"
     environment:
       TERM: xterm
     volumes:
-      - ../api:/app
+      - ../backend:/app
+      - api_node_modules:/app/node_modules
+      - ../test-album:/albums:ro
+      - dev_cache:/cache
+
+  watcher:
+    build:
+      context: ../backend
+      target: dev
+    command: "npm run watch:watcher"
+    environment:
+      TERM: xterm
+    volumes:
+      - ../backend:/app
       - api_node_modules:/app/node_modules
       - ../test-album:/albums:ro
       - dev_cache:/cache

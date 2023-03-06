@@ -7,6 +7,7 @@ const sharp = require('sharp');
 const { pipeline } = require('stream/promises');
 
 const C = require('./constants');
+const logger = C.LOGGER;
 const fileTypes = require('./util/fileTypes');
 const imageUtils = require('./util/image');
 
@@ -64,7 +65,7 @@ module.exports = async (filePath, size, crop, res) => {
     await pipeline(readStream, transform, res);
   }
   await plumbing().catch((err) => {
-    console.error('IMG CACHE PIPELINE ERROR', { filePath, cachedImagePath, err });
+    logger.error('IMG CACHE PIPELINE ERROR', { filePath, cachedImagePath, err });
     res.end();
   });
 };

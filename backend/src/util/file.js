@@ -5,6 +5,7 @@ const glob = require('glob');
 const path = require('path');
 
 const C = require('../constants');
+const logger = C.LOGGER;
 const fileTypes = require('./fileTypes');
 
 const fileUtils = module.exports = {
@@ -48,7 +49,7 @@ const fileUtils = module.exports = {
     const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
       .filter((dirEnt) => (dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)))
       .map((dirEnt) => dirEnt.name);
-    //console.log('getSupportedFiles', { dirName, dirFiles });
+    logger.debug('getSupportedFiles', { dirName, dirFiles });
     return dirFiles;
   },
 

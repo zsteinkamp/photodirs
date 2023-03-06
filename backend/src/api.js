@@ -1,14 +1,21 @@
 'use strict';
 
+const expressWinston = require('express-winston');
 const express = require('express');
 const app = express();
 const port = 3000;
 
 const handlers = require('./handlers');
-const watcher = require('./watcher');
 
-// kick off the watcher
-watcher.start();
+const C = require('./constants');
+const logger = C.LOGGER;
+
+//more options here - https://github.com/bithavoc/express-winston#request-logging
+app.use(expressWinston.logger({
+  winstonInstance: logger,
+  meta: false,
+  expressFormat: true
+}));
 
 // handles api root (HATEOS)
 app.get(new RegExp('^/api/?$'), async (req, res) => {
@@ -24,7 +31,6 @@ app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
     const [status, body] = await handlers.apiGet(req.params[0] || '/');
     res.status(status).send(body);
   } catch (e) {
-    console.error(e.message);
     return res.status(500).send(e.message);
   }
 });
@@ -35,10 +41,9 @@ app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
     // sends the response on its own
     await handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
   } catch (e) {
-    console.error(e.message);
   }
 });
 
 app.listen(port, () => {
-  console.log(`photodirs listening on port ${port}`);
+  logger.info('API LISTENING', { port });
 });
