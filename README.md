@@ -1,6 +1,7 @@
-# photodirs
-
+# Photodirs
 A filesystem-first photo and video serving, cropping, and resizing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API and looks good on any device or screen size.
+
+![Hero Banner](images/hero.jpg)
 
 Photodirs was made with the following design goals:
 
