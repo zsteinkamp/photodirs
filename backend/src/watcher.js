@@ -24,7 +24,7 @@ async function transcoder({ filePath }) {
 const scanDirectory = async (dirName) => {
   logger.info('SCAN_DIRECTORY:TOP', { dirName });
   // do a depth-first traversal so we can build the directory metadata from the bottom up
-  const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory());
+  const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(/(\.DocumentRevisions-V100|.TemporaryItems)/));
   // recurse into subdirs before continuing
   await batchUtils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
 
