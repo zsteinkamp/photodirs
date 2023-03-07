@@ -155,7 +155,7 @@ export default function Browse() {
         <div>
           Check out out <a rel="noreferrer" href="https://github.com/zsteinkamp/photodirs" target="_blank">
             Photodirs on GitHub
-          </a>.
+          </a>
         </div>
         <div>
           by <a href="https://steinkamp.us/">Zack Steinkamp</a>
