@@ -1,24 +1,22 @@
 # photodirs
 
-A filesystem-first photo and video serving, cropping, and resozing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API.
+A filesystem-first photo and video serving, cropping, and resizing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API.
 
 Photodirs was made with the following design goals:
 
+* Your directory structure is your album structure
+* Your originals are mounted read-only in the containers so there is no possibility of anything happening to them.
+* Directories can be nested arbitrarily deep
+* New files or directories are immediately available, and common resizing is triggered automatically, making for a lightning fast experience.
 * Ergonomic photo URLs (i.e. no UUIDs anywhere)
-* Flexible URL-based resizing and cropping options for photos
+* Flexible, simple URL-based resizing and cropping options for photos
 * A fast, lightweight album/photo browsing web UI
 * Publicly accessible (no authentication requried)
-* Your directory structure is your album structure
-* Your originals are mounted read-only in the container so there is no possibility of anything happening to them.
-* Directories can be nested arbitrarily deep
-* New files or directories are immediately available, and common resizing is triggered by file create making for a lightning fast experience.
-* If files or directories are deleted from the originals, the cached resized files are cleaned up.
-* Directories can have an optional YAML metadata file to override title
-(directory name is default), provide a description, specify an album image.
+* Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
     * Future: disable display, control photo sort order, optional file includelist, or anything else you would like to include
 * Support for EXIF/XMP metadata
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
-* Converted/scaled images are cached locally, and preserved between server restarts.
+* Converted/scaled images and videos are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
 * Support for video! (ffmpeg)
 
