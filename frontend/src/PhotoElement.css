@@ -22,7 +22,8 @@
   text-align: center;
 }
 .PhotoElement .header h1 {
-  color:white;
+  color:#ccc;
+  font-size: 1.5rem;
   margin: 0.5rem auto;
 }
 .PhotoElement .header p {
