@@ -1,12 +1,12 @@
 # photodirs
 
-A photo cropping/resizing service with a basic browsing interface. Use it to serve images on your site/blog as well as to host image galleries.
+A filesystem-first photo and video serving, cropping, and resozing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API.
 
 Photodirs was made with the following design goals:
 
-* A fast, lightweight album/photo browsing web UI
-* Flexible URL-based resizing and cropping options for photos
 * Ergonomic photo URLs (i.e. no UUIDs anywhere)
+* Flexible URL-based resizing and cropping options for photos
+* A fast, lightweight album/photo browsing web UI
 * Publicly accessible (no authentication requried)
 * Your directory structure is your album structure
 * Your originals are mounted read-only in the container so there is no possibility of anything happening to them.
@@ -21,6 +21,15 @@ Photodirs was made with the following design goals:
 * Converted/scaled images are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
 * Support for video! (ffmpeg)
+
+![Photodirs Home](images/screenshot1-home.jpeg | width=400)
+![Photodirs Home](images/screenshot2-album.jpeg | width=400)
+![Photodirs Home](images/screenshot3-scrolldown.jpeg | width=400)
+![Photodirs Home](images/screenshot4-detail.jpeg | width=400)
+![Photodirs Home](images/screenshot5-exif.jpeg | width=400)
+![Photodirs Home](images/screenshot6-bigscreen.jpeg | width=400)
+![Photodirs Home](images/screenshot7-phone.jpeg | width=400)
+![Photodirs Home](images/screenshot8-phonevideo.jpeg | width=400)
 
 ## Requirements
 The ability to run x86_64/amd64 Docker images.
