@@ -70,12 +70,13 @@ const albumObjUtils = module.exports = {
       .forEach(async (dirEnt) => {
         logger.debug('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
         if (dirEnt.isDirectory()) {
-          // ensure the directory isn't empty
-          const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
-          logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
-          if (supportedFiles.length > 0) {
-            dirs.push(dirEnt);
-          }
+          dirs.push(dirEnt);
+          //// ensure the directory isn't empty
+          //const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
+          //logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
+          //if (supportedFiles.length > 0) {
+          //  dirs.push(dirEnt);
+          //}
         } else if (dirEnt.isFile()) {
           if (fileTypes.isSupportedImageFile(dirEnt.name)) {
             files.push(dirEnt);
