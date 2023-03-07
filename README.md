@@ -281,6 +281,7 @@ I decided that leaning more heavily into EXIF was a good choice for investing th
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
+* Open Street Map integration (photo and album views)
 * Additional watcher services:
   * Face detection / naming / browsing
   * Object classification and searching
