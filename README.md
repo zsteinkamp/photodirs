@@ -22,14 +22,22 @@ Photodirs was made with the following design goals:
 * CDN-friendly cache headers
 * Support for video! (ffmpeg)
 
-![Photodirs Home](images/screenshot1-home.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot2-album.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot3-scrolldown.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot4-detail.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot5-exif.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot6-bigscreen.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot7-phone.jpeg){:width="400px"}
-![Photodirs Home](images/screenshot8-phonevideo.jpeg){:width="400px"}
+Home page:
+![Photodirs Home](images/screenshot1-home.jpeg)
+Album page:
+![Photodirs Home](images/screenshot2-album.jpeg)
+Scroll down Album page:
+![Photodirs Home](images/screenshot3-scrolldown.jpeg)
+Photo/Video viewer:
+![Photodirs Home](images/screenshot4-detail.jpeg)
+EXIF panel slides out:
+![Photodirs Home](images/screenshot5-exif.jpeg)
+Works well on big screens:
+![Photodirs Home](images/screenshot6-bigscreen.jpeg)
+Works well on small screens:
+![Photodirs Home](images/screenshot7-phone.jpeg)
+Plays videos everywhere too:
+![Photodirs Home](images/screenshot8-phonevideo.jpeg)
 
 ## Requirements
 The ability to run x86_64/amd64 Docker images.
