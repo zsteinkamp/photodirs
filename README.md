@@ -1,16 +1,16 @@
 # photodirs
 
-A filesystem-first photo and video serving, cropping, and resizing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API.
+A filesystem-first photo and video serving, cropping, and resizing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API and looks good on any device or screen size.
 
 Photodirs was made with the following design goals:
 
 * Your directory structure is your album structure
 * Your originals are mounted read-only in the containers so there is no possibility of anything happening to them.
 * Directories can be nested arbitrarily deep
-* New files or directories are immediately available, and common resizing is triggered automatically, making for a lightning fast experience.
-* Ergonomic photo URLs (i.e. no UUIDs anywhere)
-* Flexible, simple URL-based resizing and cropping options for photos
-* A fast, lightweight album/photo browsing web UI
+* New files or directories are immediately made available, and common resizing and/or transcoding is triggered automatically, making for a lightning fast experience.
+* Ergonomic photo URLs (i.e. no UUIDs anywhere - see Fetching Photos below)
+* Flexible, simple URL-based resizing and cropping options for photos (see Fetching Photos below)
+* A fast, keyboard-supported, lightweight album/photo browsing web UI that implements lazy image loading
 * Publicly accessible (no authentication requried)
 * Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
     * Future: disable display, control photo sort order, optional file includelist, or anything else you would like to include
@@ -18,7 +18,18 @@ Photodirs was made with the following design goals:
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 * Converted/scaled images and videos are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
-* Support for video! (ffmpeg)
+* Support for video!
+
+In my particular use case, Photodirs mounts a share on my NAS called
+`photos` into its `/albums` mount point. I can also drop photos into that NAS share using the native `Files`
+app on my iPhone. I wanted the easiest workflow, where I can select one or more
+pictures on the phone, tap the Share icon, then tap `Save to Files...`.
+
+Once the files are written, Photodirs takes notice and scurries off to
+convert/transcode them, read and cache their metadata, and resize them to the
+most commonly used sizes here. Album indices are updated up the folder
+hierarchy, and within seconds your images are available online, at any size or
+crop. HEIC and RAW files are supported automatically, as are most video formats.
 
 # Screenshots
 
@@ -45,17 +56,32 @@ The ability to run x86_64/amd64 Docker images.
 
 Photodirs requires Docker Compose to run.
 
-You will need to edit the `/albums` volume in the `docker-compose.yml` file to point to your album root. See the last line here:
+You will need to edit the `/albums` volume in the `api` and `watcher` services in the `docker-compose.yml` file to point to your album root. See the indicated lines here:
 
+docker-compose.yml
 ```
   api:
     build:
-      context: ./api
+      context: ./backend
       target: prod
+    environment:
+      NODE_ENV: production
     restart: unless-stopped
     volumes:
+      - /mnt/shared/photos:/albums:ro   # <====== THIS ONE
       - prod_cache:/cache
-      - /PATH/TO/YOUR/PHOTOS:/albums:ro
+
+  watcher:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    command: "npm run start:watcher"
+    volumes:
+      - /mnt/shared/photos:/albums:ro   # <====== THIS ONE
+      - prod_cache:/cache
 ```
 
 Note that `/albums` is mounted Read Only (`:ro`). There is no chance Photodirs
@@ -114,12 +140,16 @@ Options can include:
 * `crop` - fill the box of the specified size, cropping the image
 
 Examples:
+* `/photo/2023-03-01_hawaii/IMG_6789.JPG`  
+will return a JPEG scaled to fit inside of a 1600x1600px box.
+* `/photo/2023-03-01_hawaii/CRW_1000.CR2`  
+will return a JPEG (converted from the RAW CR2 file) scaled to fit inside of a 1600x1600px box.
 * `/photo/2023-03-01_hawaii/CRW_1000.CR2?size=orig`  
-Will return the original image file. RAW originals are downloaded as RAW.
+will return the original image file. RAW originals are downloaded as RAW.
 * `/photo/2023-03-01_hawaii/IMG_1001.JPG?size=200x200&crop`  
-Will always return a 200x200px JPEG image, cropping the long side if it is not square.
+will always return a 200x200px JPEG image, cropping the long side if it is not square.
 * `/photo/2023-03-01_hawaii/IMG_1002.HEIC?size=1000x1000`  
-Will return a JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
+will return a JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
 
 
 ## REST API
@@ -166,9 +196,10 @@ Returns metadata for a given photo. Metadata can come from the EXIF data
 embedded in the photo, an XMP sidecar file, or a YAML file with the same name
 as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
 
+VIDEO NOTE: If the file `type` is `video`, then it will have an additional property called `videoPath` which will contain the URL that can be used to download the transcoded video, e.g. used inside of an HTML `<video>` tag. The `photoPath` property of a `video` can be used to fetch the video's thumbnail image and supports the same cropping/resizing args as any other image here.
 ```
 {
-  "type": "photo",
+  "type": "photo", # Could also be "video"
   "name": "IMG_7809.JPG",
   "path": "/2023-02-10_yahoo_with ben/IMG_7809.JPG",
   "albumPath": "/2023-02-10_yahoo_with%20ben",
