@@ -18,7 +18,7 @@ const handleVideo = async (filePath, res) => {
 
   // Set the correct Content-Type header
   res.type(`video/${fileTypes.getOutputTypeForFile(cachedVideoPath)}`);
-  //TODO uncommant res.set('Cache-control', 'public, max-age=86400');
+  res.set('Cache-control', 'public, max-age=86400');
   res.sendFile(cachedVideoPath);
 };
 
