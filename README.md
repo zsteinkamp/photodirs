@@ -281,6 +281,7 @@ I decided that leaning more heavily into EXIF was a good choice for investing th
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
-* Video support
-* UI Polish
-  * More keboard controls, e.g. up-arrow to go up a folder level
+* Additional watcher services:
+  * Face detection / naming / browsing
+  * Object classification and searching
+* ...
