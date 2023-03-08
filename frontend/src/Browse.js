@@ -146,7 +146,7 @@ export default function Browse() {
   return (
     <div className="Browse">
       <header>
-        <div class="logo">
+        <div className="logo">
           <Link to="/">
             <img src="/logo.svg" alt="Photodirs Logo" />
           </Link>

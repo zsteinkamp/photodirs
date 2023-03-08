@@ -7,6 +7,7 @@
   font-size: 1.75rem;
   line-height:3.5rem;
   color: var(--bg-text-color);
+  text-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
 }
 .Browse header .logo img {
   width: 1.5rem;
@@ -15,9 +16,11 @@
   margin-left: 1rem;
 }
 .Browse .pageBody {
-  padding: 1rem 2rem;
+  padding: 1rem 1rem;
   min-height: 80vh;
   background-color: #dcdcdc;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
 }
 .Browse .pageBody > .album > .desc {
   margin-left: 20rem;
@@ -30,9 +33,7 @@
 .Browse .pageBody .album .header .date {
   white-space: nowrap;
   line-height: 1.5rem;
-  color: black;
-  font-weight: bold;
-  padding-right: 0.4rem;
+  color: #444;
 }
 .Browse .pageBody .album .header .desc {
   line-height: 1.5rem;
@@ -46,7 +47,7 @@
   height: 2.5rem;
   font-size: 1rem;
   color: var(--bg-text-color);
-  padding: 0 2rem;
+  padding: 0 1rem;
   line-height: 3rem;
 }
 .Browse footer a {
