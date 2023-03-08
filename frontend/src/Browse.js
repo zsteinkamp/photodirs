@@ -146,6 +146,9 @@ export default function Browse() {
   return (
     <div className="Browse">
       <header>
+        <div class="logo">
+          <img src="/logo.svg" alt="Photodirs Logo" />
+        </div>
         { !loading && <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } /> }
       </header>
       <div className="pageBody">

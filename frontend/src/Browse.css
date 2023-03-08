@@ -3,10 +3,16 @@
 .Browse header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: calc(0.5rem + 1.5vmin);
   line-height: calc(1.5rem + 2vmin);
   color: white;
+}
+.Browse header .logo img {
+  width: calc(0.5rem + 1.5vmin);
+  height: calc(0.5rem + 1.5vmin);
+  margin-top: calc(0.45rem + 0.5vmin);
+  margin-left: 1rem;
 }
 .Browse .pageBody {
   padding: 1rem 2rem;
