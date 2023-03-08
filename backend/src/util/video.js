@@ -33,8 +33,9 @@ const videoUtils = {
     // Need to generate JPEG version by asking ffmpeg to extract a thumbnail from the video into the cache
     await execFile('/usr/bin/ffmpeg', [
       '-i', filePath, // video file input
-      '-vf', 'scale=w=1920:h=1080:force_original_aspect_ratio=decrease', // max 1080p
-      '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', // ensure even number of pixels dimensions
+      '-y', // overwrite
+      '-crf', '35', // Decent quality but great on bandwidth
+      '-vf', 'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2', // max 1080p and even dimensions
       cachePath // and write to the cachePath
     ]);
 
