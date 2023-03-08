@@ -34,7 +34,7 @@ const videoUtils = {
     await execFile('/usr/bin/ffmpeg', [
       '-i', filePath, // video file input
       '-y', // overwrite
-      '-crf', '35', // Decent quality but great on bandwidth
+      '-crf', '30', // Decent quality but great on bandwidth
       '-vf', 'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2', // max 1080p and even dimensions
       cachePath // and write to the cachePath
     ]);
