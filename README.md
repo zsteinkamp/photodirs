@@ -8,9 +8,8 @@ Photodirs was made with the following design goals:
 * Your directory structure is your album structure
 * Your originals are mounted read-only in the containers so there is no possibility of anything happening to them.
 * Directories can be nested arbitrarily deep
-* New files or directories are immediately made available, and common resizing and/or transcoding is triggered automatically, making for a lightning fast experience.
-* Ergonomic photo URLs (i.e. no UUIDs anywhere - see Fetching Photos below)
-* Flexible, simple URL-based resizing and cropping options for photos (see Fetching Photos below)
+* New files or directories are detected. Common resizing and/or transcoding is triggered automatically, making for a lightning fast browsing experience.
+* Ergonomic photo URLs, including simple URL-based resizing and cropping options (i.e. no UUIDs anywhere - see Fetching Photos below)
 * A fast, keyboard-supported, lightweight album/photo browsing web UI that implements lazy image loading
 * Publicly accessible (no authentication requried)
 * Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
@@ -19,12 +18,24 @@ Photodirs was made with the following design goals:
 * HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 * Converted/scaled images and videos are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
-* Support for video!
+* Support for video files
 
 In my particular use case, Photodirs mounts a share on my NAS called
 `photos` into its `/albums` mount point. I can also drop photos into that NAS share using the native `Files`
-app on my iPhone. I wanted the easiest workflow, where I can select one or more
-pictures on the phone, tap the Share icon, then tap `Save to Files...`.
+app on my iPhone.
+
+My workflows are as follows:
+
+### Mobile Workflow
+* Select one or morepictures on the phone
+* Tap the Share icon
+* Tap `Save to Files...`.
+* Select the `photos` share on the NAS (shared via SMB)
+* Either choose an existing directory or create a new one
+* Save the files
+
+### Desktop Workflow
+* Save any files or create any directories in the `photos` share of the NAS.
 
 Once the files are written, Photodirs takes notice and scurries off to
 convert/transcode them, read and cache their metadata, and resize them to the
