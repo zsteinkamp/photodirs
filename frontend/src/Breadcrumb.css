@@ -12,17 +12,17 @@
   padding:0; 
 }
 .Breadcrumb > div a:visited {
-  color: #99a;
+  color: var(--bg-link-color);
 }
 .Breadcrumb > div a:hover {
-  color: #eef;
+  color: var(--bg-link-hover);
 }
 .Breadcrumb > div a {
   cursor: pointer;
   background: none;
   border: none;
   text-decoration: none;
-  color: #99a;
+  color: var(--bg-link-color);
   padding: 0;
   margin: 0 0.5em 0 0;
   transition: color 0.2s;

@@ -4,13 +4,14 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  font-size: 2rem;
-  color: white;
+  font-size: 1.75rem;
+  line-height:3.5rem;
+  color: var(--bg-text-color);
 }
 .Browse header .logo img {
-  width: 1.75rem;
-  height: 1.75rem;
-  margin-top: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding-top: 1rem;
   margin-left: 1rem;
 }
 .Browse .pageBody {
@@ -44,16 +45,16 @@
   justify-content: space-between;
   height: 2.5rem;
   font-size: 1rem;
-  color: white;
+  color: var(--bg-text-color);
   padding: 0 2rem;
   line-height: 3rem;
 }
 .Browse footer a {
-  color: #99a;
+  color: var(--bg-link-color);
   transition: color 0.2s;
 }
 .Browse footer a:hover {
-  color: #ccd;
+  color: var(--bg-link-hover);
 }
 @media only screen and (max-width: 600px) {
   .Browse .pageBody {
