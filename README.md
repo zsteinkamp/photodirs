@@ -291,6 +291,39 @@ Keywords                        : -
 ```
 I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
 
+## Weird / Cool Stuff
+
+### Serving videos directly with NGINX
+The API and Watcher containers mount a shared volume for cache. One thing that
+is cached are transcoded videos, which are saved as
+`{original_filename}^transcoded.mp4`. By mounting
+this in the NGINX container too, we can serve videos directly. This is the
+config syntax that enables that:
+```
+# Serve videos directly from the cache mount
+location ~ ^/video/(.+) {
+  root /cache/albums;
+  try_files /$1^transcoded.mp4 =404;
+}
+```
+
+### Elastic-sized Everything!
+Through a combination of setting the base font size on the `<body>` element to a
+value that takes the viewport size into account and using `rem`s everywhere,
+Photodirs' UI adapts automatically to different devices. Not only is the layout
+scaled, but the type is scaled too.
+
+This bit of CSS will scale the base font from `10px` to `18px`, depending on the
+smallest dimension of the viewport's height or width:
+```
+html {
+  font-size: calc(min(max(2vmin, 10px), 18px));
+}
+```
+You can play with the coefficient next to `vmin` for intermediate scaling
+behavior.
+
+
 ## TODO
 Random dumping ground / rough sort of pending features or ideas. Put yours here too!
 
