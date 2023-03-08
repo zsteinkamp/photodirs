@@ -8,7 +8,7 @@ export default function Breadcrumb(props) {
     if (idx === props.crumbs.length - 1) {
       itemMarkup = (
         <>
-          {crumb.title}
+          <strong>{crumb.title}</strong>
         </>
       );
     } else {

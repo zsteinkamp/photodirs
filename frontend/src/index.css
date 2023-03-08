@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 
 :root {
-  --main-bg-color: #444;
-  --bg-link-color: #aaa;
-  --bg-link-hover: white;
-  --bg-text-color: white;
+  --main-bg-color: #eee;
+  --bg-link-color: #666;
+  --bg-text-color: #444;
+  --bg-link-hover: var(--bg-text-color);
 }
 
 body {
