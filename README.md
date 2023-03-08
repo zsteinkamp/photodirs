@@ -27,7 +27,7 @@ app on my iPhone.
 My workflows are as follows:
 
 ### Mobile Workflow
-* Select one or morepictures on the phone
+* Select one or more pictures on the phone
 * Tap the Share icon
 * Tap `Save to Files...`.
 * Select the `photos` share on the NAS (shared via SMB)
