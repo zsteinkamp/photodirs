@@ -10,7 +10,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - prod_cache:/cache
+      - prod_cache:/cache:ro
 
   frontend:
     build:
