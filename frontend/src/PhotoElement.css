@@ -78,6 +78,7 @@
 }
 .PhotoElement .imageContainer .exif .tag {
   position: absolute;
+  color:black;
   top: 50%;
   right: -4.75rem;
   transform: translateY(-50%) rotate(270deg);
