@@ -4,14 +4,13 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
-  font-size: calc(0.5rem + 1.5vmin);
-  line-height: calc(1.5rem + 2vmin);
+  font-size: 2rem;
   color: white;
 }
 .Browse header .logo img {
-  width: calc(0.5rem + 1.5vmin);
-  height: calc(0.5rem + 1.5vmin);
-  margin-top: calc(0.45rem + 0.5vmin);
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-top: 0.5rem;
   margin-left: 1rem;
 }
 .Browse .pageBody {
@@ -44,8 +43,7 @@
   flex-direction: row;
   justify-content: space-between;
   height: 2.5rem;
-  font-size: calc(0.6rem + 0.5vmin);
-  line-height: calc(0.6rem + 0.5vmin);
+  font-size: 1rem;
   color: white;
   padding: 0 2rem;
   line-height: 3rem;

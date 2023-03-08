@@ -60,7 +60,7 @@
   padding: 0;
   margin: 1rem 0;
   font-weight: bold;
-  font-size: calc(15px + 0.5vmin);
+  font-size:1.5rem;
 }
 .AlbumList .AlbumItem .body .date {
   margin: 0;
