@@ -10,9 +10,9 @@
   text-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
 }
 .Browse header .logo img {
-  width: 1.5rem;
-  height: 1.5rem;
-  padding-top: 1.1rem;
+  width: 2rem;
+  height: 2rem;
+  padding-top: 0.9rem;
   margin-left: 1rem;
 }
 .Browse .pageBody {
