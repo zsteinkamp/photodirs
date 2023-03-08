@@ -2,7 +2,7 @@ import './Browse.css';
 
 import dayjs from 'dayjs';
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import Breadcrumb from "./Breadcrumb";
 import AlbumList from "./AlbumList";
@@ -147,7 +147,9 @@ export default function Browse() {
     <div className="Browse">
       <header>
         <div class="logo">
-          <img src="/logo.svg" alt="Photodirs Logo" />
+          <Link to="/">
+            <img src="/logo.svg" alt="Photodirs Logo" />
+          </Link>
         </div>
         { !loading && <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } /> }
       </header>
