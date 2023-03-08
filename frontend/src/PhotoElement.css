@@ -1,3 +1,9 @@
+:root {
+  --exif-bg-color: #333;
+  --exif-tab-text-color: #000;
+  --exif-text-color: #999;
+  --exif-header-color: white;
+}
 .PhotoElement {
   background:#111;
   min-width: 100vw;
@@ -62,38 +68,35 @@
   border: 3rem solid black;
   border-radius: 1rem;
 }
+
 .PhotoElement .imageContainer .exif {
-  background: #333;
-  color: #999;
+  background: var(--exif-bg-color);
+  color: var(--exif-text-color);
   width: 0rem;
-  transition: width 0.2s, padding 0.2s, opacity 0.2s;
-  opacity:0.25;
+  transition: width 0.2s, padding 0.2s;
   border-radius: 0 1rem 1rem 0;
   position: relative;
   box-sizing: border-box;
 }
 .PhotoElement .imageContainer .exif:hover {
   width: 20rem;
-  opacity:0.9;
 }
 .PhotoElement .imageContainer .exif .tag {
   position: absolute;
-  color:black;
+  background: var(--exif-bg-color);
+  color: var(--exif-tab-text-color);
   top: 50%;
   right: -4.75rem;
   transform: translateY(-50%) rotate(270deg);
   white-space: nowrap;
-  background: white;
   line-height: 0.5rem;
   padding: 1rem 1rem;
   border-radius: 0 0 1rem 1rem;
-  border: 1px solid white;
   transition: opacity 0.2s;
 }
 .PhotoElement .imageContainer .exif:hover .tag {
   opacity: 0;
 }
-
 .PhotoElement .exifInner {
   margin-left: -40rem;
   padding-left: 1rem;
@@ -112,14 +115,13 @@
   font-size:1rem;
 }
 .PhotoElement .imageContainer .exif dd {
-  color: white;
+  color: var(--exif-header-color);
   font-weight: bold;
   font-size:1rem;
 }
 .PhotoElement .imageContainer .exif:hover .exifInner {
   margin-left: 0;
 }
-
 
 .PhotoElement .thumbContainer {
   height: 12rem;
