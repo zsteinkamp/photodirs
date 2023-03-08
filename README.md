@@ -1,3 +1,5 @@
+<img src="frontend/public/logo.svg" width="250">
+
 # Photodirs
 A filesystem-first photo and video serving, cropping, and resizing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API and looks good on any device or screen size.
 
