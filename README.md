@@ -118,7 +118,7 @@ To get a shell in the `api` container, you can run:
 docker compose exec api bash
 ```
 
-This also works the same for the `frontend` and `nginx` containers.
+This also works the same for the `frontend`, `watcher`, and `nginx` containers.
 
 ## Album Metadata (album.yml)
 Each directory in the tree under the `/albums` mount in Photodirs can optionally have an `album.yml` file.
@@ -158,7 +158,7 @@ I decided that leaning more heavily into EXIF was a good choice for investing th
 
 ## Fetching Photos
 
-### GET /photo/:path?:options or :photoPath?:options
+### GET /photo/:path?:options
 Returns a file, with options honored. Images can even be in the root directory.
 
 Options can include:
@@ -180,6 +180,8 @@ will return a JPEG image whose long side is 1000px, i.e. will fit inside of the 
 will return a JPEG image thumbnail of the named video, cropped to a 300px square.
 
 ## Fetching Videos
+
+### GET /video/:path
 Returns a transcoded video (MP4, 1080P max)
 
 Examples:
