@@ -60,6 +60,7 @@
   padding: 0;
   margin: 1rem 0 0 0;
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
   font-family: var(--condensed-font);
   font-size:1.5rem;
