@@ -58,22 +58,22 @@
 }
 .AlbumList .AlbumItem .body h1 {
   padding: 0;
-  margin: 1rem 0;
-  font-weight: bold;
+  margin: 1rem 0 0 0;
+  font-family: var(--condensed-font);
   font-size:1.5rem;
 }
 .AlbumList .AlbumItem .body .date {
   margin: 0;
   font-weight: bold;
   font-size: 75%;
-  padding: 0;
+  padding: 0.5rem 0 0 0;
   opacity: 0.8;
 }
 .AlbumList .AlbumItem .body .desc {
   margin: 0;
   font-size: 100%;
   line-height: 1.5rem;
-  padding: 0 1rem 0 0;
+  padding: 0.5rem 1rem 0 0;
   opacity: 0.5;
   max-height: 4.5rem;
   overflow: hidden;

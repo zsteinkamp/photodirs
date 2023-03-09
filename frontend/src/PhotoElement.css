@@ -31,6 +31,7 @@
   color:#ccc;
   font-size: 1.5rem;
   margin: 0.5rem auto;
+  font-family: var(--condensed-font);
 }
 .PhotoElement .header p {
   margin:0;

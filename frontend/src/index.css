@@ -3,6 +3,7 @@
   --bg-link-color: #666;
   --bg-text-color: #444;
   --bg-link-hover: var(--bg-text-color);
+  --condensed-font: "Roboto Condensed";
 }
 
 body {

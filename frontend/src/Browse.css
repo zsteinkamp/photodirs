@@ -9,10 +9,12 @@
   color: var(--bg-text-color);
   text-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
 }
+.Browse header .logo {
+  margin-top: 0.3rem;
+}
 .Browse header .logo img {
   width: 2rem;
   height: 2rem;
-  padding-top: 0.9rem;
   margin-left: 1rem;
 }
 .Browse .pageBody {
