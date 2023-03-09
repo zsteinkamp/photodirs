@@ -22,13 +22,11 @@ Photodirs was made with the following design goals:
 * CDN-friendly cache headers
 * Support for video files
 
-In my particular use case, Photodirs mounts a share on my NAS called
-`photos` into its `/albums` mount point. I can also drop photos into that NAS share using the native `Files`
-app on my iPhone.
+## My Work Flows
 
-My workflows are as follows:
+My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` where the archive of all the photos I want to keep and share lives. I wrote Photodirs to interface with this share (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
 
-### Mobile Workflow
+### Mobile
 * Select one or more pictures on the phone
 * Tap the Share icon
 * Tap `Save to Files...`.
@@ -36,7 +34,9 @@ My workflows are as follows:
 * Either choose an existing directory or create a new one
 * Save the files
 
-### Desktop Workflow
+This also works well directly from the Files app to scan documents (with auto-cropping/straightening and PDF export) and save directly to the NAS.
+
+### Desktop
 * Save any files or create any directories in the `photos` share of the NAS.
 
 Once the files are written, Photodirs takes notice and scurries off to
@@ -143,6 +143,41 @@ docker compose exec api bash
 
 This also works the same for the `frontend` and `nginx` containers.
 
+## Album Metadata (album.yml)
+Each directory in the tree under the `/albums` mount in Photodirs can optionally have an `album.yml` file.
+
+This file specifies metadata for the album. At the time, the following properties are supported:
+* _title_ - The album title. By default, the directory name is used as the title.
+* _description_ - A description of the album. Could be a string, or an array of strings (displayed as paragraphs). Defaults to nothing.
+* _thumbnail_ - The original name of of an image or video file that you would like to use as a thumbnail. By default, the first file in the directory is used.
+
+Here is an example with a multi-paragraph description:
+```
+title: Yahoo with Ben
+description:
+  - What a great chance to relive some epic memories with one of my favorite peoples.
+  - Ben and I were teammates when Yahoo! moved into this campus. We famously took a short walk out on the levees that turned into a 3+ hour ordeal due to some confusing twists and turns the trails take next to channels of muddy water.
+  - Google owns this property now, since Verizon (who purchased most of Yahoo!) moved out. They have held off occupying it though.
+thumbnail: IMG_7807.JPG
+```
+
+## Setting Photo Title / Description
+This repo contains a utility in `bin/exif-set` that you can use to set the correct title and description in your image files. To use it, you will need the `exiftool` command installed in your system. Install with your favorite package manager, e.g.:
+* MAC: `brew install exiftool`
+* LINUX: `sudo apt install exiftool`
+
+To use it, just run the command from the terminal (you may want to copy the script to somewhere in your `$PATH`), passing a filename as an arg:
+```
+> exif-set kimchi_hands.jpg 
+Title []: Kimchi Hands
+Description []: Hands after mixing the cabbage with the kimchi paste.
+Keywords []: 
+    1 image files updated
+Object Name                     : Kimchi Hands
+Caption-Abstract                : Hands after mixing the cabbage with the kimchi paste.
+Keywords                        : -
+```
+I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
 
 ## Fetching Photos
 
@@ -272,24 +307,6 @@ VIDEO NOTE: If the file `type` is `video`, then it will have an additional prope
 Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodirs caches converted/resized images in 200 pixel increments, up to 3000px. This helps to protect against a bad actor filling your cache disk by requesting every possible image size.
 
 You can still request any image size, and Photodirs will use the cached image that is equal to or greater than the size you are requesting to fulfill your request, resizing it on-the-fly to your specification. The `Cache-control: public` header is sent with images, so that intermediate web caches, CDNs, and browsers will cache the final output.
-
-## Setting Photo Title / Description
-This repo contains a utility in `bin/exif-set` that you can use to set the correct title and description in your image files. To use it, you will need the `exiftool` command installed in your system. Install with your favorite package manager, e.g.:
-* MAC: `brew install exiftool`
-* LINUX: `sudo apt install exiftool`
-
-To use it, just run the command from the terminal (you may want to copy the script to somewhere in your `$PATH`), passing a filename as an arg:
-```
-> exif-set kimchi_hands.jpg 
-Title []: Kimchi Hands
-Description []: Hands after mixing the cabbage with the kimchi paste.
-Keywords []: 
-    1 image files updated
-Object Name                     : Kimchi Hands
-Caption-Abstract                : Hands after mixing the cabbage with the kimchi paste.
-Keywords                        : -
-```
-I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
 
 ## Weird / Cool Stuff
 
