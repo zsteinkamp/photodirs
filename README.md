@@ -22,29 +22,6 @@ Photodirs was made with the following design goals:
 * CDN-friendly cache headers
 * Support for video files
 
-## My Work Flows
-
-My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` where the archive of all the photos I want to keep and share lives. I wrote Photodirs to interface with this share (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
-
-### Mobile
-* Select one or more pictures on the phone
-* Tap the Share icon
-* Tap `Save to Files...`.
-* Select the `photos` share on the NAS (shared via SMB)
-* Either choose an existing directory or create a new one
-* Save the files
-
-This also works well directly from the Files app to scan documents (with auto-cropping/straightening and PDF export) and save directly to the NAS.
-
-### Desktop
-* Save any files or create any directories in the `photos` share of the NAS.
-
-Once the files are written, Photodirs takes notice and scurries off to
-convert/transcode them, read and cache their metadata, and resize them to the
-most commonly used sizes here. Album indices are updated up the folder
-hierarchy, and within seconds your images are available online, at any size or
-crop. HEIC and RAW files are supported automatically, as are most video formats.
-
 # Screenshots
 
 | Home page:                                            | Album page:                                            |
@@ -199,7 +176,29 @@ will return the original image file. RAW originals are downloaded as RAW.
 will always return a 200x200px JPEG image, cropping the long side if it is not square.
 * `/photo/2023-03-01_hawaii/IMG_1002.HEIC?size=1000x1000`  
 will return a JPEG image whose long side is 1000px, i.e. will fit inside of the specified `size` box without cropping.
+* `/photo/2023-03-01_hawaii/MVI_1001.MOV?size=300x300&crop`  
+will return a JPEG image thumbnail of the named video, cropped to a 300px square.
 
+## Fetching Videos
+Returns a transcoded video (MP4, 1080P max)
+
+Examples:
+* `/video/my_vacation/MOVIE_0001.AVI`  
+will return an MP4 video, scaled down to 1080P if larger.
+* `/video/my_vacation/MOVIE_0002.MOV`  
+will return an MP4 video, scaled down to 1080P if larger.
+* `/video/my_vacation/MOVIE_0003.MP4`  
+will return an MP4 video, scaled down to 1080P if larger.
+
+You can use these urls as sources in HTML `<video>` tags, along
+with their photo URL counterpart to get a `poster=` image, e.g.
+```
+<video controls autoplay="true" poster="https://myphotodirs.com/photo/my_vacation/MOVIE_0001.AVI">
+  <source src="https://myphotodirs.com/video/my_vacation/MOVIE_0001.AVI" type="video/mp4" />
+</video>
+```
+In this example, even though the original file was an AVI, and the URLs say AVI,
+the poster thumbnail will be an JPEG and the video source is an MP4.
 
 ## REST API
 
@@ -307,6 +306,29 @@ VIDEO NOTE: If the file `type` is `video`, then it will have an additional prope
 Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodirs caches converted/resized images in 200 pixel increments, up to 3000px. This helps to protect against a bad actor filling your cache disk by requesting every possible image size.
 
 You can still request any image size, and Photodirs will use the cached image that is equal to or greater than the size you are requesting to fulfill your request, resizing it on-the-fly to your specification. The `Cache-control: public` header is sent with images, so that intermediate web caches, CDNs, and browsers will cache the final output.
+
+## My Work Flows
+
+My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` where the archive of all the photos I want to keep and share lives. I wrote Photodirs to interface with this share (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
+
+### Mobile
+* Select one or more pictures on the phone
+* Tap the Share icon
+* Tap `Save to Files...`.
+* Select the `photos` share on the NAS (shared via SMB)
+* Either choose an existing directory or create a new one
+* Save the files
+
+This also works well directly from the Files app to scan documents (with auto-cropping/straightening and PDF export) and save directly to the NAS.
+
+### Desktop
+* Save any files or create any directories in the `photos` share of the NAS.
+
+Once the files are written, Photodirs takes notice and scurries off to
+convert/transcode them, read and cache their metadata, and resize them to the
+most commonly used sizes here. Album indices are updated up the folder
+hierarchy, and within seconds your images are available online, at any size or
+crop. HEIC and RAW files are supported automatically, as are most video formats.
 
 ## Weird / Cool Stuff
 
