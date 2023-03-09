@@ -31,15 +31,19 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 }
 .Browse .pageBody .album .header .date {
   white-space: nowrap;
   line-height: 1.5rem;
-  color: #444;
+  color: #666;
+  font-weight: bold;
+  width: 40rem;
 }
 .Browse .pageBody .album .header .desc {
   line-height: 1.5rem;
-  max-width: 40rem;
+  width: 40rem;
+  margin-bottom: 1rem;
 }
 .Browse footer {
   margin-top: 0rem;

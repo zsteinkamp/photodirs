@@ -123,11 +123,21 @@ export default function Browse() {
     }
 
     if (data.type === 'album') {
+      // always make description an array to simplify impl
+      if (typeof data.description === 'string' && data.description) {
+          data.description = [data.description];
+      }
+      const descriptionParagraphs = data.description && data.description.map((elem, i) => (
+        <div key={i} className='desc'>
+          {elem}
+        </div>
+      ));
+
       return (
         <div className="album">
           <div className="header">
               { data.path !== "/" && (<div className="date">{ dayjs(data.date).utc().format("YYYY-MM-DD (dddd)") }</div>) }
-              <div className="desc">{ data.description }</div>
+              { descriptionParagraphs }
           </div>
           <AlbumList albums={ data.albums } />
           <FileList files={ data.files } />

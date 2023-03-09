@@ -59,6 +59,8 @@
 .AlbumList .AlbumItem .body h1 {
   padding: 0;
   margin: 1rem 0 0 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-family: var(--condensed-font);
   font-size:1.5rem;
 }
