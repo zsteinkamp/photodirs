@@ -13,7 +13,6 @@ export default function PhotoElement(props) {
   const thisPos = albumFiles.findIndex( (file) => { return file.title === props.data.title; } );
   const prevPhoto = albumFiles[(thisPos + albumFiles.length - 1) % albumFiles.length];
   const nextPhoto = albumFiles[(thisPos + albumFiles.length + 1) % albumFiles.length];
-  //console.log({ thisPos, prevPhoto, nextPhoto });
 
   const navigate = useNavigate();
 
@@ -86,25 +85,47 @@ export default function PhotoElement(props) {
     );
   }
 
+  let pointerState = null;
+  let origCX = 0;
+  const onPointerDown = (e) => {
+    pointerState = 'down';
+    origCX = e.clientX;
+  };
+  const onPointerMove = (e) => {
+    if (pointerState === 'down') {
+      const movementX = (origCX - e.clientX);
+      if (Math.abs(movementX) > 10) {
+        if (movementX < 0) {
+          goToPrevPhoto();
+        } else {
+          goToNextPhoto();
+        }
+      }
+    }
+  };
+  const onPointerUp = (e) => {
+    pointerState = 'up';
+  };
+
   const mainElement = data.type === 'video' ? (
     <div className="video">
-      <video key={data.videoPath} controls autoPlay={true} poster={data.photoPath + "?size=1600x1600"}>
+      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={data.photoPath + "?size=1600x1600"}>
         <source src={data.videoPath} type="video/mp4" />
       </video>
     </div>
   ) : (
     <div className="image">
-      <img src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
+      <img draggable="false" src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
     </div>
   );
 
   return (
-    <div className="PhotoElement">
+    <div onPointerUp={onPointerUp} className="PhotoElement">
       <div className="header">
         <h1>{data.title}</h1>
         {data.description && <p>{data.description}</p>}
       </div>
-      <div className="imageContainer">
+      <div className="imageContainer" onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
         {exif}
         {mainElement}
       </div>

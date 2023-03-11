@@ -28,22 +28,19 @@
   margin-left: 20rem;
 }
 .Browse .pageBody .album .header {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-}
-.Browse .pageBody .album .header .date {
-  white-space: nowrap;
-  line-height: 1.5rem;
-  color: #666;
-  font-weight: bold;
+  max-width: 100vw;
   width: 40rem;
+  margin: 0 auto;
 }
 .Browse .pageBody .album .header .desc {
   line-height: 1.5rem;
-  width: 40rem;
+  max-width: 40rem;
   margin-bottom: 1rem;
+}
+.Browse .pageBody .album .header .date {
+  white-space: nowrap;
+  color: #666;
+  font-weight: bold;
 }
 .Browse footer {
   margin-top: 0rem;

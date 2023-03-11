@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="App">
       <Browse />
-        <ScrollRestoration   getKey={(location, matches) => {
+        <ScrollRestoration getKey={(location, matches) => {
           return location.pathname;
         }} />
     </div>
