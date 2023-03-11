@@ -85,14 +85,14 @@ export default function PhotoElement(props) {
     );
   }
 
-  let pointerState = null;
+  let pointerDown = false;
   let origCX = 0;
   const onPointerDown = (e) => {
-    pointerState = 'down';
+    pointerDown = true;
     origCX = e.clientX;
   };
   const onPointerMove = (e) => {
-    if (pointerState === 'down') {
+    if (pointerDown) {
       const movementX = (origCX - e.clientX);
       if (Math.abs(movementX) > 10) {
         if (movementX < 0) {
@@ -104,18 +104,21 @@ export default function PhotoElement(props) {
     }
   };
   const onPointerUp = (e) => {
-    pointerState = 'up';
+    pointerDown = false;
   };
 
   const mainElement = data.type === 'video' ? (
     <div className="video">
-      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={data.photoPath + "?size=1600x1600"}>
+      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
         <source src={data.videoPath} type="video/mp4" />
       </video>
     </div>
   ) : (
     <div className="image">
-      <img draggable="false" src={ data.photoPath + "?size=1600x1600" } alt={ data.title } />
+      <img draggable="false" src={`${data.photoPath}?size=1600x1600`}
+        srcSet={`${data.photoPath}?size=400x400 400w, ${data.photoPath}?size=800x400 800w, ${data.photoPath}?size=1600x1600 1600w`}
+        alt={data.title}
+      />
     </div>
   );
 

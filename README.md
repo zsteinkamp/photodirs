@@ -12,7 +12,7 @@ Photodirs was made with the following design goals:
 * Directories can be nested arbitrarily deep
 * New files or directories are detected. Common resizing and/or transcoding is triggered automatically, making for a lightning fast browsing experience.
 * Ergonomic photo URLs, including simple URL-based resizing and cropping options (i.e. no UUIDs anywhere - see Fetching Photos below)
-* A fast, keyboard-supported, lightweight album/photo browsing web UI that implements lazy image loading
+* A fast, keyboard-supported, swipe-enabled, lightweight album/photo browsing web UI that implements lazy image loading and image `srcSet`s.
 * Publicly accessible (no authentication requried)
 * Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
     * Future: disable display, control photo sort order, optional file includelist, or anything else you would like to include
