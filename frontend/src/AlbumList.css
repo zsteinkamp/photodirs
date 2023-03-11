@@ -41,8 +41,8 @@
 }
 
 .AlbumList .AlbumItem .thumbnail {
-  padding: none;
-  margin: none;
+  padding: 0;
+  margin: 0;
   width: 10rem;
   min-width: 10rem;
   height: 10rem;
@@ -56,6 +56,7 @@
 }
 
 .AlbumList .AlbumItem .body {
+  overflow:hidden;
 }
 .AlbumList .AlbumItem .body h1 {
   padding: 0;
