@@ -194,7 +194,9 @@ const albumObjUtils = module.exports = {
       albumObj.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(albumObj.thumbnail));
     } else {
       const thumbFname = await albumObjUtils.getAlbumDefaultThumbnailFilename(dirName);
-      albumObj.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
+      if (thumbFname) {
+        albumObj.thumbnail = path.join(C.PHOTO_URL_BASE, uriPath, encodeURIComponent(thumbFname));
+      }
     }
 
     // write out the file for next time
