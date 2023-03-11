@@ -60,7 +60,7 @@ const fileTypes = module.exports = {
    * Return whether a filename is for a RAW file
    */
   isRaw: (filePath) => {
-    return !!filePath.match(/(crw|cr2|dng|arw)$/i);
+    return !!filePath.match(/(crw|cr2|cr3|dng|arw)$/i);
   },
 
   /*
