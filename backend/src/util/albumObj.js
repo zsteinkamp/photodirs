@@ -103,7 +103,7 @@ const albumObjUtils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(extAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(extAlbumFname, JSON.stringify(extAlbumObj));
-    logger.info('Wrote cache file', extAlbumFname);
+    logger.info('GET_EXTENDED_ALBUM_OBJ - Wrote cache file', { extAlbumFname });
 
     return extAlbumObj;
   },
@@ -200,7 +200,7 @@ const albumObjUtils = module.exports = {
     // write out the file for next time
     await fsp.mkdir(path.dirname(stdAlbumFname), { recursive: true, mode: 755 });
     await fsp.writeFile(stdAlbumFname, JSON.stringify(albumObj));
-    logger.info('GET_ALBUM_OBJ', 'Wrote cache file', stdAlbumFname);
+    logger.info('GET_ALBUM_OBJ - Wrote cache file', { stdAlbumFname });
 
     return albumObj;
   },

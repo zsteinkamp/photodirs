@@ -20,7 +20,7 @@ app.get('/*', async (req, res, next) => {
     return res.status(404).end()
   }
 
-  const url = path.join('http://api:3000/api/albums', req.path)
+  const url = path.join('http://nginx:3333/api/albums', req.path)
   const resp = await fetch(url);
   let body;
   try {
@@ -44,7 +44,6 @@ app.get('/*', async (req, res, next) => {
     .replace('__META_DESCRIPTION__', body.description)
     .replace('__META_OG_IMAGE__', body.thumbnail)
 
-  console.log(htmlData);
   return res.send(htmlData);
 });
 
