@@ -24,9 +24,11 @@ export default function AlbumList(props) {
       return (
         <div className="AlbumItem" key={album.apiPath}>
           <Link to={ album.uriPath }>
-            <div className='thumbnail'>
-              <img src={ `${album.thumbnail}?size=300x300&crop)` } loading="lazy" alt={ album.title } />
-            </div>
+            {album.thumbnail && (
+              <div className='thumbnail'>
+                <img src={ `${album.thumbnail}?size=300x300&crop)` } loading="lazy" alt={ album.title } />
+              </div>
+            )}
             <div className='body'>
               <p className='date'>{dayjs(album.date).utc().format("YYYY-MM-DD")}</p>
               <h1>{album.title}</h1>
