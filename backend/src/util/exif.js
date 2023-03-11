@@ -4,7 +4,6 @@ const path = require('path');
 const exiftool = require('node-exiftool');
 
 const C = require('../constants');
-const ep = new exiftool.ExiftoolProcess('/usr/bin/exiftool');
 const logger = C.LOGGER;
 const fileTypes = require('./fileTypes');
 
@@ -30,9 +29,10 @@ const exifUtils = module.exports = {
       return ret;
     }
 
+    const ep = new exiftool.ExiftoolProcess('/usr/bin/exiftool');
     await ep.open();
     const meta = await ep.readMetadata(filePath, ['-File:all']);
-    console.log('META', { filePath, meta });
+    await ep.close();
 
     if (meta.error) {
       logger.error('EXIFTOOL ERROR', { err: meta.error });
@@ -52,7 +52,7 @@ const exifUtils = module.exports = {
         ret[prop] = exif[prop];
       }
     }
-    console.log('EXIF_DETAIL_PROPS', { exif, ret });
+    //console.log('EXIF_DETAIL_PROPS', { exif, ret });
     return ret;
   },
 
