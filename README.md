@@ -21,6 +21,7 @@ Photodirs was made with the following design goals:
 * Converted/scaled images and videos are cached locally, and preserved between server restarts.
 * CDN-friendly cache headers
 * Support for video files
+* Support for OpenGraph content previews (title, description, thumbnail)
 
 # Screenshots
 
