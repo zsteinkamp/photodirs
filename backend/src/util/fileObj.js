@@ -35,7 +35,7 @@ module.exports = {
     const reqPath = path.join('/', albumPath, fileName);
 
     // Get exif data
-    const exifObj = await exifUtils.getExifReaderForFile(reqPath);
+    const exifObj = await exifUtils.getExifObjForFile(reqPath);
     const fileTitle = exifUtils.getExifTitle(exifObj) || fileName;
     const fileDescription = exifUtils.getExifDescription(exifObj) || '';
     const fileExif = exifUtils.getExifDetailProps(exifObj);

@@ -12,6 +12,7 @@ RUN apt-get install -y \
     ffmpeg \
 		jq \
 		less \
+    libimage-exiftool-perl \
 		ninja-build \
 		python3-pip \
 		software-properties-common \
