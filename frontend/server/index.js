@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 // static resources should just be served as they are
 app.use(express.static(
   path.resolve(__dirname, '..', 'build'),
-  { maxAge: '30d' }
+  { index: false, maxAge: '30d' }
 ));
 
 const indexPath  = path.resolve(__dirname, '..', 'build', 'index.html');
