@@ -30,6 +30,10 @@ app.get('/*', async (req, res, next) => {
     return res.status(404).end()
   }
 
+  if (body.type === 'photo') {
+    body.thumbnail = body.photoPath;
+  }
+
   // inject meta tags
   htmlData = htmlData.replace(
       "<title>React App</title>",

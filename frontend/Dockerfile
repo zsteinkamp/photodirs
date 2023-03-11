@@ -10,8 +10,7 @@ CMD [ "npm", "start" ]
 ## PRODUCTION BUILD BELOW
 FROM dev AS prod
 ENV NODE_ENV=production
-COPY ./src/ ./src/
-COPY ./public/ ./public/
+COPY . .
 RUN npm run build
 
 CMD [ "npm", "run", "server" ]
