@@ -14,7 +14,7 @@
   flex: 0 1 0px;
   flex-direction: row;
   flex-wrap: nowrap;
-  min-width: 35rem;
+  min-width: 36rem;
   margin: 0 0;
 }
 .AlbumList .AlbumItem > a:visited {
@@ -30,6 +30,7 @@
   width: 100%;
   height: 10rem;
   padding: 0.75rem;
+  padding: 1rem;
   border-radius: 1rem;
   filter: drop-shadow(0 0.25rem 0.5rem rgba(0, 0, 0, 0.1));
   margin: 0;
@@ -84,18 +85,4 @@
   -webkit-line-clamp: 5;
   text-overflow: ellipsis;
   display: block;
-}
-@media only screen and (max-width: 600px) {
-  .AlbumList {
-    gap: 1rem;
-  }
-  .AlbumList .AlbumItem {
-    min-width: 100%;
-  }
-  .AlbumList .AlbumItem > a {
-  }
-  .AlbumList .AlbumItem a .thumbnail {
-    min-width: 10rem;
-    min-height: 10rem;
-  }
 }

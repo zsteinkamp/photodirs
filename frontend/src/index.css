@@ -18,7 +18,7 @@ body {
 
 /* Document level adjustments */
 html {
-  font-size: calc(min(max(2vmin, 10px), 18px));
+  font-size: calc(min(max(2.2vmin, 10px), 18px));
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',

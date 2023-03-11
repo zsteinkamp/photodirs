@@ -3,8 +3,13 @@
   flex-direction: row;
   margin-left: 0.5em;
   font-family: var(--condensed-font);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .Breadcrumb > div {
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 .Breadcrumb > div::before {
   content: '/';

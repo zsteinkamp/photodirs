@@ -22,6 +22,8 @@ Photodirs was made with the following design goals:
 * CDN-friendly cache headers
 * Support for video files
 * Support for OpenGraph content previews (title, description, thumbnail)
+* Easy integration with HTML image Source Sets, e.g.  
+`<img src="x.jpg" srcset="x.jpg?size=500x500 500w, x.jpg?size=1000x1000 1000w">`
 
 # Screenshots
 
