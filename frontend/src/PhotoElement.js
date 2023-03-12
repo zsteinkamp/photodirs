@@ -1,5 +1,5 @@
 import './PhotoElement.css'
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import ThumbnailImg from "./ThumbnailImg";
@@ -16,9 +16,22 @@ export default function PhotoElement(props) {
 
   const navigate = useNavigate();
 
+  const elemRef = useRef(null);
+
+  const hideRef = () => {
+    if (elemRef && elemRef.current && elemRef.current.style) {
+      elemRef.current.style.opacity = 0;
+    }
+  }
+  const showRef = () => {
+    if (elemRef && elemRef.current && elemRef.current.style) {
+      elemRef.current.style.opacity = 1;
+    }
+  }
+
   const returnToAlbum = () => { navigate(parentPath) };
-  const goToPrevPhoto = () => { navigate(prevPhoto.uriPath) };
-  const goToNextPhoto = () => { navigate(nextPhoto.uriPath) };
+  const goToPrevPhoto = () => { hideRef(); navigate(prevPhoto.uriPath) };
+  const goToNextPhoto = () => { hideRef(); navigate(nextPhoto.uriPath) };
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
   const keyCodeToAction = {
@@ -108,14 +121,14 @@ export default function PhotoElement(props) {
   };
 
   const mainElement = data.type === 'video' ? (
-    <div className="video">
-      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
+    <div ref={elemRef} className="video">
+      <video onLoad={showRef} ref={elemRef} draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
         <source src={data.videoPath} type="video/mp4" />
       </video>
     </div>
   ) : (
-    <div className="image">
-      <img draggable="false" src={`${data.photoPath}?size=1600x1600`}
+    <div ref={elemRef} className="image">
+      <img onLoad={showRef} draggable="false" src={`${data.photoPath}?size=1600x1600`}
         srcSet={`${data.photoPath}?size=400x400 400w, ${data.photoPath}?size=800x400 800w, ${data.photoPath}?size=1600x1600 1600w`}
         alt={data.title}
       />
