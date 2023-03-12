@@ -11,21 +11,19 @@ const metaUtils = module.exports = {
   /*
    * Merge metadata into an object, usually from `album.yml` or `{image_name}.yml` files.
    */
-  fetchAndMergeMeta: async (dest, path) => {
-    const meta = await metaUtils.getAlbumMeta(path);
+  fetchAndMergeMeta: async (dest, metaPath) => {
+    const meta = await metaUtils.getPathMeta(metaPath);
     Object.entries(meta).forEach(([key, val]) => {
       dest[key] = val;
     });
-    logger.debug('META', { path, meta, dest });
+    logger.debug('META', { metaPath, meta, dest });
     return dest;
   },
 
   /*
    * Fetch metadata from `album.yml` file in a given path.
    */
-  getAlbumMeta: async (albumPath) => {
-    const metaPath = path.join(C.ALBUMS_ROOT, albumPath, 'album.yml');
-
+  getPathMeta: async (metaPath) => {
     let fileContents;
     try {
       // TODO: figure out bug when this is async

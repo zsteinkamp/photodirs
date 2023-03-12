@@ -4,8 +4,12 @@ module.exports = {
   ALBUMS_ROOT: '/albums',
   API_BASE: '/api',
   CACHE_ROOT: '/cache',
+  META_TITLE_PROPERTY: 'title',
+  META_DESCRIPTION_PROPERTY: 'description',
   EXIF_TITLE_PROPERTY: 'ObjectName',
   EXIF_DESCRIPTION_PROPERTY: 'Caption-Abstract',
+  EXIF_VIDEO_TITLE_PROPERTY: 'Title',
+  EXIF_VIDEO_DESCRIPTION_PROPERTY: 'Description',
   EXIF_DETAIL_PROPERTIES: [
     'DateTimeOriginal',
     'Make',

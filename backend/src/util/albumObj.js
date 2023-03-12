@@ -146,7 +146,8 @@ const albumObjUtils = module.exports = {
     };
 
     // Merge meta with album object
-    albumObj = await metaUtils.fetchAndMergeMeta(albumObj, dirName);
+    const metaPath = path.join(C.ALBUMS_ROOT, dirName, 'album.yml');
+    albumObj = await metaUtils.fetchAndMergeMeta(albumObj, metaPath);
 
     // now divine the date if it was not set in the album.yml file
     if (!albumObj.date) {

@@ -22,9 +22,17 @@ module.exports = {
       logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
       const metaStat = await fsp.stat(fileObjMetaFname);
       const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
-      logger.debug('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, useCache: metaStat.mtime >= fileStat.mtime });
+
+      let ymlStat = null;
+      const ymlFName = path.join(C.ALBUMS_ROOT, albumPath, fileName + '.yml');
+
+      if (await fileUtils.fileExists(ymlFName)) {
+        ymlStat = await fsp.stat(ymlFName);
+      }
+      const useCache = metaStat.mtime >= fileStat.mtime && (!ymlStat || (metaStat.mtime >= ymlStat.mtime));
+      logger.info('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, ys: ymlStat && ymlStat.mtime, useCache, fileName });
       // check to see if the cached metadata file is not older than the album file it relates to
-      if (metaStat.mtime >= fileStat.mtime) {
+      if (useCache) {
         logger.debug('RETURN CACHE', { fileObjMetaFname });
         return JSON.parse(await fsp.readFile(fileObjMetaFname, { encoding: 'utf8' }));
       }

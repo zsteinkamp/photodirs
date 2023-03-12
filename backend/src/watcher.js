@@ -23,8 +23,11 @@ async function transcoder({ filePath }) {
 
 const scanDirectory = async (dirName) => {
   logger.debug('SCAN_DIRECTORY:TOP', { dirName });
+
   // do a depth-first traversal so we can build the directory metadata from the bottom up
-  const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true })).filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+  const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
+    .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+
   // recurse into subdirs before continuing
   await batchUtils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
 
@@ -41,14 +44,14 @@ const scanDirectory = async (dirName) => {
     let absFname = path.join('/albums', dirName, fName);
     if (fileTypes.isRaw(absFname)) {
       // convert raw file
-      const cachePath = await imageUtils.jpegFileForRaw(absFname);
-      logger.debug('PRE-CONVERT RAW', { absFname, cachePath });
-      absFname = cachePath;
+      const jpegPath = await imageUtils.jpegFileForRaw(absFname);
+      logger.debug('PRE-CONVERT RAW', { absFname, jpegPath });
+      absFname = jpegPath;
     } else if (fileTypes.isVideo(absFname)) {
       transcodingQueue.push({ filePath: absFname });
-      const cachePath = await imageUtils.jpegFileForVideo(absFname);
-      logger.debug('PRE-GENERATE VIDEO THUMBNAIL', { absFname, cachePath });
-      absFname = cachePath;
+      const posterPath = await imageUtils.jpegFileForVideo(absFname);
+      logger.debug('PRE-GENERATE VIDEO THUMBNAIL', { absFname, posterPath });
+      absFname = posterPath;
     }
     // resize the file to common sizes
     await imageUtils.preResize(absFname);

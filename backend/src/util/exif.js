@@ -6,6 +6,7 @@ const exiftool = require('node-exiftool');
 const C = require('../constants');
 const logger = C.LOGGER;
 const fileTypes = require('./fileTypes');
+const metaUtils = require('./meta');
 
 const exifUtils = module.exports = {
   /*
@@ -20,26 +21,31 @@ const exifUtils = module.exports = {
    * Return an object filled with EXIF for a given file, or empty object.
    */
   getExifObjForFile: async (reqPath) => {
-    const ret = {};
+    let ret = {};
 
     const filePath = path.join(C.ALBUMS_ROOT, reqPath);
 
     logger.debug('GET_EXIF_FOR_FILE', { filePath });
-    if (!(fileTypes.isJpeg(filePath) || fileTypes.isHeif(filePath) || fileTypes.isRaw(filePath))) {
+    if (!(fileTypes.isSupportedImageFile(filePath))) {
       return ret;
     }
 
     const ep = new exiftool.ExiftoolProcess('/usr/bin/exiftool');
     await ep.open();
-    const meta = await ep.readMetadata(filePath, ['-File:all']);
+    const meta = await ep.readMetadata(filePath);//, ['-File:all']);
     await ep.close();
+
+    // Sometimes we get an array back
+    ret = meta.data[0] || meta.data || {};
 
     if (meta.error) {
       logger.error('EXIFTOOL ERROR', { err: meta.error });
-      return ret;
     }
 
-    return meta.data[0] || meta.data;
+    const fileYML = filePath + '.yml';
+    ret = await metaUtils.fetchAndMergeMeta(ret, fileYML);
+
+    return ret;
   },
 
   /*
@@ -60,13 +66,13 @@ const exifUtils = module.exports = {
    * Get exif title
    */
   getExifTitle: (exif) => {
-    return exif[C.EXIF_TITLE_PROPERTY] || null;
+    return exif[C.META_TITLE_PROPERTY] || exif[C.EXIF_TITLE_PROPERTY] || exif[C.EXIF_VIDEO_TITLE_PROPERTY] || null;
   },
 
   /*
    * Get exif description
    */
   getExifDescription: (exif) => {
-    return exif[C.EXIF_DESCRIPTION_PROPERTY] || null;
+    return exif[C.META_DESCRIPTION_PROPERTY] || exif[C.EXIF_DESCRIPTION_PROPERTY] || exif[C.EXIF_VIDEO_DESCRIPTION_PROPERTY] || null;
   }
 };
