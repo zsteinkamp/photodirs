@@ -30,7 +30,7 @@ module.exports = {
         ymlStat = await fsp.stat(ymlFName);
       }
       const useCache = metaStat.mtime >= fileStat.mtime && (!ymlStat || (metaStat.mtime >= ymlStat.mtime));
-      logger.info('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, ys: ymlStat && ymlStat.mtime, useCache, fileName });
+      logger.debug('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, ys: ymlStat && ymlStat.mtime, useCache, fileName });
       // check to see if the cached metadata file is not older than the album file it relates to
       if (useCache) {
         logger.debug('RETURN CACHE', { fileObjMetaFname });
