@@ -76,7 +76,7 @@ const watch = () => {
   // burst of chokidar activity, then launch a scanner into the deepest (leaf
   // node) paths
   let chokidarDebounce = null;
-  const watcher = chokidar.watch(C.ALBUMS_ROOT, { usePolling: true, interval: 1000, awaitWriteFinish: true, ignoreInitial: true }).on('all', async (event, evtPath) => {
+  const watcher = chokidar.watch(C.ALBUMS_ROOT, { usePolling: false, awaitWriteFinish: true, ignoreInitial: true }).on('all', async (event, evtPath) => {
     logger.info('WATCHER ACTIVITY', { event, evtPath });
 
     // clean up cache on directory and file deletions
