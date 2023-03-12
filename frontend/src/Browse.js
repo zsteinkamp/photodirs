@@ -39,7 +39,6 @@ export default function Browse() {
 
   const keyCodeToAction = {
     27: goToParentAlbum, // escape
-    38: goToParentAlbum, // up arrow
   };
 
   const handleKeypress = (event) => {

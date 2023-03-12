@@ -36,7 +36,6 @@ export default function PhotoElement(props) {
 
   const keyCodeToAction = {
       27: returnToAlbum, // escape
-      38: returnToAlbum, // up arrow
       37: goToPrevPhoto, // left arrow
       39: goToNextPhoto  // right arrow
   };
