@@ -9,6 +9,7 @@ const cacheUtils = require('./cache');
 const fileUtils = require('./file');
 const fileTypes = require('./fileTypes');
 const exifUtils = require('./exif');
+const metaUtils = require('./meta');
 
 module.exports = {
   /*
@@ -17,14 +18,15 @@ module.exports = {
   getFileObj: async (albumPath, fileName) => {
     logger.debug('getFileObj', { albumPath, fileName });
     const fileObjMetaFname = cacheUtils.getFileObjMetadataFname(albumPath, fileName);
-    logger.debug('GET_FILE_OBJ:TOP', { fileObjMetaFname, albumPath, fileName });
+    const filePath = path.join(C.ALBUMS_ROOT, albumPath, fileName);
+    logger.debug('GET_FILE_OBJ:TOP', { fileObjMetaFname, filePath });
     if (await fileUtils.fileExists(fileObjMetaFname)) {
       logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
       const metaStat = await fsp.stat(fileObjMetaFname);
-      const fileStat = await fsp.stat(path.join(C.ALBUMS_ROOT, albumPath, fileName));
+      const fileStat = await fsp.stat(filePath);
 
       let ymlStat = null;
-      const ymlFName = path.join(C.ALBUMS_ROOT, albumPath, fileName + '.yml');
+      const ymlFName = filePath + '.yml';
 
       if (await fileUtils.fileExists(ymlFName)) {
         ymlStat = await fsp.stat(ymlFName);
@@ -49,12 +51,17 @@ module.exports = {
     const fileExif = exifUtils.getExifDetailProps(exifObj);
     const isVideo = fileTypes.isVideo(fileName);
 
+    // Get YML Meta if there
+    const fileYML = filePath + '.yml';
+    const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML);
+
     const fileObj = {
       type: isVideo ? C.TYPE_VIDEO : C.TYPE_PHOTO,
       title: fileTitle,
       description: fileDescription,
       fileName: fileName,
       albumPath: albumPath,
+      meta: fileMeta,
       path: reqPath,
       uriPath: path.join('/', uriAlbumPath, uriFileName),
       photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),

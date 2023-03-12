@@ -58,7 +58,6 @@ const exifUtils = module.exports = {
         ret[prop] = exif[prop];
       }
     }
-    //console.log('EXIF_DETAIL_PROPS', { exif, ret });
     return ret;
   },
 
