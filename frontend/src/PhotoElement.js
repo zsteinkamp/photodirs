@@ -1,8 +1,13 @@
 import './PhotoElement.css'
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore, { Thumbs } from 'swiper/core';
 
-import ThumbnailImg from "./ThumbnailImg";
+import 'swiper/css/bundle';
+
+// install Swiper's Thumbs component
+SwiperCore.use([Thumbs]);
 
 export default function PhotoElement(props) {
   const data = props.data;
@@ -23,8 +28,6 @@ export default function PhotoElement(props) {
 
   const keyCodeToAction = {
       27: returnToAlbum, // escape
-      37: goToPrevPhoto, // left arrow
-      39: goToNextPhoto  // right arrow
   };
 
   const handleKeypress = (event) => {
@@ -84,57 +87,69 @@ export default function PhotoElement(props) {
     );
   }
 
-  let pointerDown = false;
-  let origCX = 0;
-  const onPointerDown = (e) => {
-    pointerDown = true;
-    origCX = e.clientX;
-  };
-  const onPointerMove = (e) => {
-    if (pointerDown) {
-      const movementX = (origCX - e.clientX);
-      if (Math.abs(movementX) > 10) {
-        if (movementX < 0) {
-          goToPrevPhoto();
-        } else {
-          goToNextPhoto();
-        }
+  // store thumbs swiper instance
+  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
+  const getMainSwiper = () => {
+    const slides = data.album.files.map((file) => {
+      if (data.type === 'video') {
+        return (
+          <SwiperSlide key={file.photoPath} className="video">
+            <video key={file.videoPath} controls autoPlay={true} poster={`${file.photoPath}?size=1600x1600`}>
+              <source src={file.videoPath} type="video/mp4" />
+            </video>
+          </SwiperSlide>
+        );
       }
-    }
-  };
-  const onPointerUp = (e) => {
-    pointerDown = false;
+      return (
+        <SwiperSlide key={file.photoPath} className="image">
+          <img src={`${file.photoPath}?size=1600x1600`}
+            srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x800 800w, ${file.photoPath}?size=1600x1600 1600w`}
+            alt={file.title}
+          />
+        </SwiperSlide>
+      );
+    });
+    return (
+      <Swiper
+        thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+        slidesPerView={1}
+        centeredSlides
+        onSlideChange={(e) => console.log('slide change', {e})}
+      >
+        {slides}
+      </Swiper>
+    );
   };
 
-  const mainElement = data.type === 'video' ? (
-    <div className="video">
-      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
-        <source src={data.videoPath} type="video/mp4" />
-      </video>
-    </div>
-  ) : (
-    <div className="image">
-      <img draggable="false" src={`${data.photoPath}?size=1600x1600`}
-        srcSet={`${data.photoPath}?size=400x400 400w, ${data.photoPath}?size=800x400 800w, ${data.photoPath}?size=1600x1600 1600w`}
-        alt={data.title}
-      />
-    </div>
+  const thumbSwiper = (
+    <Swiper
+      onSwiper={setThumbsSwiper}
+      centeredSlides
+      slidesPerView={'auto'}
+    >
+      {data.album.files.map((file) => (
+        <SwiperSlide key={file.photoPath} className="image">
+          <img src={`${file.photoPath}?size=400x400&crop`}
+            alt={file.title}
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 
   return (
-    <div onPointerUp={onPointerUp} className="PhotoElement">
+    <div className="PhotoElement">
       <div className="header">
         <h1>{data.title}</h1>
         {data.description && <p>{data.description}</p>}
       </div>
-      <div className="imageContainer" onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
+      <div className="imageContainer">
         {exif}
-        {mainElement}
+        {getMainSwiper()}
       </div>
-      <div className="thumbContainer invisible-scrollbar">
-        { data.album.files.map( (file) => (
-          <ThumbnailImg key={file.uriPath} data={data} file={file} />))
-        }
+      <div className="thumbContainer">
+        {thumbSwiper}
       </div>
       <Link preventScrollReset={true} title="Return to Album" className="closeBtn" to={parentPath}>{closeSVG}</Link>
       <Link title="Download Original" className="downloadBtn" onClick={downloadOriginal} to="#">{downloadSVG}</Link>
