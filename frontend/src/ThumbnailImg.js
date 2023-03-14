@@ -3,10 +3,13 @@ import { Link } from "react-router-dom";
 
 import VideoIcon from "./VideoIcon";
 
-const ThumbnailImg = ({data, file}) => {
+const ThumbnailImg = ({data, file, handleNavigate}) => {
   const elemRef = useRef(null);
 
   const scrollCenter = () => {
+    if (data.uriPath !== file.uriPath) {
+      handleNavigate();
+    }
     if (elemRef && elemRef.current && elemRef.current.scrollIntoView) {
       elemRef.current.scrollIntoView({ behavior: "smooth", inline: "center"});
     }

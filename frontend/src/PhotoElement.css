@@ -51,9 +51,11 @@
   position: relative;
   overflow: hidden;
 }
+.PhotoElement .imageContainer .mainElement {
+  transition: opacity 1s;
+}
 .PhotoElement .imageContainer .video {
   margin: auto;
-  transition: opacity 0.6s;
 }
 .PhotoElement .imageContainer .video video {
   object-fit: contain;
@@ -62,7 +64,6 @@
 }
 .PhotoElement .imageContainer .image {
   margin: auto;
-  transition: opacity 1.0s;
 }
 .PhotoElement .imageContainer .image img {
   object-fit: contain;
