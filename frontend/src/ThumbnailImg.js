@@ -19,7 +19,7 @@ const ThumbnailImg = ({data, file}) => {
   });
 
   return (
-    <Link ref={elemRef} onClick={scrollCenter} preventScrollReset={true} className={'thumbnailLink' + (file.uriPath === data.uriPath ? ' sel' : '')} to={ file.uriPath } title={ file.title }>
+    <Link replace={true} ref={elemRef} onClick={scrollCenter} className={'thumbnailLink' + (file.uriPath === data.uriPath ? ' sel' : '')} to={ file.uriPath } title={ file.title }>
       <img src={`${file.photoPath}?size=300x300&crop`} alt={ file.title }/>
       {(file.type === 'video') && <VideoIcon />}
     </Link>

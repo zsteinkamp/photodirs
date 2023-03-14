@@ -3,7 +3,8 @@
   --bg-link-color: #666;
   --bg-text-color: #444;
   --bg-link-hover: var(--bg-text-color);
-  --condensed-font: "Roboto Condensed";
+  --condensed-font: "Roboto Condensed", Impact, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+;
 }
 
 body {
