@@ -1,5 +1,5 @@
 import './PhotoElement.css'
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import ThumbnailImg from "./ThumbnailImg";
@@ -19,8 +19,8 @@ export default function PhotoElement(props) {
   const navigate = useNavigate();
 
   const returnToAlbum = () => { navigate(parentPath) };
-  const goToPrevPhoto = () => { handleNavigate(); navigate(prevPhoto.uriPath) };
-  const goToNextPhoto = () => { handleNavigate(); navigate(nextPhoto.uriPath) };
+  const goToPrevPhoto = () => { navigate(prevPhoto.uriPath) };
+  const goToNextPhoto = () => { navigate(nextPhoto.uriPath) };
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
   const keyCodeToAction = {
@@ -39,12 +39,6 @@ export default function PhotoElement(props) {
       }
     }
   };
-
-  const elemRef = useRef();
-
-  useEffect(() => {
-    elemRef.current && (elemRef.current.style.opacity = 1);
-  }, [data]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeypress);
@@ -99,18 +93,14 @@ export default function PhotoElement(props) {
     pointerDown = false;
   };
 
-  const handleNavigate = () => {
-    elemRef.current && (elemRef.current.style.opacity = 0);
-  }
-
   const mainElement = data.type === 'video' ? (
-    <div ref={elemRef} className="mainElement video">
+    <div className="video">
       <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
         <source src={data.videoPath} type="video/mp4" />
       </video>
     </div>
   ) : (
-    <div ref={elemRef} className="mainElement image">
+    <div className="image">
       <img draggable="false" src={`${data.photoPath}?size=1600x1600`}
         srcSet={`${data.photoPath}?size=400x400 400w, ${data.photoPath}?size=800x400 800w, ${data.photoPath}?size=1600x1600 1600w`}
         alt={data.title}
@@ -130,7 +120,7 @@ export default function PhotoElement(props) {
       </div>
       <div className="thumbContainer invisible-scrollbar">
         { data.album.files.map((file) => (
-          <ThumbnailImg key={file.uriPath} data={data} file={file} handleNavigate={handleNavigate} />
+          <ThumbnailImg key={file.uriPath} data={data} file={file} />
         ))}
       </div>
       <Link title="Return to Album" className="closeBtn" to={parentPath}><SVGClose /></Link>
