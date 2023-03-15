@@ -6,6 +6,7 @@
   --thumbnail-height: 5rem;
   --thumbnail-border: 0.5rem;
   --header-height: 5rem;
+  --main-height: calc(100vh - var(--thumbnail-height) - var(--header-height) - (2 * var(--thumbnail-border)));
 }
 .PhotoElement {
   background:#111;
@@ -43,7 +44,7 @@
 }
 .PhotoElement .imageContainer {
   display: flex;
-  height: calc(100vh - var(--thumbnail-height) - var(--header-height) - (2 * var(--thumbnail-border)));
+  height: var(--main-height);
   width: 100vw;
   flex-direction: row;
   align-content: center;
@@ -57,7 +58,7 @@
 }
 .PhotoElement .imageContainer .video video {
   object-fit: contain;
-  max-height: calc(100vh - 17rem);
+  max-height: var(--main-height);
   max-width: 100%;
 }
 .PhotoElement .imageContainer .image {
@@ -66,7 +67,7 @@
 }
 .PhotoElement .imageContainer .image img {
   object-fit: contain;
-  height: calc(100vh - var(--thumbnail-height) - var(--header-height) - (2 * var(--thumbnail-border)));
+  height: var(--main-height);
   max-width: 100%;
   border: 2rem solid black;
   border-radius: 1rem;
@@ -102,7 +103,7 @@
 .PhotoElement .exifInner {
   margin-left: -40rem;
   padding-left: 1rem;
-  max-height: calc(100vh - 22rem);
+  max-height: calc(var(--main-height) - 5rem);
   transition: margin-left 0.2s;
   display: flex;
   flex-direction: column;
