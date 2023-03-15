@@ -1,32 +1,42 @@
 import './PhotoElement.css'
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import ThumbnailImg from "./ThumbnailImg";
 import SVGDownload from "./SVGDownload";
 import SVGClose from "./SVGClose";
 
-export default function PhotoElement(props) {
-  const data = props.data;
+export default function PhotoElement({data}) {
 
   const parentPath = data.album.uriPath;
 
-  const albumFiles = props.data.album.files;
-  const thisPos = albumFiles.findIndex( (file) => { return file.title === props.data.title; } );
-  const prevPhoto = albumFiles[(thisPos + albumFiles.length - 1) % albumFiles.length];
-  const nextPhoto = albumFiles[(thisPos + albumFiles.length + 1) % albumFiles.length];
+  const albumFiles = data.album.files;
+  let currFileIndex = albumFiles.findIndex( (file) => { return file.path === data.path; } );
+
+  const [currData, setCurrData] = useState(data);
 
   const navigate = useNavigate();
+  const carouselRef = useRef(null);
 
   const returnToAlbum = () => { navigate(parentPath) };
-  const goToPrevPhoto = () => { navigate(prevPhoto.uriPath) };
-  const goToNextPhoto = () => { navigate(nextPhoto.uriPath) };
+  const goToPrevPhoto = () => { scrollCarousel(-1); };
+  const goToNextPhoto = () => { scrollCarousel(1); };
+
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
+  const scrollCarousel = (relative) => {
+    if (!carouselRef.current) {
+      return;
+    }
+    const currScroll = carouselRef.current.scrollLeft;
+    const currWidth = carouselRef.current.clientWidth;
+    const newScroll = (currScroll + (relative * currWidth)) % (albumFiles.length * currWidth);
+    carouselRef.current.scrollLeft = newScroll;
+  };
+
   const keyCodeToAction = {
-      27: returnToAlbum, // escape
-      37: goToPrevPhoto, // left arrow
-      39: goToNextPhoto  // right arrow
+    27: returnToAlbum, // escape
+    37: goToPrevPhoto, // left arrow
+    39: goToNextPhoto  // right arrow
   };
 
   const handleKeypress = (event) => {
@@ -47,9 +57,52 @@ export default function PhotoElement(props) {
     };
   });
 
-  let exif = null;
-  if (data.exif && Object.keys(data.exif).length > 0) {
-    const exifDetails = Object.entries(data.exif)
+  const updateData = async () => {
+    const crc = carouselRef.current;
+    if (!crc) {
+      return;
+    }
+    currFileIndex = Math.round(crc.scrollLeft / crc.clientWidth);
+
+    const response = await fetch(albumFiles[currFileIndex].apiPath);
+    if (!response.ok) {
+      const body = await response.json();
+      throw new Error(
+        `HTTP error ${response.status}: ${JSON.stringify(body)}`
+      );
+    }
+
+    let actualData = await response.json();
+    setCurrData(actualData);
+
+    // update displayed URL without engaging router -- have to do it this way
+    // because we use a catch-all route
+    window.history.replaceState(null, actualData.title, actualData.path);
+  };
+
+  const debounceRef = useRef(null);
+  const handleScroll = (e) => {
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+    // if no scrolling for 250ms then update data
+    debounceRef.current = window.setTimeout(updateData, 250);
+  };
+
+  // subscribe to carousel scroll to trigger fetching metadata for other images
+  useEffect(() => {
+    const current = carouselRef.current;
+    if (current) {
+      carouselRef.current.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      current.removeEventListener("scroll", handleScroll);
+    }
+  });
+
+  let exifElement = null;
+  if (currData.exif && Object.keys(currData.exif).length > 0) {
+    const exifDetails = Object.entries(currData.exif)
       .map(([key, val]) => {
         return (
           <Fragment key={key}>
@@ -59,69 +112,61 @@ export default function PhotoElement(props) {
         );
       });
 
-    exif = (
-        <div className="exif">
-          <div className="exifInner invisible-scrollbar">
-            <dl>{exifDetails}</dl>
-          </div>
-          <div className="tag">EXIF / INFO</div>
+    exifElement = (
+      <div className="exif">
+        <div className="exifInner invisible-scrollbar">
+          <dl>{exifDetails}</dl>
         </div>
+        <div className="tag">EXIF / INFO</div>
+      </div>
     );
   }
 
-  let pointerDown = false;
-  let origCX = 0;
-  const onPointerDown = (e) => {
-    pointerDown = true;
-    origCX = e.clientX;
-  };
-  const onPointerMove = (e) => {
-    if (pointerDown) {
-      const movementX = (origCX - e.clientX);
-      if (Math.abs(movementX) > 10) {
-        // only trigger the movement once
-        pointerDown = false;
-        if (movementX < 0) {
-          goToPrevPhoto();
-        } else {
-          goToNextPhoto();
-        }
-      }
-    }
-  };
-  const onPointerUp = (e) => {
-    pointerDown = false;
-  };
+  const currFileRef = useRef(null);
+  // if the data in state is the same as the data in props
+  const isInitialLoad = currData === data;
 
-  const mainElement = data.type === 'video' ? (
-    <div className="video">
-      <video draggable="false" key={data.videoPath} controls autoPlay={true} poster={`${data.photoPath}?size=1600x1600`}>
-        <source src={data.videoPath} type="video/mp4" />
-      </video>
-    </div>
-  ) : (
-    <div className="image">
-      <img draggable="false" src={`${data.photoPath}?size=1600x1600`}
-        srcSet={`${data.photoPath}?size=400x400 400w, ${data.photoPath}?size=800x400 800w, ${data.photoPath}?size=1600x1600 1600w`}
-        alt={data.title}
-      />
+  useEffect(() => {
+    if (currFileRef.current) {
+      currFileRef.current.scrollIntoView();
+      carouselRef.current.style['scroll-behavior'] = 'smooth';
+    }
+  });
+
+  const tiles = albumFiles.map((file, i) => {
+    const ref = isInitialLoad && i === currFileIndex ? currFileRef : null;
+    return (
+      <div ref={ref} key={file.uriPath} className="carouselItem">
+        { file.type === 'video' ? (
+          <video draggable="false" controls autoPlay={false} poster={`${file.photoPath}?size=1600x1600`} loading='lazy'>
+            <source src={file.videoPath} type="video/mp4" />
+          </video>
+        ) : (
+          <img draggable="false" src={`${file.photoPath}?size=1600x1600`}
+            srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x400 800w, ${file.photoPath}?size=1600x1600 1600w`}
+            alt={file.title}
+            loading='lazy'
+          />
+        ) }
+      </div>
+    );
+  });
+
+  const mainElement = (
+    <div ref={carouselRef} className="carousel">
+      {tiles}
     </div>
   );
 
   return (
-    <div onPointerUp={onPointerUp} className="PhotoElement">
+    <div className="PhotoElement">
       <div className="header">
-        <h1>{data.title}</h1>
-        {data.description && <p>{data.description}</p>}
+        <h1>{currData.title}</h1>
+        {currData.description && <p>{currData.description}</p>}
       </div>
-      <div className="imageContainer" onPointerDown={onPointerDown} onPointerMove={onPointerMove}>
-        {exif}
+      <div className="imageContainer">
         {mainElement}
-      </div>
-      <div className="thumbContainer invisible-scrollbar">
-        { data.album.files.map((file) => (
-          <ThumbnailImg key={file.uriPath} data={data} file={file} />
-        ))}
+        {exifElement}
       </div>
       <Link title="Return to Album" className="closeBtn" to={parentPath}><SVGClose /></Link>
       <Link title="Download Original" className="downloadBtn" onClick={downloadOriginal} to="#"><SVGDownload /></Link>
