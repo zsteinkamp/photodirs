@@ -88,7 +88,7 @@ same as development mode, just without auto-reloading.
 
 You will need to edit the `docker-compose.yml` file in the `prod/` directory to
 use the correct path to your albums directory. Note that this is mounted "Read
-Only" so even if I had a terrible bug in my code, I could not mess up your
+Only" so even if there was a terrible bug in the code, it could not mess up your
 originals.
 
 After you have changed the `/albums` mount source, then you can start in
@@ -102,7 +102,7 @@ The containers are configured to start on boot, unless explicitly stopped.
 
 If you want to monitor the log output, then you can run:
 ```
-docker logs -f
+docker compose logs -f
 ```
 
 ### Development Mode
@@ -314,7 +314,7 @@ You can still request any image size, and Photodirs will use the cached image th
 
 ## My Work Flows
 
-My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` where the archive of all the photos I want to keep and share lives. I wrote Photodirs to interface with this share (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
+My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
 
 ### Mobile
 * Select one or more pictures on the phone
