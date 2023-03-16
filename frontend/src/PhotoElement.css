@@ -10,17 +10,23 @@
 }
 .PhotoElement {
   background:#111;
-  min-width: 100vw;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  max-height: 100vh;
-  max-width: 100vw;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
 }
+@supports(height: 100dvh) {
+  :root {
+    --main-height: calc(100dvh - var(--header-height));
+  }
+  .PhotoElement {
+    height: 100dvh;
+  }
+}
+
 .PhotoElement .invisible-scrollbar {
   scrollbar-width: none;
 }
