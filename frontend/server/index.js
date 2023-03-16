@@ -36,13 +36,13 @@ app.get('/*', async (req, res, next) => {
 
   // inject meta tags
   htmlData = htmlData.replace(
-      "<title>React App</title>",
+      '<title>React App</title>',
       `<title>${body.title}</title>`
     )
     .replace('__META_OG_TITLE__', body.title)
     .replace('__META_OG_DESCRIPTION__', body.description)
     .replace('__META_DESCRIPTION__', body.description)
-    .replace('__META_OG_IMAGE__', body.thumbnail)
+    .replace('__META_OG_IMAGE__', body.album ? body.album.thumbnail : body.thumbnail)
 
   return res.send(htmlData);
 });
