@@ -1,9 +1,9 @@
 FROM node:18 AS dev
 
-RUN apt-get update && apt-get install -y dcraw
+RUN apt-get update && apt-get install -y libraw-bin
 
 ##
-# START
+# START HEIF/HEIC SUPPORT - custom libvips build
 # mostly from https://github.com/jcupitt/docker-builds/blob/master/libvips-ubuntu20.04/Dockerfile
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y \

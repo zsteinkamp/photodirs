@@ -164,7 +164,7 @@ const imageUtils = module.exports = {
     // -T == TIFF output
     // -w == camera white balance
     // -c == output to STDOUT
-    const dcrawProcess = spawn('/usr/bin/dcraw', ['-T', '-w', '-c', filePath],
+    const dcrawProcess = spawn('/usr/lib/libraw/dcraw_emu', ['-T', '-w', '-Z', '-', filePath],
       { stdio: ['ignore', 'pipe', process.stderr] });
     // The `pipe` option above connects STDOUT to a pipe that can then be streamed.
     // This avoids the wasteful overhead of temp files or creating bloated
