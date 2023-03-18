@@ -42,7 +42,7 @@ app.get('/*', async (req, res, next) => {
     .replace('__META_OG_TITLE__', body.title)
     .replace('__META_OG_DESCRIPTION__', body.description)
     .replace('__META_DESCRIPTION__', body.description)
-    .replace('__META_OG_IMAGE__', body.album ? body.album.thumbnail : body.thumbnail)
+    .replace('__META_OG_IMAGE__', body.thumbnail || body.photoPath )
 
   return res.send(htmlData);
 });
