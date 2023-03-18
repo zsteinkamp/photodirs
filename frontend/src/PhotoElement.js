@@ -10,28 +10,48 @@ export default function PhotoElement({data}) {
   const parentPath = data.album.uriPath;
 
   const albumFiles = data.album.files;
-  let currFileIndex = albumFiles.findIndex( (file) => { return file.path === data.path; } );
+
+  const [currFileIdx, setCurrFileIdx] = useState(albumFiles.findIndex( (file) => { return file.path === data.path; } ));
 
   const [currData, setCurrData] = useState(data);
 
   const navigate = useNavigate();
   const carouselRef = useRef(null);
+  const thumbsRef = useRef(null);
+
+  // if the data in state is the same as the data in props
+  const isInitialLoad = currData === data;
+
+  // a ref for each image tile
+  const tileRefs = useRef([]);
+  const thumbRefs = useRef([]);
 
   const returnToAlbum = () => { navigate(parentPath) };
-  const goToPrevPhoto = () => { scrollCarousel(-1); };
-  const goToNextPhoto = () => { scrollCarousel(1); };
+  const goToPrevPhoto = () => { scrollCarouselTo(currFileIdx - 1); };
+  const goToNextPhoto = () => { scrollCarouselTo(currFileIdx + 1); };
 
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
-  const scrollCarousel = (relative) => {
-    if (!carouselRef.current) {
+  const scrollCarouselTo = (idx) => {
+    setCurrFileIdx((albumFiles.length + idx) % albumFiles.length);
+  };
+
+  useEffect(() => {
+    if (!tileRefs.current || !thumbRefs.current) {
       return;
     }
-    const currScroll = carouselRef.current.scrollLeft;
-    const currWidth = carouselRef.current.clientWidth;
-    const newScroll = (currScroll + (relative * currWidth)) % (albumFiles.length * currWidth);
-    carouselRef.current.scrollLeft = newScroll;
-  };
+    const tileRef = tileRefs.current[currFileIdx];
+    const thumbRef = thumbRefs.current[currFileIdx];
+    if (tileRef) {
+      tileRef.scrollIntoView();
+      // can't have two smooth scrollers at once in Chrome
+      setTimeout(() => {
+        thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
+        thumbRef.classList.add('sel');
+        thumbRef.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      }, 1000);
+    }
+  }, [currFileIdx]);
 
   const keyCodeToAction = {
     27: returnToAlbum, // escape
@@ -40,7 +60,6 @@ export default function PhotoElement({data}) {
   };
 
   const handleKeypress = (event) => {
-    //console.log(event.keyCode, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey);
     if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
       const keypressAction = keyCodeToAction[event.keyCode];
       if (keypressAction) {
@@ -62,9 +81,9 @@ export default function PhotoElement({data}) {
     if (!crc) {
       return;
     }
-    currFileIndex = Math.round(crc.scrollLeft / crc.clientWidth);
+    scrollCarouselTo(Math.round(crc.scrollLeft / crc.clientWidth));
 
-    const response = await fetch(albumFiles[currFileIndex].apiPath);
+    const response = await fetch(albumFiles[currFileIdx].apiPath);
     if (!response.ok) {
       const body = await response.json();
       throw new Error(
@@ -122,21 +141,9 @@ export default function PhotoElement({data}) {
     );
   }
 
-  const currFileRef = useRef(null);
-  // if the data in state is the same as the data in props
-  const isInitialLoad = currData === data;
-
-  useEffect(() => {
-    if (currFileRef.current) {
-      currFileRef.current.scrollIntoView();
-      carouselRef.current.style['scroll-behavior'] = 'smooth';
-    }
-  });
-
   const tiles = albumFiles.map((file, i) => {
-    const ref = isInitialLoad && i === currFileIndex ? currFileRef : null;
     return (
-      <div ref={ref} key={file.uriPath} className="carouselItem">
+      <div ref={(el) => tileRefs.current[i] = el} key={file.uriPath} className="carouselItem">
         { file.type === 'video' ? (
           <video draggable="false" controls autoPlay={false} poster={`${file.photoPath}?size=1600x1600`} loading='lazy'>
             <source src={file.videoPath} type="video/mp4" />
@@ -152,11 +159,38 @@ export default function PhotoElement({data}) {
     );
   });
 
+  const thumbnails = albumFiles.map((file, i) => {
+    return (
+      <Link ref={(el) => thumbRefs.current[i] = el} to={file.uriPath} key={file.uriPath} onClick={()=>scrollCarouselTo(i)}>
+        <img draggable="false" src={`${file.photoPath}?size=400x400`}
+          alt={file.title}
+          loading='lazy'
+        />
+      </Link>
+    );
+  });
+
   const mainElement = (
     <div ref={carouselRef} className="carousel">
       {tiles}
     </div>
   );
+
+  // this will run on initial load and center the tile corresponding to the URL
+  useEffect(() => {
+    if (!isInitialLoad || !tileRefs.current || !thumbRefs.current) {
+      return;
+    }
+    const tileRef = tileRefs.current[currFileIdx];
+    if (tileRef) {
+      tileRef.scrollIntoView();
+      carouselRef.current.style['scroll-behavior'] = 'smooth';
+    }
+    const thumbRef = thumbRefs.current[currFileIdx];
+    if (thumbRef) {
+      thumbRef.scrollIntoView();
+    }
+  });
 
   return (
     <div className="PhotoElement">
@@ -167,6 +201,9 @@ export default function PhotoElement({data}) {
       <div className="imageContainer">
         {mainElement}
         {exifElement}
+      </div>
+      <div ref={thumbsRef} className="thumbContainer">
+        {thumbnails}
       </div>
       <Link title="Return to Album" className="closeBtn" to={parentPath}><SVGClose /></Link>
       <Link title="Download Original" className="downloadBtn" onClick={downloadOriginal} to="#"><SVGDownload /></Link>

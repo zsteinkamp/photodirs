@@ -5,8 +5,9 @@
   --exif-header-color: white;
   --thumbnail-height: 5rem;
   --thumbnail-border: 0.5rem;
+  --thumb-container-height: calc(var(--thumbnail-height) + (2 * var(--thumbnail-border)));
   --header-height: 5rem;
-  --main-height: calc(100vh - var(--header-height));
+  --main-height: calc(100vh - var(--header-height) - var(--thumb-container-height));
 }
 .PhotoElement {
   background:#111;
@@ -20,7 +21,7 @@
 }
 @supports(height: 100dvh) {
   :root {
-    --main-height: calc(100dvh - var(--header-height));
+    --main-height: calc(100dvh - var(--header-height) - var(--thumb-container-height));
   }
   .PhotoElement {
     height: 100dvh;
@@ -141,7 +142,7 @@
 }
 
 .PhotoElement .thumbContainer {
-  height: calc(var(--thumnbnail-height) + (2 * var(--thumbnail-border)));
+  height: var(--thumb-container-height);
   max-width: 100vw;
   display: flex;
   align-items: center;
@@ -150,11 +151,17 @@
   flex-direction: row;
   flex-wrap: nowrap;
   overflow-x: auto;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.PhotoElement .thumbContainer::-webkit-scrollbar {
+  /* Chrome, Safari, Opera */
+  display: none;
 }
 .PhotoElement .thumbContainer a {
   display: block;
-  height: calc(var(--thumbnail-height) + (2 * var(--thumbnail-border)));
-  width: calc(var(--thumbnail-height) + (2 * var(--thumbnail-border)));
+  height: var(--thumb-container-height);
+  width: var(--thumb-container-height);
   border: var(--thumbnail-border) solid black;
   transition: border-color 0.2s;
   position: relative;
