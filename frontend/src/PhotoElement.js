@@ -12,12 +12,14 @@ export default function PhotoElement({data}) {
   const albumFiles = data.album.files;
 
   const [currFileIdx, setCurrFileIdx] = useState(albumFiles.findIndex( (file) => { return file.path === data.path; } ));
+  console.log('CURRFILEIDX', currFileIdx);
 
   const [currData, setCurrData] = useState(data);
 
   const navigate = useNavigate();
   const carouselRef = useRef(null);
   const thumbsRef = useRef(null);
+  const imageContainerRef = useRef(null);
 
   // if the data in state is the same as the data in props
   const isInitialLoad = currData === data;
@@ -33,9 +35,15 @@ export default function PhotoElement({data}) {
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
   const scrollCarouselTo = (idx) => {
-    setCurrFileIdx((albumFiles.length + idx) % albumFiles.length);
+    const newIdx = (albumFiles.length + idx) % albumFiles.length;
+    handleThumbClick(newIdx);
   };
 
+  // Debounce fetching metadata for the currFileIdx, since it can change
+  // rapidly while scrolling
+  const debounceRef = useRef(null);
+
+  // currFileIdx effect
   useEffect(() => {
     if (!tileRefs.current || !thumbRefs.current) {
       return;
@@ -43,20 +51,52 @@ export default function PhotoElement({data}) {
     const tileRef = tileRefs.current[currFileIdx];
     const thumbRef = thumbRefs.current[currFileIdx];
     if (tileRef) {
-      tileRef.scrollIntoView();
-      // can't have two smooth scrollers at once in Chrome
-      setTimeout(() => {
-        thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
-        thumbRef.classList.add('sel');
-        thumbRef.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-      }, 1000);
+      thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
+      thumbRef.classList.add('sel');
     }
-  }, [currFileIdx]);
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+
+    const updateData = async () => {
+      //console.log('UPDATE DATA');
+      const crc = carouselRef.current;
+      if (!crc) {
+        return;
+      }
+
+      const response = await fetch(albumFiles[currFileIdx].apiPath);
+      if (!response.ok) {
+        const body = await response.json();
+        throw new Error(
+          `HTTP error ${response.status}: ${JSON.stringify(body)}`
+        );
+      }
+
+      let actualData = await response.json();
+      setCurrData(actualData);
+
+      // update displayed URL without engaging router -- have to do it this way
+      // because we use a catch-all route
+      window.history.replaceState(null, actualData.title, actualData.path);
+    };
+
+    // if no index change for 250ms then update data
+    debounceRef.current = window.setTimeout(updateData, 250);
+  }, [currFileIdx, albumFiles]);
+
+  const toggleFullScreen = () => {
+    if (!imageContainerRef.current) {
+      return;
+    }
+    imageContainerRef.current.classList.toggle('fullscreen');
+  };
 
   const keyCodeToAction = {
     27: returnToAlbum, // escape
     37: goToPrevPhoto, // left arrow
-    39: goToNextPhoto  // right arrow
+    39: goToNextPhoto, // right arrow
+    70: toggleFullScreen // letter f
   };
 
   const handleKeypress = (event) => {
@@ -65,6 +105,8 @@ export default function PhotoElement({data}) {
       if (keypressAction) {
         keypressAction();
         event.preventDefault();
+      } else {
+        //console.log('KEYPRESS', event.keyCode);
       }
     }
   };
@@ -76,36 +118,32 @@ export default function PhotoElement({data}) {
     };
   });
 
-  const updateData = async () => {
+  const alignThumbToCarousel = () => {
     const crc = carouselRef.current;
     if (!crc) {
       return;
     }
-    scrollCarouselTo(Math.round(crc.scrollLeft / crc.clientWidth));
+    const trc = thumbsRef.current;
+    const carouselScrollCoeff = crc.scrollLeft / (crc.scrollWidth - crc.clientWidth);
+    const thumbnailWidth = thumbRefs.current[0].clientWidth * .95;
 
-    const response = await fetch(albumFiles[currFileIdx].apiPath);
-    if (!response.ok) {
-      const body = await response.json();
-      throw new Error(
-        `HTTP error ${response.status}: ${JSON.stringify(body)}`
-      );
-    }
-
-    let actualData = await response.json();
-    setCurrData(actualData);
-
-    // update displayed URL without engaging router -- have to do it this way
-    // because we use a catch-all route
-    window.history.replaceState(null, actualData.title, actualData.path);
+    const newThumbScrollLeft = Math.max(0, carouselScrollCoeff * trc.clientWidth + thumbnailWidth);
+    thumbsRef.current.scrollLeft = Math.max(0, newThumbScrollLeft);
   };
 
-  const debounceRef = useRef(null);
-  const handleScroll = (e) => {
-    if (debounceRef.current) {
-      window.clearTimeout(debounceRef.current);
+  const [careAboutScroll, setCareAboutScroll] = useState(true);
+  const handleScroll = () => {
+    if (!careAboutScroll) {
+      return;
     }
-    // if no scrolling for 250ms then update data
-    debounceRef.current = window.setTimeout(updateData, 250);
+
+    alignThumbToCarousel();
+
+    const crc = carouselRef.current;
+    const newFileIdx = Math.round(crc.scrollLeft / crc.clientWidth);
+    if (currFileIdx !== newFileIdx) {
+      setCurrFileIdx(newFileIdx);
+    }
   };
 
   // subscribe to carousel scroll to trigger fetching metadata for other images
@@ -159,9 +197,21 @@ export default function PhotoElement({data}) {
     );
   });
 
+  const handleThumbClick = (tileIndex) => {
+    setCareAboutScroll(false);
+    setTimeout(() => {
+      setCareAboutScroll(true);
+      thumbRefs.current[tileIndex].scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+      //alignThumbToCarousel();
+    }, 1000);
+    //console.log(tileIndex, tileRefs.current[tileIndex]);
+    tileRefs.current[tileIndex].scrollIntoView();
+    setCurrFileIdx(tileIndex);
+  };
+
   const thumbnails = albumFiles.map((file, i) => {
     return (
-      <Link ref={(el) => thumbRefs.current[i] = el} to={file.uriPath} key={file.uriPath} onClick={()=>scrollCarouselTo(i)}>
+      <Link ref={(el) => thumbRefs.current[i] = el} to={file.uriPath} key={file.uriPath} onClick={(e)=>handleThumbClick(i)}>
         <img draggable="false" src={`${file.photoPath}?size=400x400`}
           alt={file.title}
           loading='lazy'
@@ -188,9 +238,10 @@ export default function PhotoElement({data}) {
     }
     const thumbRef = thumbRefs.current[currFileIdx];
     if (thumbRef) {
-      thumbRef.scrollIntoView();
+      thumbRef.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
     }
   });
+
 
   return (
     <div className="PhotoElement">
@@ -198,7 +249,7 @@ export default function PhotoElement({data}) {
         <h1>{currData.title}</h1>
         {currData.description && <p>{currData.description}</p>}
       </div>
-      <div className="imageContainer">
+      <div ref={imageContainerRef} className="imageContainer">
         {mainElement}
         {exifElement}
       </div>
