@@ -124,10 +124,17 @@ export default function PhotoElement({data}) {
     }
     const trc = thumbsRef.current;
     const carouselScrollCoeff = crc.scrollLeft / (crc.scrollWidth - crc.clientWidth);
-    const thumbnailWidth = thumbRefs.current[0].clientWidth * .95;
 
-    const newThumbScrollLeft = Math.max(0, carouselScrollCoeff * trc.clientWidth + thumbnailWidth);
-    thumbsRef.current.scrollLeft = Math.max(0, newThumbScrollLeft);
+    const thumbContentWidth = trc.scrollWidth - trc.clientWidth; // half client width added as padding to the ends
+    const thumbnailWidth = thumbRefs.current[0].clientWidth;
+    const thumbContentProp = (carouselScrollCoeff * (thumbContentWidth - thumbnailWidth - thumbnailWidth / 5));
+    const halfThumbnailWidth = thumbnailWidth / 2;
+
+    const newThumbScrollLeft = thumbContentProp + halfThumbnailWidth;
+
+    //console.log({ carouselScrollCoeff, tcw: trc.clientWidth, ntsl: newThumbScrollLeft, htw: halfThumbnailWidth });
+
+    thumbsRef.current.scrollLeft = newThumbScrollLeft;
   };
 
   const [careAboutScroll, setCareAboutScroll] = useState(true);
@@ -196,11 +203,16 @@ export default function PhotoElement({data}) {
     );
   });
 
+  let scrollCareTimeout = null;
   const handleThumbClick = (tileIndex) => {
     setCareAboutScroll(false);
-    setTimeout(() => {
+    if (scrollCareTimeout) {
+      clearTimeout(scrollCareTimeout);
+    }
+    scrollCareTimeout = setTimeout(() => {
       setCareAboutScroll(true);
       thumbRefs.current[tileIndex].scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+      scrollCareTimeout = null;
       //alignThumbToCarousel();
     }, 1000);
     //console.log(tileIndex, tileRefs.current[tileIndex]);

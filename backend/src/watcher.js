@@ -74,11 +74,11 @@ const scanDirectory = async (dirName) => {
   let scanning = false;
   setInterval(async () => {
     if (!scanning) {
-      logger.info('>>>>>>>> PERIODIC SCAN STARTING');
+      logger.debug('>>>>>>>> PERIODIC SCAN STARTING');
       scanning = true;
       await scanDirectory('/');
       scanning = false;
-      logger.info('<<<<<<<< PERIODIC SCAN COMPLETE');
+      logger.debug('<<<<<<<< PERIODIC SCAN COMPLETE');
     } else {
       logger.info('======== PERIODIC SCAN STILL IN PROGRESS');
     }
