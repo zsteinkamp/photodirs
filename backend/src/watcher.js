@@ -1,6 +1,5 @@
 'use strict';
 
-const chokidar = require('chokidar');
 const fsp = require('fs/promises');
 const path = require('path');
 
@@ -8,7 +7,6 @@ const C = require('./constants');
 const logger = C.LOGGER;
 const albumObjUtils = require('./util/albumObj');
 const batchUtils = require('./util/batch');
-const cacheUtils = require('./util/cache');
 const fileObj = require('./util/fileObj');
 const fileTypes = require('./util/fileTypes');
 const fileUtils = require('./util/file');
@@ -66,61 +64,23 @@ const scanDirectory = async (dirName) => {
 };
 
 /*
- * Set up album directory watcher. Wait for 2 seconds of calm after activity to rescan.
- */
-const watch = () => {
-  logger.info(`STARTING WATCHER on ${C.ALBUMS_ROOT}`);
-  // Chokidar tells us multiple times when things happen. The strategy here is
-  // to wait for a lull in any chokidar activity, then just trigger a full
-  // scan. It is quite fast ripping through areas where nothing changed, so I
-  // decided it wasn't worth the hassle to write a more elaborate dependency
-  // identifier.
-  // TODO: Next level of performance would be to identify uniqe paths in the
-  // burst of chokidar activity, then launch a scanner into the deepest (leaf
-  // node) paths
-  let chokidarDebounce = null;
-  const watcher = chokidar.watch(C.ALBUMS_ROOT, { usePolling: false, awaitWriteFinish: true, ignoreInitial: true }).on('all', async (event, evtPath) => {
-    logger.info('WATCHER ACTIVITY', { event, evtPath });
-
-    // clean up cache on directory and file deletions
-    if (event === 'unlinkDir') {
-      // directory removed -- so just nuke it in cache then rebuild the parent
-      const cachePath = path.join(C.CACHE_ROOT, evtPath);
-      logger.info('UNLINK_DIR', { cachePath });
-      await fsp.rm(cachePath, { recursive: true, force: true });
-      // also remove parent album jsons
-      await fsp.rm(path.join(path.dirname(cachePath), 'album.json'), { force: true });
-      await fsp.rm(path.join(path.dirname(cachePath), 'album.extended.json'), { force: true });
-    } else if (event === 'unlink') {
-      const albumFilePath = evtPath.substr(C.ALBUMS_ROOT.length);
-      if (fileTypes.isSupportedImageFile(evtPath)) {
-        await cacheUtils.cleanUpCacheFor(albumFilePath);
-      }
-    }
-
-    // debounce chokidar events by 2.0 seconds. See big comment above for explanation of strategy
-    if (chokidarDebounce) {
-      clearTimeout(chokidarDebounce);
-    }
-    chokidarDebounce = setTimeout(async () => {
-      await scanDirectory('/');
-      logger.info('SCAN COMPLETE');
-      chokidarDebounce = null;
-    }, 2000);
-  });
-  process.on('SIGTERM', (sig) => {
-    logger.info('SIGTERM STOPPING WATCHER', sig);
-    watcher.close();
-    logger.info('WATCHER STOPPed');
-  });
-};
-
-/*
  * Kick it all off!
  */
 (async () => {
   logger.info('STARTING UP ... INITIAL SCAN');
+
   await scanDirectory('/');
   logger.info('INITIAL SCAN COMPLETE');
-  watch();
+  let scanning = false;
+  setInterval(async () => {
+    if (!scanning) {
+      logger.info('>>>>>>>> PERIODIC SCAN STARTING');
+      scanning = true;
+      await scanDirectory('/');
+      scanning = false;
+      logger.info('<<<<<<<< PERIODIC SCAN COMPLETE');
+    } else {
+      logger.info('======== PERIODIC SCAN STILL IN PROGRESS');
+    }
+  }, 60000);
 })();
