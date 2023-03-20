@@ -12,7 +12,6 @@ export default function PhotoElement({data}) {
   const albumFiles = data.album.files;
 
   const [currFileIdx, setCurrFileIdx] = useState(albumFiles.findIndex( (file) => { return file.path === data.path; } ));
-  console.log('CURRFILEIDX', currFileIdx);
 
   const [currData, setCurrData] = useState(data);
 
