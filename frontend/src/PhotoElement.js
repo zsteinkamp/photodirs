@@ -34,9 +34,12 @@ export default function PhotoElement({data}) {
 
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
+  const safeIndex = (idx) => {
+    return (albumFiles.length + idx) % albumFiles.length;
+  };
+
   const scrollCarouselTo = (idx) => {
-    const newIdx = (albumFiles.length + idx) % albumFiles.length;
-    handleThumbClick(newIdx);
+    handleThumbClick(safeIndex(idx));
   };
 
   // Debounce fetching metadata for the currFileIdx, since it can change
@@ -54,6 +57,10 @@ export default function PhotoElement({data}) {
       thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
       thumbRef.classList.add('sel');
     }
+
+    // preload images -- turn off lazy attribute of adjacent images
+    tileRefs.current[safeIndex(currFileIdx + 1)].firstChild.loading = 'auto';
+    tileRefs.current[safeIndex(currFileIdx - 1)].firstChild.loading = 'auto';
 
     const updateData = async () => {
       //console.log('UPDATE DATA');
