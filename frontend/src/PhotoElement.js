@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import SVGDownload from "./SVGDownload";
 import SVGClose from "./SVGClose";
+import VideoIcon from "./VideoIcon";
 
 export default function PhotoElement({data}) {
 
@@ -34,12 +35,8 @@ export default function PhotoElement({data}) {
 
   const downloadOriginal = () => { window.location.href = data.photoPath + "?size=orig"; }
 
-  const safeIndex = (idx) => {
-    return (albumFiles.length + idx) % albumFiles.length;
-  };
-
   const scrollCarouselTo = (idx) => {
-    handleThumbClick(safeIndex(idx));
+    handleThumbClick((albumFiles.length + idx) % albumFiles.length);
   };
 
   // Debounce fetching metadata for the currFileIdx, since it can change
@@ -57,6 +54,10 @@ export default function PhotoElement({data}) {
       thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
       thumbRef.classList.add('sel');
     }
+
+    const safeIndex = (idx) => {
+      return (albumFiles.length + idx) % albumFiles.length;
+    };
 
     // preload images -- turn off lazy attribute of adjacent images
     tileRefs.current[safeIndex(currFileIdx + 1)].firstChild.loading = 'auto';
@@ -195,7 +196,7 @@ export default function PhotoElement({data}) {
     return (
       <div ref={(el) => tileRefs.current[i] = el} key={file.uriPath} className="carouselItem">
         { file.type === 'video' ? (
-          <video draggable="false" controls autoPlay={false} poster={`${file.photoPath}?size=1600x1600`} loading='lazy'>
+          <video draggable="false" controls autoPlay={false} poster={`${file.photoPath}?size=1600x1600`} preload='none'>
             <source src={file.videoPath} type="video/mp4" />
           </video>
         ) : (
@@ -232,6 +233,7 @@ export default function PhotoElement({data}) {
           alt={file.title}
           loading='lazy'
         />
+        { file.type === 'video' && <VideoIcon /> }
       </Link>
     );
   });

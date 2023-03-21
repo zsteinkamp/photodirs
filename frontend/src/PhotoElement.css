@@ -171,6 +171,7 @@
 }
 .PhotoElement .thumbContainer a {
   display: block;
+  position: relative;
   margin-top: 0.25rem;
   transition: margin 0.3s;
 }
