@@ -8,7 +8,7 @@
   transition: opacity 0.2s;
 }
 .videoIcon svg g path {
-  fill: white;
+  fill: var(--photoelement-icon-fill);
 }
 a:hover .videoIcon {
   opacity: 75%;

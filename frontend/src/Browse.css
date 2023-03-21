@@ -1,4 +1,5 @@
 .Browse {
+  color: var(--browse-color);
 }
 .Browse header {
   display: flex;
@@ -7,7 +8,7 @@
   font-size: 1.75rem;
   line-height:3.5rem;
   color: var(--bg-text-color);
-  text-shadow: 0 0.1rem 0.25rem rgba(0, 0, 0, 0.1);
+  text-shadow: 0 0.1rem 0.25rem var(--browse-header-shadow-color);
 }
 .Browse header .logo {
   margin-top: 0.3rem;
@@ -20,9 +21,9 @@
 .Browse .pageBody {
   padding: 1rem 1rem;
   min-height: 80vh;
-  background-color: #dcdcdc;
-  border-top: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  background-color: var(--browse-page-background-color);
+  border-top: 1px solid var(--browse-page-body-border);
+  border-bottom: 1px solid var(--browse-page-body-border);
 }
 .Browse .pageBody > .album > .desc {
   margin-left: 20rem;

@@ -1,4 +1,3 @@
-import './App.css';
 import Browse from './Browse';
 
 function App() {
