@@ -176,7 +176,7 @@
 .PhotoElement .thumbContainer a {
   display: block;
   margin-top: 0.25rem;
-  transition: margin 0.5s;
+  transition: margin 0.3s;
 }
 .PhotoElement .thumbContainer a:hover,
 .PhotoElement .thumbContainer a.sel {

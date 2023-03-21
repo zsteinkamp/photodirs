@@ -11,9 +11,10 @@ export default function PhotoElement({data}) {
 
   const albumFiles = data.album.files;
 
-  const [currFileIdx, setCurrFileIdx] = useState(albumFiles.findIndex( (file) => { return file.path === data.path; } ));
-
+  const [careAboutScroll, setCareAboutScroll] = useState(true);
   const [currData, setCurrData] = useState(data);
+  const [currFileIdx, setCurrFileIdx] = useState(albumFiles.findIndex( (file) => { return file.path === data.path; } ));
+  const [scrollCareTimeout, setScrollCareTimeout] = useState(null);
 
   const navigate = useNavigate();
   const carouselRef = useRef(null);
@@ -136,7 +137,6 @@ export default function PhotoElement({data}) {
     thumbsRef.current.scrollLeft = thumbContentProp + (thumbnailWidth / 2) + (thumbnailWidth / 5);
   };
 
-  const [careAboutScroll, setCareAboutScroll] = useState(true);
   const handleScroll = () => {
     if (!careAboutScroll) {
       return;
@@ -202,18 +202,17 @@ export default function PhotoElement({data}) {
     );
   });
 
-  let scrollCareTimeout = null;
   const handleThumbClick = (tileIndex) => {
     setCareAboutScroll(false);
     if (scrollCareTimeout) {
       clearTimeout(scrollCareTimeout);
     }
-    scrollCareTimeout = setTimeout(() => {
+    setScrollCareTimeout(setTimeout(() => {
       setCareAboutScroll(true);
       thumbRefs.current[tileIndex].scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
-      scrollCareTimeout = null;
+      setScrollCareTimeout(null);
       //alignThumbToCarousel();
-    }, 1000);
+    }, 1000));
     //console.log(tileIndex, tileRefs.current[tileIndex]);
     tileRefs.current[tileIndex].scrollIntoView();
     setCurrFileIdx(tileIndex);
