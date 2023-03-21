@@ -126,15 +126,14 @@ export default function PhotoElement({data}) {
     const carouselScrollCoeff = crc.scrollLeft / (crc.scrollWidth - crc.clientWidth);
 
     const thumbContentWidth = trc.scrollWidth - trc.clientWidth; // half client width added as padding to the ends
+    // the width of one thumbnail image. The ratio of this number to the "sel" class padding is important for some of the math below.
     const thumbnailWidth = thumbRefs.current[0].clientWidth;
-    const thumbContentProp = (carouselScrollCoeff * (thumbContentWidth - thumbnailWidth - thumbnailWidth / 5));
-    const halfThumbnailWidth = thumbnailWidth / 2;
+    // get the proportion of thumbnail pixels        full width        - one thumbnail  - sel margin treatment (2 rem on 5 rem thumb) */
+    const thumbContentProp = (carouselScrollCoeff * (thumbContentWidth - thumbnailWidth - (thumbnailWidth / 2.5)));
 
-    const newThumbScrollLeft = thumbContentProp + halfThumbnailWidth;
-
-    //console.log({ carouselScrollCoeff, tcw: trc.clientWidth, ntsl: newThumbScrollLeft, htw: halfThumbnailWidth });
-
-    thumbsRef.current.scrollLeft = newThumbScrollLeft;
+    // now apply back to the
+    // scrollLeft property:  proprtion in px + half of a thumbnail width + half of the sel margin treatment
+    thumbsRef.current.scrollLeft = thumbContentProp + (thumbnailWidth / 2) + (thumbnailWidth / 5);
   };
 
   const [careAboutScroll, setCareAboutScroll] = useState(true);

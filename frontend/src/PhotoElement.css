@@ -176,8 +176,6 @@
 .PhotoElement .thumbContainer a {
   display: block;
   margin-top: 0.25rem;
-  height: calc(var(--thumb-container-height) - 0.5rem);
-  width: calc(var(--thumb-container-height) - 0.5rem);
   transition: margin 0.5s;
 }
 .PhotoElement .thumbContainer a:hover,
