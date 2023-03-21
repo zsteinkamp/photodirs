@@ -20,7 +20,7 @@
 }
 .Browse .pageBody {
   padding: 1rem 1rem;
-  min-height: 80vh;
+  min-height: 90vh;
   background-color: var(--browse-page-background-color);
   border-top: 1px solid var(--browse-page-body-border);
   border-bottom: 1px solid var(--browse-page-body-border);
@@ -43,7 +43,7 @@
   font-weight: bold;
 }
 .Browse footer {
-  margin-top: 0rem;
+  margin-top: 1rem;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

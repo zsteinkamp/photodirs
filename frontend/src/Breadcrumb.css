@@ -6,6 +6,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  color: var(--breadcrumb-color);
 }
 .Breadcrumb > div {
   text-overflow: ellipsis;
