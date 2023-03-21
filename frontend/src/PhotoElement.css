@@ -52,7 +52,7 @@
 .PhotoElement .imageContainer {
   display: flex;
   height: var(--main-height);
-  width: 100vw;
+  max-width: 100vw;
   flex-direction: row-reverse;
   align-content: center;
   align-items: center;
@@ -87,7 +87,7 @@
   margin: auto;
   position: relative;
   height: var(--main-height);
-  width: 100vw;
+  max-width: 100vw;
   background: black;
 }
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem {
