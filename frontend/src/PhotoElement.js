@@ -54,9 +54,6 @@ export default function PhotoElement({data}) {
       thumbRefs.current.forEach((ref) => ref.classList.remove('sel'));
       thumbRef.classList.add('sel');
     }
-    if (debounceRef.current) {
-      window.clearTimeout(debounceRef.current);
-    }
 
     const updateData = async () => {
       //console.log('UPDATE DATA');
@@ -81,6 +78,9 @@ export default function PhotoElement({data}) {
       window.history.replaceState(null, actualData.title, actualData.path);
     };
 
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
     // if no index change for 250ms then update data
     debounceRef.current = window.setTimeout(updateData, 250);
   }, [currFileIdx, albumFiles]);
