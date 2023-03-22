@@ -192,9 +192,18 @@ export default function PhotoElement({data}) {
     );
   }
 
+  const handleClick = (e) => {
+    const xProp = e.clientX / tileRefs.current[currFileIdx].clientWidth;
+    if (xProp < 0.25) {
+      goToPrevPhoto();
+    } else if (xProp > 0.75) {
+      goToNextPhoto();
+    }
+  }
+
   const tiles = albumFiles.map((file, i) => {
     return (
-      <div ref={(el) => tileRefs.current[i] = el} key={file.uriPath} className="carouselItem">
+      <div ref={(el) => tileRefs.current[i] = el} key={file.uriPath} onClick={handleClick} className="carouselItem">
         { file.type === 'video' ? (
           <video draggable="false" controls autoPlay={false} poster={`${file.photoPath}?size=1600x1600`} preload='none'>
             <source src={file.videoPath} type="video/mp4" />
