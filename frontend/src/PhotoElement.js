@@ -237,7 +237,7 @@ export default function PhotoElement({data}) {
 
   const thumbnails = albumFiles.map((file, i) => {
     return (
-      <Link ref={(el) => thumbRefs.current[i] = el} to={file.uriPath} key={file.uriPath} onClick={(e)=>handleThumbClick(i)}>
+      <Link preventScrollReset={true} ref={(el) => thumbRefs.current[i] = el} to={file.uriPath} key={file.uriPath} onClick={(e)=>handleThumbClick(i)}>
         <img draggable="false" src={`${file.photoPath}?size=400x400`}
           alt={file.title}
           loading='lazy'
