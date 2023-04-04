@@ -23,8 +23,17 @@ const scanDirectory = async (dirName) => {
   logger.debug('SCAN_DIRECTORY:TOP', { dirName });
 
   // do a depth-first traversal so we can build the directory metadata from the bottom up
-  const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
-    .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+  let subdirs;
+  try {
+    subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
+      .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+  } catch (e) {
+    if (e.code === 'PERM') {
+      logger.info('EPERM', { dir: dirEnt.name })
+      return null;
+    }
+    throw e;
+  }
 
   // recurse into subdirs before continuing
   await batchUtils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
