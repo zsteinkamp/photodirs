@@ -27,6 +27,42 @@ const scanDirectory = async (dirName) => {
   try {
     subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
       .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+
+    // recurse into subdirs before continuing
+    await batchUtils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
+
+    // get the list of supported files in this directory
+    const dirFiles = await fileUtils.getSupportedFiles(dirName);
+
+    logger.debug('SCAN_DIRECTORY:MID', { dirName, dirFiles });
+
+    // first write the file objs
+    await batchUtils.promiseAllInBatches(dirFiles, (fName) => fileObj.getFileObj(dirName, fName), 10);
+
+    // now cache the 400x400 and 1000x1000 size
+    await batchUtils.promiseAllInBatches(dirFiles, async (fName) => {
+      let absFname = path.join('/albums', dirName, fName);
+      if (fileTypes.isRaw(absFname)) {
+        // convert raw file
+        const jpegPath = await imageUtils.jpegFileForRaw(absFname);
+        logger.debug('PRE-CONVERT RAW', { absFname, jpegPath });
+        absFname = jpegPath;
+      } else if (fileTypes.isVideo(absFname)) {
+        transcodingQueue.push({ filePath: absFname });
+        const posterPath = await imageUtils.jpegFileForVideo(absFname);
+        logger.debug('PRE-GENERATE VIDEO THUMBNAIL', { absFname, posterPath });
+        absFname = posterPath;
+      }
+      // resize the file to common sizes
+      await imageUtils.preResize(absFname);
+    }, 10);
+
+    // write the standard album obj
+    const albumObj = await albumObjUtils.getAlbumObj(dirName);
+
+    // write the extended album obj
+    await albumObjUtils.getExtendedAlbumObj(albumObj);
+    logger.debug('CHECKED/WROTE METADATAS', { dirName });
   } catch (e) {
     if (e.code === 'PERM' || e.code === 'EACCESS') {
       logger.info('Permission Denied', { error: e });
@@ -34,42 +70,6 @@ const scanDirectory = async (dirName) => {
     }
     throw e;
   }
-
-  // recurse into subdirs before continuing
-  await batchUtils.promiseAllInBatches(subdirs, (dirEnt) => scanDirectory(path.join(dirName, dirEnt.name)), 10);
-
-  // get the list of supported files in this directory
-  const dirFiles = await fileUtils.getSupportedFiles(dirName);
-
-  logger.debug('SCAN_DIRECTORY:MID', { dirName, dirFiles });
-
-  // first write the file objs
-  await batchUtils.promiseAllInBatches(dirFiles, (fName) => fileObj.getFileObj(dirName, fName), 10);
-
-  // now cache the 400x400 and 1000x1000 size
-  await batchUtils.promiseAllInBatches(dirFiles, async (fName) => {
-    let absFname = path.join('/albums', dirName, fName);
-    if (fileTypes.isRaw(absFname)) {
-      // convert raw file
-      const jpegPath = await imageUtils.jpegFileForRaw(absFname);
-      logger.debug('PRE-CONVERT RAW', { absFname, jpegPath });
-      absFname = jpegPath;
-    } else if (fileTypes.isVideo(absFname)) {
-      transcodingQueue.push({ filePath: absFname });
-      const posterPath = await imageUtils.jpegFileForVideo(absFname);
-      logger.debug('PRE-GENERATE VIDEO THUMBNAIL', { absFname, posterPath });
-      absFname = posterPath;
-    }
-    // resize the file to common sizes
-    await imageUtils.preResize(absFname);
-  }, 10);
-
-  // write the standard album obj
-  const albumObj = await albumObjUtils.getAlbumObj(dirName);
-
-  // write the extended album obj
-  await albumObjUtils.getExtendedAlbumObj(albumObj);
-  logger.debug('CHECKED/WROTE METADATAS', { dirName });
 };
 
 /*
