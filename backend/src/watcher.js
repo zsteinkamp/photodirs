@@ -28,8 +28,8 @@ const scanDirectory = async (dirName) => {
     subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, dirName), { withFileTypes: true }))
       .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
   } catch (e) {
-    if (e.code === 'PERM') {
-      logger.info('EPERM', { dir: dirEnt.name })
+    if (e.code === 'PERM' || e.code === 'EACCESS') {
+      logger.info('Permission Denied', { error: e });
       return null;
     }
     throw e;

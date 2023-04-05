@@ -46,11 +46,19 @@ const fileUtils = module.exports = {
    */
   getSupportedFiles: async (dirName) => {
     const albumDir = path.join(C.ALBUMS_ROOT, dirName);
-    const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
-      .filter((dirEnt) => (dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)))
-      .map((dirEnt) => dirEnt.name);
-    logger.debug('getSupportedFiles', { dirName, dirFiles });
-    return dirFiles;
+    try {
+      const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
+        .filter((dirEnt) => (dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)))
+        .map((dirEnt) => dirEnt.name);
+      logger.debug('getSupportedFiles', { dirName, dirFiles });
+      return dirFiles;
+    } catch (e) {
+      if (e.code === 'PERM' || e.code === 'eaccess') {
+        logger.info('Permission Denied', { error: e });
+        return [];
+      }
+      throw e;
+    }
   },
 
   /*

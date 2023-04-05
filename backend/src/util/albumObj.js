@@ -49,8 +49,17 @@ const albumObjUtils = module.exports = {
     logger.debug('getExtendedAlbumObj', { path: extAlbumObj.path });
     const extAlbumFname = path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.extended.json');
     if (await fileUtils.fileExists(extAlbumFname)) {
-      const subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
-        .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+      let subdirs;
+      try {
+        subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
+          .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
+      } catch (e) {
+        if (e.code === 'PERM' || e.code === 'EACCESS') {
+          logger.info('Permission Denied', { error: e });
+        } else {
+          throw e;
+        }
+      }
       const subdirAlbumJson = subdirs.map((elem) => path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, elem.name, 'album.json'));
       // make sure to check the local `album.json` too
       subdirAlbumJson.push(path.join(C.CACHE_ROOT, 'albums', extAlbumObj.path, 'album.json'));
@@ -65,24 +74,32 @@ const albumObjUtils = module.exports = {
     const dirs = [];
     const files = [];
     const albumPath = path.join(C.ALBUMS_ROOT, extAlbumObj.path);
-    (await fsp.readdir(albumPath, { withFileTypes: true }))
-      .filter((dirEnt) => !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX))
-      .forEach(async (dirEnt) => {
-        logger.debug('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
-        if (dirEnt.isDirectory()) {
-          dirs.push(dirEnt);
-          //// ensure the directory isn't empty
-          //const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
-          //logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
-          //if (supportedFiles.length > 0) {
-          //  dirs.push(dirEnt);
-          //}
-        } else if (dirEnt.isFile()) {
-          if (fileTypes.isSupportedImageFile(dirEnt.name)) {
-            files.push(dirEnt);
+    try {
+      (await fsp.readdir(albumPath, { withFileTypes: true }))
+        .filter((dirEnt) => !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX))
+        .forEach(async (dirEnt) => {
+          logger.debug('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt });
+          if (dirEnt.isDirectory()) {
+            dirs.push(dirEnt);
+            //// ensure the directory isn't empty
+            //const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
+            //logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
+            //if (supportedFiles.length > 0) {
+            //  dirs.push(dirEnt);
+            //}
+          } else if (dirEnt.isFile()) {
+            if (fileTypes.isSupportedImageFile(dirEnt.name)) {
+              files.push(dirEnt);
+            }
           }
-        }
-      });
+        });
+    } catch (e) {
+      if (e.code === 'PERM' || e.code === 'EACCESS') {
+        logger.info('Permission Denied', { error: e });
+      } else {
+        throw e;
+      }
+    }
 
     extAlbumObj.breadcrumb = await albumObjUtils.getBreadcrumbForPath(extAlbumObj.path);
 
@@ -213,9 +230,19 @@ const albumObjUtils = module.exports = {
    */
   getAlbumDefaultThumbnailFilename: async (reqPath) => {
     const albumPath = path.join(C.ALBUMS_ROOT, reqPath);
-    const thumbEntry = (await fsp.readdir(albumPath, { withFileTypes: true }))
-      .filter((dirEnt) => !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX))
-      .find((dirEnt) => fileTypes.isSupportedImageFile(dirEnt.name));
+    let thumbEntry;
+
+    try {
+      thumbEntry = (await fsp.readdir(albumPath, { withFileTypes: true }))
+        .filter((dirEnt) => !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX))
+        .find((dirEnt) => fileTypes.isSupportedImageFile(dirEnt.name));
+    } catch (e) {
+      if (e.code === 'PERM' || e.code === 'EACCESS') {
+        logger.info('Permission Denied', { error: e });
+      } else {
+        throw e;
+      }
+    }
     if (thumbEntry) {
       return thumbEntry.name;
     }
