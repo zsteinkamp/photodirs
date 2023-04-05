@@ -38,6 +38,14 @@ app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
 // handles photo requests
 app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
   try {
+    // support size/crop presets
+    const queryKeys = Object.keys(req.query);
+    if (queryKeys.length === 1) {
+      const queryPreset = C.SIZE_PRESETS[queryKeys[0]];
+      // preset just slides into query params
+      req.query.size = queryPreset.size;
+      req.query.crop = queryPreset.crop;
+    }
     // sends the response on its own
     await handlers.photoGet(req.params[0], req.query.size, req.query.crop, res);
   } catch (e) {

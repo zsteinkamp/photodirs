@@ -149,10 +149,20 @@ const imageUtils = module.exports = {
    */
   preResize: async (absFname) => {
     logger.debug('PRE_RESIZE', { absFname });
-    return Promise.all([
-      imageUtils.getCachedImagePath(absFname, { height: 400, width: 400 }),
-      imageUtils.getCachedImagePath(absFname, { height: 1600, width: 1600 })
-    ]);
+    // set pre-generate sizes and rules in constants.js
+    const preResizeSizes = Object.values(C.SIZE_PRESETS)
+      .filter((o) => { return o.pregenerate && (o.size !== 'orig'); })
+      .map((o) => {
+        return {
+          height: ParseInt(o.size.split('x')[0]),
+          width:  ParseInt(o.size.split('x')[1])
+        };
+      });
+    return Promise.all(
+      preResizeSizes.map((o) => {
+        return imageUtils.getCachedImagePath(absFname, { height: o.height, width: o.width }),
+      })
+    );
   },
 
   /*

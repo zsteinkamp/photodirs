@@ -44,6 +44,14 @@ module.exports = {
   MIN_DIMENSION: 16,
   PHOTO_URL_BASE: '/photo',
   VIDEO_URL_BASE: '/video',
+  SIZE_PRESETS = {
+    // default size
+    null: { pregenerate: true, size: "1600x1600", crop: false },
+    // define your shortcuts here
+    tn: { pregenerate: true, size: "400x400", crop: true },
+    xl: { size: "2400x2400", crop: false },
+    orig: { size: "orig" },
+  },
   TYPE_ALBUM: 'album',
   TYPE_PHOTO: 'photo',
   TYPE_VIDEO: 'video'
