@@ -20,16 +20,15 @@ module.exports = {
     const fileObjMetaFname = cacheUtils.getFileObjMetadataFname(albumPath, fileName);
     const filePath = path.join(C.ALBUMS_ROOT, albumPath, fileName);
     logger.debug('GET_FILE_OBJ:TOP', { fileObjMetaFname, filePath });
+    const fileYML = filePath + '.yml';
     if (await fileUtils.fileExists(fileObjMetaFname)) {
       logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
       const metaStat = await fsp.stat(fileObjMetaFname);
       const fileStat = await fsp.stat(filePath);
 
       let ymlStat = null;
-      const ymlFName = filePath + '.yml';
-
-      if (await fileUtils.fileExists(ymlFName)) {
-        ymlStat = await fsp.stat(ymlFName);
+      if (await fileUtils.fileExists(fileYML)) {
+        ymlStat = await fsp.stat(fileYML);
       }
       const useCache = metaStat.mtime >= fileStat.mtime && (!ymlStat || (metaStat.mtime >= ymlStat.mtime));
       logger.debug('GET_FILE_OBJ:STATS', { ms: metaStat.mtime, fs: fileStat.mtime, ys: ymlStat && ymlStat.mtime, useCache, fileName });
@@ -52,7 +51,6 @@ module.exports = {
     const isVideo = fileTypes.isVideo(fileName);
 
     // Get YML Meta if there
-    const fileYML = filePath + '.yml';
     const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML);
 
     const fileObj = {
