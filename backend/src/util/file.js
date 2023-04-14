@@ -53,10 +53,11 @@ const fileUtils = module.exports = {
       logger.debug('getSupportedFiles', { dirName, dirFiles });
       return dirFiles;
     } catch (e) {
-      if (e.code === 'PERM' || e.code === 'eaccess') {
+      if (e.code === 'PERM' || e.code === 'EACCES') {
         logger.info('Permission Denied', { error: e });
         return [];
       }
+      logger.error('readdir error4', e);
       throw e;
     }
   },

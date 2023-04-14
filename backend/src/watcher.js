@@ -64,11 +64,13 @@ const scanDirectory = async (dirName) => {
     await albumObjUtils.getExtendedAlbumObj(albumObj);
     logger.debug('CHECKED/WROTE METADATAS', { dirName });
   } catch (e) {
-    if (e.code === 'PERM' || e.code === 'EACCESS') {
+    if (e.code === 'PERM' || e.code === 'EACCES') {
       logger.info('Permission Denied', { error: e });
       return null;
+    } else {
+      logger.error('readdir error5', { keys: Object.keys(e), code: e.code, errno: e.errno });
+      throw e;
     }
-    throw e;
   }
 };
 

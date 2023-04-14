@@ -54,9 +54,10 @@ const albumObjUtils = module.exports = {
         subdirs = (await fsp.readdir(path.join(C.ALBUMS_ROOT, extAlbumObj.path), { withFileTypes: true }))
           .filter((dirEnt) => dirEnt.isDirectory() && !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX));
       } catch (e) {
-        if (e.code === 'PERM' || e.code === 'EACCESS') {
+        if (e.code === 'PERM' || e.code === 'EACCES') {
           logger.info('Permission Denied', { error: e });
         } else {
+          logger.error('readdir error', e);
           throw e;
         }
       }
@@ -94,9 +95,10 @@ const albumObjUtils = module.exports = {
           }
         });
     } catch (e) {
-      if (e.code === 'PERM' || e.code === 'EACCESS') {
+      if (e.code === 'PERM' || e.code === 'EACCES') {
         logger.info('Permission Denied', { error: e });
       } else {
+        logger.error('readdir error2', e);
         throw e;
       }
     }
@@ -237,9 +239,10 @@ const albumObjUtils = module.exports = {
         .filter((dirEnt) => !dirEnt.name.match(C.MAC_FORBIDDEN_FILES_REGEX))
         .find((dirEnt) => fileTypes.isSupportedImageFile(dirEnt.name));
     } catch (e) {
-      if (e.code === 'PERM' || e.code === 'EACCESS') {
+      if (e.code === 'PERM' || e.code === 'EACCES') {
         logger.info('Permission Denied', { error: e });
       } else {
+        logger.error('readdir error3', e);
         throw e;
       }
     }
