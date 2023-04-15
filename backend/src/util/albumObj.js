@@ -187,10 +187,10 @@ const albumObjUtils = module.exports = {
         // 2) Next get the exif data for files inside and use the oldest
         let leastDate = null;
         const supportedFiles = await fileUtils.getSupportedFiles(dirName);
-        const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => exifUtils.getExifForFile(path.join(dirName, fName)), 10);
+        const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => exifUtils.getExifObjForFile(path.join(dirName, fName)), 10);
         logger.debug('GET_ALBUM_OBJ', { dirName, exifArr });
         for (const exif of exifArr) {
-          const exifDate = exifUtils.getExifDate(exif);
+          const exifDate = new Date(exifUtils.getExifDate(exif));
           if (exifDate) {
             logger.debug('GET_ALBUM_OBJ:EXIF', { dt: exifDate });
             if (!leastDate || exifDate < leastDate) {
