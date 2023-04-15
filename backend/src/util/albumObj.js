@@ -190,11 +190,9 @@ const albumObjUtils = module.exports = {
         const exifArr = await batchUtils.promiseAllInBatches(supportedFiles, (fName) => exifUtils.getExifForFile(path.join(dirName, fName)), 10);
         logger.debug('GET_ALBUM_OBJ', { dirName, exifArr });
         for (const exif of exifArr) {
-          if (exif.DateTime) {
-            logger.debug('GET_ALBUM_OBJ:EXIF', { dt: exif.DateTime });
-            // sometimes the dates look like 2020:03:21 and so the colons need to be changed to slashes
-            exif.DateTime = exif.DateTime.replace(/^(\d{4}):(\d{2}):(\d{2}) /, '$1/$2/$3 ');
-            const exifDate = new Date(exif.DateTime);
+          const exifDate = exifUtils.getExifDate(exif);
+          if (exifDate) {
+            logger.debug('GET_ALBUM_OBJ:EXIF', { dt: exifDate });
             if (!leastDate || exifDate < leastDate) {
               leastDate = exifDate;
             }
