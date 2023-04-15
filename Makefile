@@ -10,5 +10,8 @@ devshell:
 prod:
 	docker compose build && docker compose up -d --force-recreate && docker compose logs -f
 
+prodlogs:
+	docker compose logs -f
+
 prodshell:
 	docker compose exec watcher bash

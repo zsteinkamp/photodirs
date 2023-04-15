@@ -51,17 +51,12 @@ module.exports = {
     const exifObj = await exifUtils.getExifObjForFile(reqPath);
     const fileTitle = exifUtils.getExifTitle(exifObj) || fileName;
     const fileDescription = exifUtils.getExifDescription(exifObj) || '';
+    const exifDate = exifUtils.getExifDate(exifObj);
     const fileExif = exifUtils.getExifDetailProps(exifObj);
     const isVideo = fileTypes.isVideo(fileName);
 
     // Get YML Meta if there
     const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML);
-
-    let exifDate = fileExif && fileExif.DateTimeOriginal;
-    if (exifDate) {
-      // the EXIF library outputs the date in a funny format
-      exifDate = exifDate.substr(0, 10).replaceAll(':', '-') + 'T' + exifDate.substr(11, 8) + 'Z';
-    }
 
     const dates = {
       exif: exifDate,

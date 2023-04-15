@@ -64,6 +64,18 @@ const exifUtils = module.exports = {
   /*
    * Get exif title
    */
+  getExifDate: (exif) => {
+    let exifDate = exif[C.EXIF_DATE_PROPERTY] || exif[C.EXIF_VIDEO_DATE_PROPERTY] || null;
+    if (exifDate) {
+      // the EXIF library outputs the date in a funny format
+      exifDate = exifDate.substr(0, 10).replaceAll(':', '-') + 'T' + exifDate.substr(11, 8) + 'Z';
+    }
+    return exifDate;
+  },
+
+  /*
+   * Get exif title
+   */
   getExifTitle: (exif) => {
     return exif[C.META_TITLE_PROPERTY] || exif[C.EXIF_TITLE_PROPERTY] || exif[C.EXIF_VIDEO_TITLE_PROPERTY] || null;
   },

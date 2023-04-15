@@ -7,11 +7,12 @@ module.exports = {
   META_TITLE_PROPERTY: 'title',
   META_DESCRIPTION_PROPERTY: 'description',
   EXIF_TITLE_PROPERTY: 'ObjectName',
+  EXIF_DATE_PROPERTY: 'DateTimeOriginal',
   EXIF_DESCRIPTION_PROPERTY: 'Caption-Abstract',
   EXIF_VIDEO_TITLE_PROPERTY: 'Title',
   EXIF_VIDEO_DESCRIPTION_PROPERTY: 'Description',
+  EXIF_VIDEO_DATE_PROPERTY: 'CreateDate',
   EXIF_DETAIL_PROPERTIES: [
-    'DateTimeOriginal',
     'Make',
     'Model',
     'LensMake',
