@@ -57,8 +57,6 @@ module.exports = {
     // Get YML Meta if there
     const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML);
 
-    console.log({ val: fileExif && fileExif.DateTimeOriginal }); // && dayjs(fileExif.DateTimeOriginal).toISOString(),
-
     let exifDate = fileExif && fileExif.DateTimeOriginal;
     if (exifDate) {
       // the EXIF library outputs the date in a funny format
