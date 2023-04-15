@@ -11,6 +11,10 @@ const fileTypes = require('./fileTypes');
 const exifUtils = require('./exif');
 const metaUtils = require('./meta');
 
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+
 module.exports = {
   /*
    * returns the standard File object
@@ -19,12 +23,12 @@ module.exports = {
     logger.debug('getFileObj', { albumPath, fileName });
     const fileObjMetaFname = cacheUtils.getFileObjMetadataFname(albumPath, fileName);
     const filePath = path.join(C.ALBUMS_ROOT, albumPath, fileName);
+    const fileStat = await fsp.stat(filePath);
     logger.debug('GET_FILE_OBJ:TOP', { fileObjMetaFname, filePath });
     const fileYML = filePath + '.yml';
     if (await fileUtils.fileExists(fileObjMetaFname)) {
       logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname });
       const metaStat = await fsp.stat(fileObjMetaFname);
-      const fileStat = await fsp.stat(filePath);
 
       let ymlStat = null;
       if (await fileUtils.fileExists(fileYML)) {
@@ -53,9 +57,25 @@ module.exports = {
     // Get YML Meta if there
     const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML);
 
+    console.log({ val: fileExif && fileExif.DateTimeOriginal }); // && dayjs(fileExif.DateTimeOriginal).toISOString(),
+
+    let exifDate = fileExif && fileExif.DateTimeOriginal;
+    if (exifDate) {
+      // the EXIF library outputs the date in a funny format
+      exifDate = exifDate.substr(0, 10).replaceAll(':', '-') + 'T' + exifDate.substr(11, 8) + 'Z';
+    }
+
+    const dates = {
+      exif: exifDate,
+      ctime: fileStat.ctime,
+      meta: fileMeta.date
+    };
+
     const fileObj = {
       type: isVideo ? C.TYPE_VIDEO : C.TYPE_PHOTO,
       title: fileTitle,
+      date: dates.meta || dates.exif || dates.ctime,
+      dates: dates,
       description: fileDescription,
       fileName: fileName,
       albumPath: albumPath,

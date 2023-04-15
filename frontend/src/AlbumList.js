@@ -3,7 +3,7 @@ import './AlbumList.css';
 import dayjs from 'dayjs';
 import { Link } from "react-router-dom";
 
-var utc = require('dayjs/plugin/utc');
+const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 
 export default function AlbumList(props) {

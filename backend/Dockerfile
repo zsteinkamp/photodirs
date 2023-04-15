@@ -66,10 +66,9 @@ RUN npm ci
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ## END HACK
 
-USER node
 # ergonomics
-RUN echo "alias ll='ls -la'" >> /home/node/.bashrc
-RUN echo "alias ..='cd ..'" >> /home/node/.bashrc
+RUN echo "alias ll='ls -la'" >> /root/.bashrc
+RUN echo "alias ..='cd ..'" >> /root/.bashrc
 
 # by default, start the dev api server (watches for changes and restarts itself)
 CMD [ "npm", "run", "watch:api" ]

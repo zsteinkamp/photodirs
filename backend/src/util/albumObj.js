@@ -117,6 +117,9 @@ const albumObjUtils = module.exports = {
 
     // TODO: metadata caching and/or pagination
     const fileResult = await batchUtils.promiseAllInBatches(files, (file) => fileObj.getFileObj(extAlbumObj.path, file.name), 10);
+    //
+    fileResult.sort((a, b) => { return a.date < b.date ? -1 : 1; });
+    console.log(fileResult);
     extAlbumObj.files = fileResult;
 
     // write out the file for next time
@@ -155,6 +158,7 @@ const albumObjUtils = module.exports = {
       .replace(/_/g, ' ')
       .replace(/^\d{4}-\d{2}-\d{2}/, '')
       .trim();
+
     let albumObj = {
       type: C.TYPE_ALBUM,
       title: albumTitle,
