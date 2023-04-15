@@ -119,7 +119,6 @@ const albumObjUtils = module.exports = {
     const fileResult = await batchUtils.promiseAllInBatches(files, (file) => fileObj.getFileObj(extAlbumObj.path, file.name), 10);
     //
     fileResult.sort((a, b) => { return a.date < b.date ? -1 : 1; });
-    console.log(fileResult);
     extAlbumObj.files = fileResult;
 
     // write out the file for next time

@@ -6,6 +6,10 @@ import SVGDownload from "./SVGDownload";
 import SVGClose from "./SVGClose";
 import VideoIcon from "./VideoIcon";
 
+import dayjs from 'dayjs';
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
+
 export default function PhotoElement({data}) {
 
   const parentPath = data.album.uriPath;
@@ -275,6 +279,7 @@ export default function PhotoElement({data}) {
       <div className="header">
         <h1>{currData.title}</h1>
         {currData.description && <p>{currData.description}</p>}
+        {currData.date && <p>{dayjs(currData.date).utc().format("YYYY-MM-DD dddd")}</p>}
       </div>
       <div ref={imageContainerRef} className="imageContainer">
         {mainElement}
