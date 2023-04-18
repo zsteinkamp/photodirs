@@ -13,7 +13,7 @@ export default function FileList(props) {
       //console.log(file.photoPath);
       return (
         <div key={ file.apiPath }>
-          <Link preventScrollReset={true} title={file.title} to={ file.uriPath }>
+          <Link title={file.title} to={ file.uriPath }>
             <img src={file.photoPath + "?size=300x300&crop"} alt={file.name} loading="lazy" />
               { file.type === 'video' && <VideoIcon /> }
           </Link>
