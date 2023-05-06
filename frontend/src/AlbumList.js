@@ -26,7 +26,7 @@ export default function AlbumList(props) {
           <Link to={ album.uriPath }>
             {album.thumbnail && (
               <div className='thumbnail'>
-                <img src={ `${album.thumbnail}?size=300x300&crop)` } loading="lazy" alt={ album.title } />
+                <img src={ `${album.thumbnail}?size=300x300&crop` } loading="lazy" alt={ album.title } />
               </div>
             )}
             <div className='body'>
