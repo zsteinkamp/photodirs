@@ -265,7 +265,7 @@ export default function PhotoElement({data}) {
     const tileRef = tileRefs.current[currFileIdx];
     if (tileRef) {
       tileRef.scrollIntoView();
-      carouselRef.current.style['scroll-behavior'] = 'smooth';
+      //carouselRef.current.style['scroll-behavior'] = 'smooth';
     }
     const thumbRef = thumbRefs.current[currFileIdx];
     if (thumbRef) {
