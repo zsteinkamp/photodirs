@@ -52,6 +52,17 @@ export default function PhotoElement({data}) {
     if (!tileRefs.current || !thumbRefs.current) {
       return;
     }
+
+    // pause any videos
+    tileRefs.current.forEach((e) => {
+      for (const ce of e.children) {
+        if (ce.tagName === 'VIDEO') {
+          ce.pause();
+          ce.blur();
+        }
+      }
+    })
+
     const tileRef = tileRefs.current[currFileIdx];
     const thumbRef = thumbRefs.current[currFileIdx];
     if (tileRef) {
