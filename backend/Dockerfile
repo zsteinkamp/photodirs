@@ -9,31 +9,26 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y \
 		bc \
 		build-essential \
-    ffmpeg \
 		jq \
 		less \
-    libimage-exiftool-perl \
 		ninja-build \
+		pipx \
 		python3-pip \
 		software-properties-common \
-		wget
-
-# we need meson for libvips build
-RUN pip3 install meson
-
-# stuff we need to build our own libvips ... this is a pretty random selection
-# of dependencies, you'll want to adjust these
-RUN apt-get install -y \
-	glib-2.0-dev \
-	libexpat-dev \
-	librsvg2-dev \
-	libpng-dev \
-	libjpeg62-turbo-dev \
-	libtiff-dev \
-	libexif-dev \
-	liblcms2-dev \
-	libheif-dev \
-	liborc-dev
+		wget \
+    ffmpeg \
+    glib-2.0-dev \
+    libexif-dev \
+    libexpat-dev \
+    libheif-dev \
+    libimage-exiftool-perl \
+    libjpeg62-turbo-dev \
+    liblcms2-dev \
+    liborc-dev \
+    libpng-dev \
+    librsvg2-dev \
+    libtiff-dev \
+    meson
 
 WORKDIR /usr/local/src
 
