@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import SVGDownload from "./SVGDownload";
+import SVGFullscreen from "./SVGFullscreen";
 import SVGClose from "./SVGClose";
 import VideoIcon from "./VideoIcon";
 
@@ -300,6 +301,7 @@ export default function PhotoElement({data}) {
         {thumbnails}
       </div>
       <Link title="Return to Album" className="closeBtn" to={parentPath}><SVGClose /></Link>
+      <Link title="Full Screen" className="fullscreenBtn" onClick={toggleFullScreen} to="#"><SVGFullscreen /></Link>
       <Link title="Download Original" className="downloadBtn" onClick={downloadOriginal} to="#"><SVGDownload /></Link>
     </div>
   );

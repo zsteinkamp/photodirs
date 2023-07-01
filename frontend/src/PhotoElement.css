@@ -74,6 +74,9 @@
   background: var(--photoelement-fullscreen-background-color);
   z-index: 1000;
 }
+.imageContainer.fullscreen ~ .fullscreenBtn {
+  z-index: 1001;
+}
 
 .PhotoElement .imageContainer .carousel .carouselItem {
   width: 100%;
@@ -189,10 +192,28 @@
   width: var(--thumbnail-height);
 }
 
+.PhotoElement .fullscreenBtn {
+  position: absolute;
+  cursor: pointer;
+  right: 1em;
+  top: 1rem;
+  margin-top:0.1rem;
+  opacity: 0.5;
+}
+.PhotoElement .fullscreenBtn:hover {
+  opacity: 1;
+}
+.PhotoElement .closeBtn {
+  position: absolute;
+  cursor: pointer;
+  left: 1rem;
+  top: 1rem;
+  opacity: 0.5;
+}
 .PhotoElement .downloadBtn {
   position: absolute;
   cursor: pointer;
-  right: 1rem;
+  right: 3.75em;
   top: 1rem;
   opacity: 0.5;
 }
@@ -209,6 +230,7 @@
 .PhotoElement .closeBtn:hover {
   opacity: 1;
 }
+.PhotoElement .fullscreenBtn svg,
 .PhotoElement .closeBtn svg,
 .PhotoElement .downloadBtn svg {
   width: 2em;
@@ -217,5 +239,8 @@
 .PhotoElement .downloadBtn svg g path,
 .PhotoElement .closeBtn svg g path {
   fill: var(--photoelement-icon-fill);
+}
+.PhotoElement .fullscreenBtn svg g path {
+  stroke: var(--photoelement-icon-fill);
 }
 
