@@ -7,28 +7,27 @@ RUN apt-get update && apt-get install -y libraw-bin
 # mostly from https://github.com/jcupitt/docker-builds/blob/master/libvips-ubuntu20.04/Dockerfile
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y \
-		bc \
-		build-essential \
-		jq \
-		less \
-		ninja-build \
-		pipx \
-		python3-pip \
-		software-properties-common \
-		wget \
-    ffmpeg \
-    glib-2.0-dev \
-    libexif-dev \
-    libexpat-dev \
-    libheif-dev \
-    libimage-exiftool-perl \
-    libjpeg62-turbo-dev \
-    liblcms2-dev \
-    liborc-dev \
-    libpng-dev \
-    librsvg2-dev \
-    libtiff-dev \
-    meson
+      bc \
+      build-essential \
+      ffmpeg \
+      glib-2.0-dev \
+      jq \
+      less \
+      libexif-dev \
+      libexpat-dev \
+      libheif-dev \
+      libimage-exiftool-perl \
+      libjpeg62-turbo-dev \
+      liblcms2-dev \
+      liborc-dev \
+      libpng-dev \
+      librsvg2-dev \
+      libtiff-dev \
+      meson \
+      ninja-build \
+      python3-pip \
+      software-properties-common \
+      wget
 
 WORKDIR /usr/local/src
 
