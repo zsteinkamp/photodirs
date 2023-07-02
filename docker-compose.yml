@@ -28,7 +28,7 @@ services:
       NODE_ENV: production
     restart: unless-stopped
     volumes:
-      - /mnt/shared/photos:/albums:ro
+      - prod_albums:/albums:ro
       - prod_cache:/cache
 
   watcher:
@@ -40,8 +40,14 @@ services:
     restart: unless-stopped
     command: "npm run start:watcher"
     volumes:
-      - /mnt/shared/photos:/albums:ro
+      - prod_albums:/albums:ro
       - prod_cache:/cache
 
 volumes:
+  prod_albums:
+    driver: local
+    driver_opts:
+      type: "nfs4"
+      o: "addr=truenas.lan,vers=4,soft,nolock,ro"
+      device: ":/mnt/data-pool/shared/photos"
   prod_cache:
