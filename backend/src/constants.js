@@ -40,7 +40,7 @@ module.exports = {
     'WhiteBalance'
   ],
   LOGGER: require('./logger'),
-  MAC_FORBIDDEN_FILES_REGEX: /(\.fseventsd|\.DocumentRevisions-V100|.TemporaryItems)/,
+  MAC_FORBIDDEN_FILES_REGEX: /(\.fseventsd|\.DocumentRevisions-V100|\.TemporaryItems|\.Trashes)/,
   MAX_DIMENSION: 3000,
   MIN_DIMENSION: 16,
   PHOTO_URL_BASE: '/photo',
