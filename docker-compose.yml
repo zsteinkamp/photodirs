@@ -48,6 +48,6 @@ volumes:
     driver: local
     driver_opts:
       type: "nfs4"
-      o: "addr=truenas.lan,vers=4,soft,nolock,ro"
+      o: "addr=truenas.lan,vers=4,soft,nolock"
       device: ":/mnt/data-pool/shared/photos"
   prod_cache:

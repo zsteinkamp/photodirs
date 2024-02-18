@@ -1,20 +1,25 @@
+.DEFAULT_GOAL := prod
+
 devup:
-	cd dev && docker compose build && docker compose up -d --force-recreate && docker compose logs -f
+	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate && docker compose logs -f
 
 devlogs:
-	cd dev && docker compose logs -f
+	cd photodirs-dev && docker compose logs -f
 
 devdown:
-	cd dev && docker compose down
+	cd photodirs-dev && docker compose down
 
 devshell:
-	cd dev && docker compose exec watcher bash
+	cd photodirs-dev && docker compose exec watcher bash
 
-prod:
+prod: prod-compose
 	docker compose build && docker compose up -d --force-recreate && docker compose logs -f
 
-prodlogs:
+prodlogs: prod-compose
 	docker compose logs -f
 
-prodshell:
+prodshell: prod-compose
 	docker compose exec watcher bash
+
+prod-compose: docker-compose.yml
+	bin/gen-compose
