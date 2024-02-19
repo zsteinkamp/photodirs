@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
-const fsp = require('fs/promises');
-const path = require('path');
-const util = require('node:util');
-const execFile = util.promisify(require('child_process').execFile);
+const fsp = require('fs/promises')
+const path = require('path')
+const util = require('node:util')
+const execFile = util.promisify(require('child_process').execFile)
 
-const C = require('../constants');
-const logger = C.LOGGER;
-const cacheUtils = require('./cache');
-const fileUtils = require('./file');
+const C = require('../constants')
+const logger = C.LOGGER
+const cacheUtils = require('./cache')
+const fileUtils = require('./file')
 
 const videoUtils = {
   /*
@@ -17,33 +17,39 @@ const videoUtils = {
    * return the cache path to the transcoded file in the cache.
    */
   getCachedVideoPath: async (filePath) => {
-    const cachePath = cacheUtils.cachePathForVideo(filePath);
-    logger.debug('getCachedVideoPath', { filePath, cachePath });
+    const cachePath = cacheUtils.cachePathForVideo(filePath)
+    logger.debug('getCachedVideoPath', { filePath, cachePath })
     // if the file at cachepath is NOT older than the filePath, then early return the cachepath
-    if (await fileUtils.fileExists(cachePath) && (!(await fileUtils.isFileOlderThanAny(cachePath, [filePath])))) {
+    if (
+      (await fileUtils.fileExists(cachePath)) &&
+      !(await fileUtils.isFileOlderThanAny(cachePath, [filePath]))
+    ) {
       // Return existing jpg
-      return cachePath;
+      return cachePath
     }
 
-    logger.info('TRANSCODING START', { filePath, cachePath });
+    logger.info('TRANSCODING START', { filePath, cachePath })
 
     // Gotta give the cached file a home. Not worth checking for existence...
-    await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 });
+    await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 })
 
     // Need to generate JPEG version by asking ffmpeg to extract a thumbnail from the video into the cache
     await execFile('/usr/bin/ffmpeg', [
-      '-i', filePath, // video file input
+      '-i',
+      filePath, // video file input
       '-y', // overwrite
-      '-crf', '30', // Decent quality but great on bandwidth
-      '-vf', 'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2', // max 1080p and even dimensions
-      cachePath // and write to the cachePath
-    ]);
+      '-crf',
+      '30', // Decent quality but great on bandwidth
+      '-vf',
+      'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2', // max 1080p and even dimensions
+      cachePath, // and write to the cachePath
+    ])
 
-    logger.info('TRANSCODING END', { filePath, cachePath });
+    logger.info('TRANSCODING END', { filePath, cachePath })
 
     // Return the path to the cached JPEG
-    return cachePath;
-  }
-};
+    return cachePath
+  },
+}
 
-module.exports = videoUtils;
+module.exports = videoUtils

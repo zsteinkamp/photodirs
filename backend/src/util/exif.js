@@ -1,89 +1,104 @@
-'use strict';
+'use strict'
 
-const path = require('path');
-const exiftool = require('node-exiftool');
+const path = require('path')
+const exiftool = require('node-exiftool')
 
-const C = require('../constants');
-const logger = C.LOGGER;
-const fileTypes = require('./fileTypes');
-const metaUtils = require('./meta');
+const C = require('../constants')
+const logger = C.LOGGER
+const fileTypes = require('./fileTypes')
+const metaUtils = require('./meta')
 
-const exifUtils = module.exports = {
+const exifUtils = (module.exports = {
   /*
    * Convenience method to load the exif reader and return the Detail props.
    */
   getExifForFile: async (reqPath) => {
-    const exifObj = await exifUtils.getExifObjForFile(reqPath);
-    return exifUtils.getExifDetailProps(exifObj);
+    const exifObj = await exifUtils.getExifObjForFile(reqPath)
+    return exifUtils.getExifDetailProps(exifObj)
   },
 
   /*
    * Return an object filled with EXIF for a given file, or empty object.
    */
   getExifObjForFile: async (reqPath) => {
-    let ret = {};
+    let ret = {}
 
-    const filePath = path.join(C.ALBUMS_ROOT, reqPath);
+    const filePath = path.join(C.ALBUMS_ROOT, reqPath)
 
-    logger.debug('GET_EXIF_FOR_FILE', { filePath });
-    if (!(fileTypes.isSupportedImageFile(filePath))) {
-      return ret;
+    logger.debug('GET_EXIF_FOR_FILE', { filePath })
+    if (!fileTypes.isSupportedImageFile(filePath)) {
+      return ret
     }
 
-    const ep = new exiftool.ExiftoolProcess('/usr/bin/exiftool');
-    await ep.open();
-    const meta = await ep.readMetadata(filePath);//, ['-File:all']);
-    await ep.close();
+    const ep = new exiftool.ExiftoolProcess('/usr/bin/exiftool')
+    await ep.open()
+    const meta = await ep.readMetadata(filePath) //, ['-File:all']);
+    await ep.close()
 
     // Sometimes we get an array back
-    ret = meta.data[0] || meta.data || {};
+    ret = meta.data[0] || meta.data || {}
 
     if (meta.error) {
-      logger.error('EXIFTOOL ERROR', { err: meta.error });
+      logger.error('EXIFTOOL ERROR', { err: meta.error })
     }
 
-    const fileYML = filePath + '.yml';
-    ret = await metaUtils.fetchAndMergeMeta(ret, fileYML);
+    const fileYML = filePath + '.yml'
+    ret = await metaUtils.fetchAndMergeMeta(ret, fileYML)
 
-    return ret;
+    return ret
   },
 
   /*
    * Given a full EXIF object, return the properties that will be shown in the exif panel.
    */
   getExifDetailProps: (exif) => {
-    const ret = {};
+    const ret = {}
     for (const prop of C.EXIF_DETAIL_PROPERTIES) {
       if (exif[prop]) {
-        ret[prop] = exif[prop];
+        ret[prop] = exif[prop]
       }
     }
-    return ret;
+    return ret
   },
 
   /*
    * Get exif title
    */
   getExifDate: (exif) => {
-    let exifDate = exif[C.EXIF_DATE_PROPERTY] || exif[C.EXIF_VIDEO_DATE_PROPERTY] || null;
+    let exifDate =
+      exif[C.EXIF_DATE_PROPERTY] || exif[C.EXIF_VIDEO_DATE_PROPERTY] || null
     if (exifDate) {
       // the EXIF library outputs the date in a funny format
-      exifDate = exifDate.substr(0, 10).replaceAll(':', '-') + 'T' + exifDate.substr(11, 8) + 'Z';
+      exifDate =
+        exifDate.substr(0, 10).replaceAll(':', '-') +
+        'T' +
+        exifDate.substr(11, 8) +
+        'Z'
     }
-    return exifDate;
+    return exifDate
   },
 
   /*
    * Get exif title
    */
   getExifTitle: (exif) => {
-    return exif[C.META_TITLE_PROPERTY] || exif[C.EXIF_TITLE_PROPERTY] || exif[C.EXIF_VIDEO_TITLE_PROPERTY] || null;
+    return (
+      exif[C.META_TITLE_PROPERTY] ||
+      exif[C.EXIF_TITLE_PROPERTY] ||
+      exif[C.EXIF_VIDEO_TITLE_PROPERTY] ||
+      null
+    )
   },
 
   /*
    * Get exif description
    */
   getExifDescription: (exif) => {
-    return exif[C.META_DESCRIPTION_PROPERTY] || exif[C.EXIF_DESCRIPTION_PROPERTY] || exif[C.EXIF_VIDEO_DESCRIPTION_PROPERTY] || null;
-  }
-};
+    return (
+      exif[C.META_DESCRIPTION_PROPERTY] ||
+      exif[C.EXIF_DESCRIPTION_PROPERTY] ||
+      exif[C.EXIF_VIDEO_DESCRIPTION_PROPERTY] ||
+      null
+    )
+  },
+})

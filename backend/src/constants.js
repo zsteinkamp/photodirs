@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   ALBUMS_ROOT: '/albums',
@@ -37,10 +37,11 @@ module.exports = {
     'GPSSpeed',
     'GPSSpeedRef',
     'Orientation',
-    'WhiteBalance'
+    'WhiteBalance',
   ],
   LOGGER: require('./logger'),
-  MAC_FORBIDDEN_FILES_REGEX: /(\.fseventsd|\.DocumentRevisions-V100|\.TemporaryItems|\.Trashes)/,
+  MAC_FORBIDDEN_FILES_REGEX:
+    /(\.fseventsd|\.DocumentRevisions-V100|\.TemporaryItems|\.Trashes)/,
   MAX_DIMENSION: 3000,
   MIN_DIMENSION: 16,
   PHOTO_URL_BASE: '/photo',
@@ -51,9 +52,9 @@ module.exports = {
     // define your shortcuts here
     tn: { pregenerate: true, size: '400x400', crop: true },
     xl: { size: '2400x2400', crop: false },
-    orig: { size: 'orig' }
+    orig: { size: 'orig' },
   },
   TYPE_ALBUM: 'album',
   TYPE_PHOTO: 'photo',
-  TYPE_VIDEO: 'video'
-};
+  TYPE_VIDEO: 'video',
+}

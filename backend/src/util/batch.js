@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 module.exports = {
   /**
@@ -13,13 +13,16 @@ module.exports = {
    * @returns {Promise<B[]>}
    */
   promiseAllInBatches: async (items, task, batchSize) => {
-    let position = 0;
-    let results = [];
+    let position = 0
+    let results = []
     while (position < items.length) {
-      const itemsForBatch = items.slice(position, position + batchSize);
-      results = [...results, ...await Promise.all(itemsForBatch.map(item => task(item)))];
-      position += batchSize;
+      const itemsForBatch = items.slice(position, position + batchSize)
+      results = [
+        ...results,
+        ...(await Promise.all(itemsForBatch.map((item) => task(item)))),
+      ]
+      position += batchSize
     }
-    return results;
-  }
-};
+    return results
+  },
+}

@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
-const fsp = require('fs/promises');
-const glob = require('glob');
-const path = require('path');
+const fsp = require('fs/promises')
+const glob = require('glob')
+const path = require('path')
 
-const C = require('../constants');
-const logger = C.LOGGER;
-const fileTypes = require('./fileTypes');
+const C = require('../constants')
+const logger = C.LOGGER
+const fileTypes = require('./fileTypes')
 
-const fileUtils = module.exports = {
+const fileUtils = (module.exports = {
   /*
    * promisify glob
    */
@@ -16,12 +16,12 @@ const fileUtils = module.exports = {
     return new Promise((resolve, reject) => {
       glob(pattern, (err, files) => {
         if (err) {
-          reject(err);
+          reject(err)
         } else {
-          resolve(files);
+          resolve(files)
         }
-      });
-    });
+      })
+    })
   },
 
   /*
@@ -29,36 +29,39 @@ const fileUtils = module.exports = {
    */
   isFileOlderThanAny: async (testFile, compareArr) => {
     if (await fileUtils.fileExists(testFile)) {
-      const testFileMtime = (await fsp.stat(testFile)).mtime;
+      const testFileMtime = (await fsp.stat(testFile)).mtime
       for (const compareFile of compareArr) {
         if (await fileUtils.fileExists(compareFile)) {
           if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
-            return true;
+            return true
           }
         }
       }
     }
-    return false;
+    return false
   },
 
   /*
    * return a list of filenames of supported files in the given dirName
    */
   getSupportedFiles: async (dirName) => {
-    const albumDir = path.join(C.ALBUMS_ROOT, dirName);
+    const albumDir = path.join(C.ALBUMS_ROOT, dirName)
     try {
       const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
-        .filter((dirEnt) => (dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)))
-        .map((dirEnt) => dirEnt.name);
-      logger.debug('getSupportedFiles', { dirName, dirFiles });
-      return dirFiles;
+        .filter(
+          (dirEnt) =>
+            dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)
+        )
+        .map((dirEnt) => dirEnt.name)
+      logger.debug('getSupportedFiles', { dirName, dirFiles })
+      return dirFiles
     } catch (e) {
       if (e.code === 'PERM' || e.code === 'EACCES') {
-        logger.info('Permission Denied', { error: e });
-        return [];
+        logger.info('Permission Denied', { error: e })
+        return []
       }
-      logger.error('readdir error4', e);
-      throw e;
+      logger.error('readdir error4', e)
+      throw e
     }
   },
 
@@ -69,10 +72,10 @@ const fileUtils = module.exports = {
    */
   fileExists: async (filePath) => {
     try {
-      await fsp.access(filePath);
-      return true;
+      await fsp.access(filePath)
+      return true
     } catch {
-      return false;
+      return false
     }
-  }
-};
+  },
+})

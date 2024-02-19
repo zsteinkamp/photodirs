@@ -6,11 +6,11 @@
   "customizations": {
     "vscode": {
       "extensions": [
-		"rvest.vs-code-prettier-eslint",
-		"esbenp.prettier-vscode",
-		"dbaeumer.vscode-eslint",
-		"bradlc.vscode-tailwindcss"
-	]
+        "rvest.vs-code-prettier-eslint",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss"
+      ]
     }
   }
 }

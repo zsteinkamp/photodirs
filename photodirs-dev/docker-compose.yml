@@ -1,4 +1,4 @@
-name: photodirs_dev
+name: photodirs-dev
 services:
   nginx:
     image: nginx:1

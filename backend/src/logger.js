@@ -1,15 +1,13 @@
-'use strict';
+'use strict'
 
-const { createLogger, format, transports } = require('winston');
-const { combine } = format;
+const { createLogger, format, transports } = require('winston')
+const { combine } = format
 
 const logger = createLogger({
   transports: [new transports.Console()],
-  format: combine(
-    format.simple()
-  ),
+  format: combine(format.simple()),
   level: 'info',
-  colorize: false
-});
+  colorize: false,
+})
 
-module.exports = logger;
+module.exports = logger
