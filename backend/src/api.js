@@ -2,12 +2,13 @@
 
 import { logger as _logger } from 'express-winston'
 import express from 'express'
-const app = express()
-const port = 3000
 
 import { apiGet, photoGet, videoGet } from './handlers.js'
 import { LOGGER, SIZE_PRESETS } from './constants.js'
+
 const logger = LOGGER
+const app = express()
+const port = 3000
 
 //more options here - https://github.com/bithavoc/express-winston#request-logging
 //console.log('LOGGER=', logger)

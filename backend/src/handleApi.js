@@ -1,6 +1,5 @@
 'use strict'
 
-// requires
 import { dirname, basename } from 'path'
 
 import { getAlbumObj, getExtendedAlbumObj } from './util/albumObj.js'

@@ -85,6 +85,9 @@ export const scanDirectory = async dirName => {
     if (e.code === 'PERM' || e.code === 'EACCES') {
       logger.info('Permission Denied', { error: e })
       return null
+    } else if (e.code === 'ENOENT') {
+      logger.info('Path not found', { dirName })
+      return null
     } else {
       logger.error('readdir error5', {
         keys: Object.keys(e),
