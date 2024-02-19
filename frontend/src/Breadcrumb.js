@@ -11,7 +11,13 @@ export default function Breadcrumb(props) {
     let itemMarkup
     if (idx === props.crumbs.length - 1) {
       if (isAdmin) {
-        itemMarkup = <InlineEdit value={crumb.title} setValue={props.onEdit} />
+        itemMarkup = (
+          <InlineEdit
+            placeholder="Enter a title..."
+            value={crumb.title}
+            setValue={props.onEdit}
+          />
+        )
       } else {
         itemMarkup = <strong>{crumb.title}</strong>
       }

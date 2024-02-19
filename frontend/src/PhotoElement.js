@@ -377,7 +377,11 @@ export default function PhotoElement({ data }) {
       <div className="header">
         <h1>
           {isAdmin ? (
-            <InlineEdit value={currData.title} setValue={setTitle} />
+            <InlineEdit
+              placeholder="Enter a title..."
+              value={currData.title}
+              setValue={setTitle}
+            />
           ) : (
             currData.title
           )}
@@ -388,6 +392,7 @@ export default function PhotoElement({ data }) {
               <InlineEdit
                 value={currData.description}
                 setValue={setDescription}
+                placeholder="Enter a description..."
                 options={{ textarea: true }}
               />
             ) : (

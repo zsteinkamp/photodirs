@@ -1,5 +1,5 @@
 import { useState } from 'react'
-const InlineEdit = ({ value, setValue, options = {} }) => {
+const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
   const [editingValue, setEditingValue] = useState(value)
 
   const onChange = (event) => setEditingValue(event.target.value)
@@ -23,6 +23,7 @@ const InlineEdit = ({ value, setValue, options = {} }) => {
         value={editingValue}
         onBlur={onBlur}
         onChange={onChange}
+        placeholder={placeholder}
       />
     )
   }
@@ -36,6 +37,7 @@ const InlineEdit = ({ value, setValue, options = {} }) => {
       onChange={onChange}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
+      placeholder={placeholder}
     />
   )
 }

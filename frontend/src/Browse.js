@@ -165,6 +165,7 @@ export default function Browse() {
             )}
             {isAdmin ? (
               <InlineEdit
+                placeholder="Enter a description..."
                 value={data.description}
                 setValue={editAlbumDescription}
                 options={{ textarea: true }}

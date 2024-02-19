@@ -10,10 +10,8 @@ export default function IsAdmin({ children }) {
       try {
         fetch('/api/admin').then(async (response) => {
           if (!response.ok) {
-            console.log('NOT OK RESPONSE')
             setIsAdmin(false)
           }
-          console.log('OK RESPONSE')
           const body = await response.json()
           setIsAdmin(body.isAdmin)
         })
