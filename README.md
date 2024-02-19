@@ -178,6 +178,14 @@ To stop the dev containers, run this command:
 make devdown
 ```
 
+### Reset the Dev Cache
+
+To delete the cache volume in the dev environment to force re-generation of thumbnails, presizes, and transcoding.
+
+```
+make devreset
+```
+
 ## Album Metadata (album.yml)
 
 Each directory in the tree under the `/albums` mount in Photodirs can optionally have an `album.yml` file.
