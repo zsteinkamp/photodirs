@@ -28,6 +28,14 @@ app.get(new RegExp('^/api/?$'), async (req, res) => {
   res.status(200).send(body)
 })
 
+// indicates no admin capability
+app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
+  const body = {
+    isAdmin: false,
+  }
+  res.status(200).header({ 'cache-control': 'no-cache' }).json(body)
+})
+
 // handles album, and file metadata requests
 app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
   try {

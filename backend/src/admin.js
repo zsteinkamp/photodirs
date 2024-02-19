@@ -3,7 +3,7 @@
 import { logger as _logger } from 'express-winston'
 import express from 'express'
 
-import { adminGet, isAdmin } from './handleAdmin.js'
+import { adminGet } from './handleAdmin.js'
 import { LOGGER, SIZE_PRESETS } from './constants.js'
 
 const logger = LOGGER
@@ -23,9 +23,9 @@ app.use(
 // handles api root - indicates admin capability
 app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
   const body = {
-    admin: true,
+    isAdmin: true,
   }
-  res.status(200).send(body)
+  res.status(200).header({ 'cache-control': 'no-cache' }).json(body)
 })
 
 app.get(new RegExp('^/api/admin(/.+)?'), async (req, res) => {

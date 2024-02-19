@@ -1,62 +1,86 @@
-import './Browse.css';
+import './Browse.css'
 
-import dayjs from 'dayjs';
-import { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import dayjs from 'dayjs'
+import { useState, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
-import Breadcrumb from "./Breadcrumb";
-import AlbumList from "./AlbumList";
-import FileList from "./FileList";
-import PhotoElement from "./PhotoElement";
+import Breadcrumb from './Breadcrumb'
+import AlbumList from './AlbumList'
+import FileList from './FileList'
+import PhotoElement from './PhotoElement'
 
-var utc = require('dayjs/plugin/utc');
-dayjs.extend(utc);
+var utc = require('dayjs/plugin/utc')
+dayjs.extend(utc)
 
 export default function Browse() {
   const makeApiPath = (path) => {
-    return '/api/albums' + path;
-  };
-  const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname));
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+    return '/api/albums' + path
+  }
 
-  const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname))
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
 
-  const location = useLocation();
+  const navigate = useNavigate()
+
+  const location = useLocation()
   useEffect(() => {
-    setApiPath(makeApiPath(location.pathname));
-  }, [location]);
+    setApiPath(makeApiPath(location.pathname))
+  }, [location])
+
+  useEffect(() => {
+    const getIsAdmin = async () => {
+      try {
+        fetch('/api/admin').then(async (response) => {
+          if (!response.ok) {
+            console.log('NOT OK RESPONSE')
+            setIsAdmin(false)
+          }
+          console.log('OK RESPONSE')
+          const body = await response.json()
+          setIsAdmin(body.isAdmin)
+        })
+      } catch (err) {
+        setError(err.message)
+        setIsAdmin(false)
+      }
+    }
+
+    getIsAdmin()
+  }, [])
 
   /*
    * Keyboard Controls
    */
   const goToParentAlbum = () => {
-    if (data && data.breadcrumb && data.breadcrumb.length > 1) { // not at root
-      navigate(data.breadcrumb[data.breadcrumb.length - 2].path);
+    if (data && data.breadcrumb && data.breadcrumb.length > 1) {
+      // not at root
+      navigate(data.breadcrumb[data.breadcrumb.length - 2].path)
     }
-  };
+  }
 
   const keyCodeToAction = {
     27: goToParentAlbum, // escape
-  };
+  }
 
   const handleKeypress = (event) => {
     //console.log(event.keyCode, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey);
     if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
-      const keypressAction = keyCodeToAction[event.keyCode];
+      const keypressAction = keyCodeToAction[event.keyCode]
       if (keypressAction) {
-        keypressAction();
-        event.preventDefault();
+        keypressAction()
+        event.preventDefault()
       }
     }
-  };
+  }
   useEffect(() => {
-    window.addEventListener("keydown", handleKeypress);
+    window.addEventListener('keydown', handleKeypress)
     return () => {
-      window.removeEventListener("keydown", handleKeypress);
-    };
-  });
+      window.removeEventListener('keydown', handleKeypress)
+    }
+  })
 
   /*
    * Fetch data when the apiPath changes
@@ -64,49 +88,50 @@ export default function Browse() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetch(apiPath);
+        setLoading(true)
+        const response = await fetch(apiPath)
         if (!response.ok) {
-          const body = await response.json();
+          const body = await response.json()
           throw new Error(
             `HTTP error ${response.status}: ${JSON.stringify(body)}`
-          );
+          )
         }
-        let actualData = await response.json();
-        setData(actualData);
+        let actualData = await response.json()
+        setData(actualData)
 
         // set page title
         if (actualData.album && actualData.album.title && actualData.title) {
-          document.title = [actualData.album.title, actualData.title].join(' / ');
+          document.title = [actualData.album.title, actualData.title].join(
+            ' / '
+          )
         } else if (actualData.title) {
-          document.title = actualData.title;
+          document.title = actualData.title
         }
 
-        setError(null);
-      } catch(err) {
-        setError(err.message);
-        setData(null);
+        setError(null)
+      } catch (err) {
+        setError(err.message)
+        setData(null)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    getData();
+    getData()
   }, [apiPath])
 
   /*
    * Something to put in breadcrumb if there is an error fetching
    */
   const errorBreadcrumb = [
-    { title: "Home", path: "/", apiPath: "/api/albums/" },
-    { title: "Error", path: "/", apiPath: "/api/albums/" }
-  ];
+    { title: 'Home', path: '/', apiPath: '/api/albums/' },
+    { title: 'Error', path: '/', apiPath: '/api/albums/' },
+  ]
 
   /*
    * Received photo data on api, return a PhotoElement
    */
   if (!error && !loading && (data.type === 'photo' || data.type === 'video')) {
-    return (
-      <PhotoElement data={ data } />
-    );
+    return <PhotoElement data={data} />
   }
 
   /*
@@ -114,60 +139,76 @@ export default function Browse() {
    */
   const getPageBody = (loading, error, data) => {
     if (loading) {
-      return (<div className="loading">Loading...</div>);
+      return <div className="loading">Loading...</div>
     }
 
     if (error) {
-      return (<div className="error">{`There is a problem fetching the data - ${error}`}</div>);
+      return (
+        <div className="error">{`There is a problem fetching the data - ${error}`}</div>
+      )
     }
 
     if (data.type === 'album') {
       // always make description an array to simplify impl
       if (typeof data.description === 'string' && data.description) {
-          data.description = [data.description];
+        data.description = [data.description]
       }
-      const descriptionParagraphs = data.description && data.description.map((elem, i) => (
-        <div key={i} className='desc'>
-          {elem}
-        </div>
-      ));
+      const descriptionParagraphs =
+        data.description &&
+        data.description.map((elem, i) => (
+          <div key={i} className="desc">
+            {elem}
+          </div>
+        ))
 
       return (
         <div className="album">
           <div className="header">
-              { data.path !== "/" && (<div className="date">{ dayjs(data.date).utc().format("YYYY-MM-DD (dddd)") }</div>) }
-              { descriptionParagraphs }
+            {data.path !== '/' && (
+              <div className="date">
+                {dayjs(data.date).utc().format('YYYY-MM-DD (dddd)')}
+              </div>
+            )}
+            {descriptionParagraphs}
           </div>
-          <AlbumList albums={ data.albums } />
-          <FileList files={ data.files } />
+          <AlbumList albums={data.albums} />
+          <FileList files={data.files} />
         </div>
-      );
+      )
     }
 
     return (
-      <div className="error">Unknown type <pre>{ data.type }</pre>.</div>
-    );
-  };
+      <div className="error">
+        Unknown type <pre>{data.type}</pre>.
+      </div>
+    )
+  }
 
   /*
    * Common layout for album/photo lists, loading, error
    */
   return (
     <div className="Browse">
+      {isAdmin && <h1>ADMIN</h1>}
       <header>
         <div className="logo">
           <Link to="/">
             <img src="/logo.svg" alt="Photodirs Logo" />
           </Link>
         </div>
-        { !loading && <Breadcrumb crumbs={ data ? data.breadcrumb : errorBreadcrumb } /> }
+        {!loading && (
+          <Breadcrumb crumbs={data ? data.breadcrumb : errorBreadcrumb} />
+        )}
       </header>
-      <div className="pageBody">
-        { getPageBody(loading, error, data) }
-      </div>
+      <div className="pageBody">{getPageBody(loading, error, data)}</div>
       <footer>
         <div>
-          Check out out <a rel="noreferrer" href="https://github.com/zsteinkamp/photodirs" target="_blank">
+          Check out out{' '}
+          <a
+            rel="noreferrer"
+            href="https://github.com/zsteinkamp/photodirs"
+            target="_blank"
+          >
             Photodirs on GitHub
           </a>
         </div>
@@ -176,5 +217,5 @@ export default function Browse() {
         </div>
       </footer>
     </div>
-  );
+  )
 }

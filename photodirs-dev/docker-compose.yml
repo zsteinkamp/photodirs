@@ -5,6 +5,7 @@ services:
     depends_on:
       - frontend
       - api
+      - admin
     ports:
       - '4444:3333'
       - '4333:4333'
