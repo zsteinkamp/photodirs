@@ -1,15 +1,15 @@
 {
-  "dockerComposeFile": "../photodirs-dev/docker-compose.yml",
+  "dockerComposeFile": "../../photodirs-dev/docker-compose.yml",
   "service": "watcher",
-  "workspaceFolder": "/app",
-  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/app/backend",
+  "shutdownAction": "none",
   "customizations": {
     "vscode": {
       "extensions": [
         "rvest.vs-code-prettier-eslint",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "mechatroner.rainbow-csv",
+        "bradlc.vscode-tailwindcss",
         "ms-azuretools.vscode-docker"
       ]
     }

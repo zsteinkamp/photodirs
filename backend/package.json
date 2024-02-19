@@ -8,9 +8,11 @@
     "lint": "npx eslint src/",
     "start:api": "node src/api.js",
     "start:watcher": "node src/watcher.js",
+    "start:admin": "node src/admin.js",
     "test": "mocha",
     "watch:api": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:api'",
-    "watch:watcher": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:watcher'"
+    "watch:watcher": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:watcher'",
+    "watch:admin": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:admin'"
   },
   "mocha": {
     "spec": "src/**/*.spec.js"

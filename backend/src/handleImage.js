@@ -17,7 +17,7 @@ import {
 
 const logger = LOGGER
 
-export default async (filePath, size, crop, res) => {
+export const handleImage = async (filePath, size, crop, res) => {
   // Initialize these here up top
   let width = 1600
   let height = 1600

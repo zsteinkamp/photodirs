@@ -25,7 +25,7 @@ clean:
 ## dev below
 
 dev:
-	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate && docker compose logs -f
+	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate
 
 devlogs:
 	cd photodirs-dev && docker compose logs -f

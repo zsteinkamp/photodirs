@@ -4,7 +4,7 @@ import fsp from 'fs/promises'
 import path from 'path'
 
 import * as C from './constants.js'
-import handleImage from './handleImage.js'
+import { handleImage } from './handleImage.js'
 import { handleVideo } from './handleVideo.js'
 import { apiGetAlbum, apiGetFile } from './handleApi.js'
 import * as fileUtils from './util/file.js'

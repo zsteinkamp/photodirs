@@ -51,7 +51,7 @@ RUN cd libvips-${VIPS_BRANCH} \
 ##
 
 # node packages
-WORKDIR /app
+WORKDIR /app/backend
 COPY package*.json ./
 RUN npm ci
 

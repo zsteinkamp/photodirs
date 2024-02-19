@@ -1,8 +1,8 @@
 {
-  "dockerComposeFile": "../photodirs-dev/docker-compose.yml",
+  "dockerComposeFile": "../../photodirs-dev/docker-compose.yml",
   "service": "frontend",
-  "workspaceFolder": "/app",
-  "shutdownAction": "stopCompose",
+  "workspaceFolder": "/app/frontend",
+  "shutdownAction": "none",
   "customizations": {
     "vscode": {
       "extensions": [
