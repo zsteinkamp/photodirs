@@ -1,0 +1,9 @@
+.AdminHeader {
+  font-size: 0.5rem;
+  background-color: #fc3;
+  font-weight: bold;
+  letter-spacing: 0.25em;
+  text-align: center;
+  margin: 0.25rem;
+  padding: 0.25rem;
+}

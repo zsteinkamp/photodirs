@@ -1,23 +1,24 @@
 import './Browse.css'
 
 import dayjs from 'dayjs'
-import { useState, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import Breadcrumb from './Breadcrumb'
 import AlbumList from './AlbumList'
 import FileList from './FileList'
 import PhotoElement from './PhotoElement'
+import { AdminContext } from './AdminContext'
 
 var utc = require('dayjs/plugin/utc')
 dayjs.extend(utc)
 
 export default function Browse() {
+  const isAdmin = useContext(AdminContext)
   const makeApiPath = (path) => {
     return '/api/albums' + path
   }
 
-  const [isAdmin, setIsAdmin] = useState(false)
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname))
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -29,27 +30,6 @@ export default function Browse() {
   useEffect(() => {
     setApiPath(makeApiPath(location.pathname))
   }, [location])
-
-  useEffect(() => {
-    const getIsAdmin = async () => {
-      try {
-        fetch('/api/admin').then(async (response) => {
-          if (!response.ok) {
-            console.log('NOT OK RESPONSE')
-            setIsAdmin(false)
-          }
-          console.log('OK RESPONSE')
-          const body = await response.json()
-          setIsAdmin(body.isAdmin)
-        })
-      } catch (err) {
-        setError(err.message)
-        setIsAdmin(false)
-      }
-    }
-
-    getIsAdmin()
-  }, [])
 
   /*
    * Keyboard Controls
@@ -189,7 +169,6 @@ export default function Browse() {
    */
   return (
     <div className="Browse">
-      {isAdmin && <h1>ADMIN</h1>}
       <header>
         <div className="logo">
           <Link to="/">
