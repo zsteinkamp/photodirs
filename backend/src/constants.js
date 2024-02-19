@@ -57,3 +57,5 @@ export const SIZE_PRESETS = {
 export const TYPE_ALBUM = 'album'
 export const TYPE_PHOTO = 'photo'
 export const TYPE_VIDEO = 'video'
+
+export const WATCHER_PATH_CHECK_PORT = 3000

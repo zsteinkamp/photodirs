@@ -21,6 +21,7 @@ export const apiGet = async reqPath => {
   }
   return apiGetFile(reqPath)
 }
+
 // For delivering resized/cropped images
 export const photoGet = async (reqPath, size, crop, res) => {
   const filePath = path.join(C.ALBUMS_ROOT, reqPath)
@@ -31,6 +32,7 @@ export const photoGet = async (reqPath, size, crop, res) => {
   // File exists so convert/resize/send it
   handleImage(filePath, size, crop, res)
 }
+
 // For delivering video
 export const videoGet = async (reqPath, res) => {
   const filePath = path.join(C.ALBUMS_ROOT, reqPath)

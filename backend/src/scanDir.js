@@ -5,7 +5,6 @@ import { join } from 'path'
 import fastq from 'fastq'
 
 import { LOGGER, ALBUMS_ROOT, MAC_FORBIDDEN_FILES_REGEX } from './constants.js'
-const logger = LOGGER
 import { getAlbumObj, getExtendedAlbumObj } from './util/albumObj.js'
 import { promiseAllInBatches } from './util/batch.js'
 import { getFileObj } from './util/fileObj.js'
@@ -13,6 +12,8 @@ import { isRaw, isVideo } from './util/fileTypes.js'
 import { getSupportedFiles } from './util/file.js'
 import { jpegFileForRaw, jpegFileForVideo, preResize } from './util/image.js'
 import * as videoUtils from './util/video.js'
+
+const logger = LOGGER
 
 // Bring up a single-worker queue for video transcoding
 const transcoder = async ({ filePath }) => {

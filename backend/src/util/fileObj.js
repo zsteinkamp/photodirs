@@ -2,18 +2,18 @@
 
 import fsp from 'fs/promises'
 import path from 'path'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+dayjs.extend(utc)
 
 import * as C from '../constants.js'
-const logger = C.LOGGER
 import * as cacheUtils from './cache.js'
 import * as fileUtils from './file.js'
 import * as fileTypes from './fileTypes.js'
 import * as exifUtils from './exif.js'
 import * as metaUtils from './meta.js'
 
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc.js'
-dayjs.extend(utc)
+const logger = C.LOGGER
 
 /*
  * returns the standard File object

@@ -1,13 +1,17 @@
 'use strict'
 
-import { scanDirectory } from './scanDir.js'
-import { LOGGER } from './constants.js'
-const logger = LOGGER
-
 import { logger as _logger } from 'express-winston'
 import express from 'express'
+
+import { scanDirectory } from './scanDir.js'
+import { LOGGER, WATCHER_PATH_CHECK_PORT } from './constants.js'
+
+const logger = LOGGER
+
+//
+// Set up Express server for path notifier HTTP endpoint
+//
 const app = express()
-const port = 3000
 app.use(
   _logger({
     winstonInstance: logger,
@@ -16,17 +20,22 @@ app.use(
   }),
 )
 app.get(new RegExp('^/'), async (req, res) => {
-  logger.info('WATCHER PATH NOTIFY GOT', { path: req.path })
+  logger.debug('WATCHER PATH NOTIFY GOT', { path: req.path })
   topqueueJob({
     // runAt: now
     path: req.path,
   })
   return res.status(200).send('OK')
 })
-app.listen(port, () => {
-  logger.info('WATCHER PATH NOTIFY LISTENING', { port })
+app.listen(WATCHER_PATH_CHECK_PORT, () => {
+  logger.info('WATCHER PATH NOTIFY LISTENING', {
+    port: WATCHER_PATH_CHECK_PORT,
+  })
 })
 
+//
+// Work Queue and associated methods
+//
 const workQueue = []
 
 const topqueueJob = job => {
@@ -75,15 +84,15 @@ setInterval(async () => {
   )
   if (hasJobToDo()) {
     const job = dequeueJob()
-    logger.info('Running Job:', job)
+    logger.debug('Running Job:', job)
     await runJob(job)
-    logger.info('Completed Job:', job)
+    logger.debug('Completed Job:', job)
   }
 }, 1000)
 
-/*
- * Kick it all off!
- */
+//
+// Kick it all off!
+//
 ;(async () => {
   enqueueJob({
     // runAt: now

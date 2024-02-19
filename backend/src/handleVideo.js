@@ -1,9 +1,10 @@
 'use strict'
 
 import { LOGGER } from './constants.js'
-const logger = LOGGER
 import { getOutputTypeForFile } from './util/fileTypes.js'
 import { getCachedVideoPath } from './util/video.js'
+
+const logger = LOGGER
 
 export const handleVideo = async (filePath, res) => {
   // getCachedImagePath is also responsible for resizing the image and caching it

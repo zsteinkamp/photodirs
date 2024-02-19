@@ -12,7 +12,6 @@ import {
   API_BASE,
   PHOTO_URL_BASE,
 } from '../constants.js'
-const logger = LOGGER
 import { promiseAllInBatches } from './batch.js'
 import { getFileObjMetadataFname } from './cache.js'
 import { getExifObjForFile, getExifDate } from './exif.js'
@@ -20,6 +19,8 @@ import { getFileObj } from './fileObj.js'
 import { isSupportedImageFile } from './fileTypes.js'
 import { fileExists, isFileOlderThanAny, getSupportedFiles } from './file.js'
 import { fetchAndMergeMeta } from './meta.js'
+
+const logger = LOGGER
 
 /*
  * Given a reqPath (i.e. the path root is the album root), return an array of

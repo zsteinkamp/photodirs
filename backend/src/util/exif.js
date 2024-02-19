@@ -16,9 +16,10 @@ import {
   EXIF_DESCRIPTION_PROPERTY,
   EXIF_VIDEO_DESCRIPTION_PROPERTY,
 } from '../constants.js'
-const logger = LOGGER
 import { isSupportedImageFile } from './fileTypes.js'
 import { fetchAndMergeMeta } from './meta.js'
+
+const logger = LOGGER
 
 /*
  * Convenience method to load the exif reader and return the Detail props.

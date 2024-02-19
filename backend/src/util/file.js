@@ -5,8 +5,9 @@ import glob from 'glob'
 import { join } from 'path'
 
 import { LOGGER, ALBUMS_ROOT } from '../constants.js'
-const logger = LOGGER
 import { isSupportedImageFile } from './fileTypes.js'
+
+const logger = LOGGER
 
 export async function globPromise(pattern) {
   return new Promise((resolve, reject) => {

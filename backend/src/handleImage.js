@@ -7,7 +7,6 @@ const { fit: _fit } = sharp
 import { pipeline } from 'stream/promises'
 
 import { LOGGER, MAX_DIMENSION, MIN_DIMENSION } from './constants.js'
-const logger = LOGGER
 import { isRaw, isVideo, getOutputTypeForFile } from './util/fileTypes.js'
 import {
   jpegFileForRaw,
@@ -15,6 +14,8 @@ import {
   getCachedImagePath,
   getSharpTransform,
 } from './util/image.js'
+
+const logger = LOGGER
 
 export default async (filePath, size, crop, res) => {
   // Initialize these here up top
