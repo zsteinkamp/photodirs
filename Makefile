@@ -39,3 +39,6 @@ devshell:
 devdown:
 	cd photodirs-dev && docker compose down
 
+devreset:
+	cd photodirs-dev && docker volume rm photodirs-dev_dev_cache
+

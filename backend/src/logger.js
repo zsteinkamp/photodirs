@@ -1,6 +1,6 @@
 'use strict'
 
-const { createLogger, format, transports } = require('winston')
+import { createLogger, format, transports } from 'winston'
 const { combine } = format
 
 const logger = createLogger({
@@ -10,4 +10,4 @@ const logger = createLogger({
   colorize: false,
 })
 
-module.exports = logger
+export default logger

@@ -1,17 +1,22 @@
 'use strict'
 
-// requires
-const fs = require('fs')
-const path = require('path')
-const sharp = require('sharp')
-const { pipeline } = require('stream/promises')
+import { createReadStream } from 'fs'
+import { basename } from 'path'
+import sharp from 'sharp'
+const { fit: _fit } = sharp
+import { pipeline } from 'stream/promises'
 
-const C = require('./constants')
-const logger = C.LOGGER
-const fileTypes = require('./util/fileTypes')
-const imageUtils = require('./util/image')
+import { LOGGER, MAX_DIMENSION, MIN_DIMENSION } from './constants.js'
+const logger = LOGGER
+import { isRaw, isVideo, getOutputTypeForFile } from './util/fileTypes.js'
+import {
+  jpegFileForRaw,
+  jpegFileForVideo,
+  getCachedImagePath,
+  getSharpTransform,
+} from './util/image.js'
 
-module.exports = async (filePath, size, crop, res) => {
+export default async (filePath, size, crop, res) => {
   // Initialize these here up top
   let width = 1600
   let height = 1600
@@ -22,7 +27,7 @@ module.exports = async (filePath, size, crop, res) => {
       res.set('Cache-Control', 'public, max-age=86400')
       res.set(
         'Content-Disposition',
-        `attachment; filename="${path.basename(filePath)}"`
+        `attachment; filename="${basename(filePath)}"`,
       )
       return res.sendFile(filePath)
     }
@@ -31,12 +36,12 @@ module.exports = async (filePath, size, crop, res) => {
     const matches = size.match(/^(?<width>\d+)x(?<height>\d+)$/)
     if (matches) {
       width = Math.max(
-        Math.min(parseInt(matches.groups.width), C.MAX_DIMENSION),
-        C.MIN_DIMENSION
+        Math.min(parseInt(matches.groups.width), MAX_DIMENSION),
+        MIN_DIMENSION,
       )
       height = Math.max(
-        Math.min(parseInt(matches.groups.height), C.MAX_DIMENSION),
-        C.MIN_DIMENSION
+        Math.min(parseInt(matches.groups.height), MAX_DIMENSION),
+        MIN_DIMENSION,
       )
     }
   }
@@ -47,38 +52,35 @@ module.exports = async (filePath, size, crop, res) => {
   const resizeOptions = {
     width: width,
     height: height,
-    fit: crop ? sharp.fit.cover : sharp.fit.inside,
+    fit: crop ? _fit.cover : _fit.inside,
   }
 
-  if (fileTypes.isRaw(filePath)) {
+  if (isRaw(filePath)) {
     // RAW handling -- convert to JPEG, cache, and return JPEG filename.
     // Will return JPEG filename immediately if already cached.
-    filePath = await imageUtils.jpegFileForRaw(filePath)
-  } else if (fileTypes.isVideo(filePath)) {
-    filePath = await imageUtils.jpegFileForVideo(filePath)
+    filePath = await jpegFileForRaw(filePath)
+  } else if (isVideo(filePath)) {
+    filePath = await jpegFileForVideo(filePath)
   }
 
   // getCachedImagePath is also responsible for resizing the image and caching it
-  const cachedImagePath = await imageUtils.getCachedImagePath(
-    filePath,
-    resizeOptions
-  )
+  const cachedImagePath = await getCachedImagePath(filePath, resizeOptions)
 
   if (!cachedImagePath) {
     // must have been an error
     return res.status(500).send()
   }
-  const readStream = fs.createReadStream(cachedImagePath)
-  const transform = imageUtils.getSharpTransform(cachedImagePath, resizeOptions)
+  const readStream = createReadStream(cachedImagePath)
+  const transform = getSharpTransform(cachedImagePath, resizeOptions)
 
   // Set the correct Content-Type header
-  res.type(`image/${fileTypes.getOutputTypeForFile(cachedImagePath)}`)
+  res.type(`image/${getOutputTypeForFile(cachedImagePath)}`)
   res.set('Cache-control', 'public, max-age=86400')
   // Stream the image through the transformer and out to the response.
   async function plumbing() {
     await pipeline(readStream, transform, res)
   }
-  await plumbing().catch((err) => {
+  await plumbing().catch(err => {
     logger.error('IMG CACHE PIPELINE ERROR', { filePath, cachedImagePath, err })
     res.end()
   })

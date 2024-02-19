@@ -1,32 +1,24 @@
 'use strict'
 
 // requires
-const path = require('path')
+import { dirname, basename } from 'path'
 
-const albumObjUtils = require('./util/albumObj')
-const fileObjUtils = require('./util/fileObj')
+import { getAlbumObj, getExtendedAlbumObj } from './util/albumObj.js'
+import { getFileObj } from './util/fileObj.js'
 
-const apiGetAlbum = async (albumPath) => {
-  const albumObj = await albumObjUtils.getAlbumObj(albumPath)
-  const extAlbumObj = await albumObjUtils.getExtendedAlbumObj(albumObj)
+export const apiGetAlbum = async albumPath => {
+  const albumObj = await getAlbumObj(albumPath)
+  const extAlbumObj = await getExtendedAlbumObj(albumObj)
   return [200, extAlbumObj]
 }
 
-const apiGetFile = async (reqPath) => {
+export const apiGetFile = async reqPath => {
   // get the fileObj (includes exif)
-  const fileObj = await fileObjUtils.getFileObj(
-    path.dirname(reqPath),
-    path.basename(reqPath)
-  )
+  const fileObj = await getFileObj(dirname(reqPath), basename(reqPath))
 
   // add album to fileObj
-  const albumObj = await albumObjUtils.getAlbumObj(fileObj.albumPath)
-  fileObj.album = await albumObjUtils.getExtendedAlbumObj(albumObj)
+  const albumObj = await getAlbumObj(fileObj.albumPath)
+  fileObj.album = await getExtendedAlbumObj(albumObj)
 
   return [200, fileObj]
-}
-
-module.exports = {
-  apiGetFile,
-  apiGetAlbum,
 }

@@ -8,8 +8,10 @@ module.exports = {
   ignorePatterns: ['**/node_modules/', '/dist/', '/lib/'],
   parserOptions: {
     sourceType: 'module',
+    ecmaVersion: 2018,
   },
   rules: {
+    /*
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
@@ -18,6 +20,7 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
+    */
     'prettier/prettier': 'error',
   },
   plugins: ['prettier'],
