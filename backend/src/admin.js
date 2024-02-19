@@ -2,8 +2,9 @@
 
 import { logger as _logger } from 'express-winston'
 import express from 'express'
+import bodyParser from 'body-parser'
 
-import { adminGet } from './handleAdmin.js'
+import { adminCall } from './handleAdmin.js'
 import { LOGGER, SIZE_PRESETS } from './constants.js'
 
 const logger = LOGGER
@@ -28,15 +29,29 @@ app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
   res.status(200).header({ 'cache-control': 'no-cache' }).json(body)
 })
 
-app.get(new RegExp('^/api/admin(/.+)?'), async (req, res) => {
+// duh no kidding how to do JSON REST
+app.use(bodyParser.json())
+
+app.all(new RegExp('^/api/admin(/.+)?'), async (req, res) => {
   try {
     //logger.info('API Request Received', { path: req.path })
     //res.status(200).send(req.path)
-    const [status, body] = await adminGet(req)
-    res.status(status).send(body)
+    const reqBody = req.body
+    console.log({ reqBody })
+    const [status, body] = await adminCall(req.params[0], reqBody)
+    res.status(status).json(body)
   } catch (e) {
     return res.status(500).send(e.message)
   }
+})
+
+app.all('*', (req, res) => {
+  res.status(404).json({ error: 404, msg: 'not found' })
+})
+
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).json({ error: 500, err })
 })
 
 app.listen(port, () => {

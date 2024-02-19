@@ -3,11 +3,13 @@ import './Browse.css'
 import dayjs from 'dayjs'
 import { useContext, useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Markdown from 'react-markdown'
 
 import Breadcrumb from './Breadcrumb'
 import AlbumList from './AlbumList'
 import FileList from './FileList'
 import PhotoElement from './PhotoElement'
+import InlineEdit from './InlineEdit'
 import { AdminContext } from './AdminContext'
 
 var utc = require('dayjs/plugin/utc')
@@ -20,6 +22,7 @@ export default function Browse() {
   }
 
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname))
+  const [adminApiPath, setAdminApiPath] = useState(apiPath)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -96,6 +99,7 @@ export default function Browse() {
         setLoading(false)
       }
     }
+    setAdminApiPath(apiPath.replace(/^\/api/, '/api/admin'))
     getData()
   }, [apiPath])
 
@@ -129,17 +133,27 @@ export default function Browse() {
     }
 
     if (data.type === 'album') {
-      // always make description an array to simplify impl
-      if (typeof data.description === 'string' && data.description) {
-        data.description = [data.description]
+      const editAlbumDescription = async (val) => {
+        try {
+          const response = await fetch(
+            (adminApiPath + '/description').replace('//', '/'),
+            {
+              method: 'POST', // or 'PUT'
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ val }),
+            }
+          )
+          const result = await response.json()
+          console.log('Success:', result)
+        } catch (error) {
+          console.error('Error:', error)
+        }
+        data.description = val
       }
-      const descriptionParagraphs =
-        data.description &&
-        data.description.map((elem, i) => (
-          <div key={i} className="desc">
-            {elem}
-          </div>
-        ))
+
+      const markdownDescription = <Markdown>{data.description}</Markdown>
 
       return (
         <div className="album">
@@ -149,7 +163,17 @@ export default function Browse() {
                 {dayjs(data.date).utc().format('YYYY-MM-DD (dddd)')}
               </div>
             )}
-            {descriptionParagraphs}
+            {isAdmin ? (
+              <InlineEdit
+                value={data.description}
+                setValue={editAlbumDescription}
+                options={{ textarea: true }}
+              >
+                {markdownDescription}
+              </InlineEdit>
+            ) : (
+              markdownDescription
+            )}
           </div>
           <AlbumList albums={data.albums} />
           <FileList files={data.files} />
@@ -164,6 +188,26 @@ export default function Browse() {
     )
   }
 
+  const setObjectTitle = async (val) => {
+    console.log('SET OBJECT TITLE', val)
+    try {
+      const response = await fetch(
+        (adminApiPath + '/title').replace('//', '/'),
+        {
+          method: 'POST', // or 'PUT'
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ val }),
+        }
+      )
+      const result = await response.json()
+      console.log('Success:', result)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
+
   /*
    * Common layout for album/photo lists, loading, error
    */
@@ -176,7 +220,10 @@ export default function Browse() {
           </Link>
         </div>
         {!loading && (
-          <Breadcrumb crumbs={data ? data.breadcrumb : errorBreadcrumb} />
+          <Breadcrumb
+            crumbs={data ? data.breadcrumb : errorBreadcrumb}
+            onEdit={setObjectTitle}
+          />
         )}
       </header>
       <div className="pageBody">{getPageBody(loading, error, data)}</div>
