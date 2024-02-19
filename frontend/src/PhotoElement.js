@@ -348,6 +348,9 @@ export default function PhotoElement({ data }) {
   const setTitle = async (val) => {
     await setObjectAttr('title', val)
   }
+  const setDescription = async (val) => {
+    await setObjectAttr('description', val)
+  }
 
   const setObjectAttr = async (attr, val) => {
     console.log('SET OBJECT ATTR', { attr, val })
@@ -379,7 +382,19 @@ export default function PhotoElement({ data }) {
             currData.title
           )}
         </h1>
-        {currData.description && <p>{currData.description}</p>}
+        {currData.description && (
+          <p>
+            {isAdmin ? (
+              <InlineEdit
+                value={currData.description}
+                setValue={setDescription}
+                options={{ textarea: true }}
+              />
+            ) : (
+              currData.description
+            )}
+          </p>
+        )}
         {currData.date && (
           <p>{dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}</p>
         )}
