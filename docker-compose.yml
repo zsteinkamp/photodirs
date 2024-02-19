@@ -9,7 +9,7 @@ services:
       - '3333:3333'
     restart: unless-stopped
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx*.conf:/etc/nginx/:ro
       - prod_cache:/cache:ro
 
   frontend:
@@ -38,7 +38,7 @@ services:
     environment:
       NODE_ENV: production
     restart: unless-stopped
-    command: "npm run start:watcher"
+    command: 'npm run start:watcher'
     volumes:
       - prod_albums:/albums:ro
       - prod_cache:/cache
@@ -47,7 +47,7 @@ volumes:
   prod_albums:
     driver: local
     driver_opts:
-      type: "nfs4"
-      o: "addr=truenas.lan,vers=4,soft,nolock"
-      device: ":/mnt/data-pool/shared/photos"
+      type: 'nfs4'
+      o: 'addr=truenas.lan,vers=4,soft,nolock'
+      device: ':/mnt/data-pool/shared/photos'
   prod_cache:

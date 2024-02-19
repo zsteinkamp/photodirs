@@ -3,7 +3,7 @@
 import { logger as _logger } from 'express-winston'
 import express from 'express'
 
-import { adminGet } from './handleAdmin.js'
+import { adminGet, isAdmin } from './handleAdmin.js'
 import { LOGGER, SIZE_PRESETS } from './constants.js'
 
 const logger = LOGGER
@@ -20,7 +20,7 @@ app.use(
   }),
 )
 
-// handles api root (HATEOS)
+// handles api root - indicates admin capability
 app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
   const body = {
     admin: true,
@@ -28,7 +28,6 @@ app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
   res.status(200).send(body)
 })
 
-// handles album, and file metadata requests
 app.get(new RegExp('^/api/admin(/.+)?'), async (req, res) => {
   try {
     //logger.info('API Request Received', { path: req.path })
