@@ -1,5 +1,7 @@
 import './InlineEdit.css'
 
+// From https://www.emgoto.com/react-inline-edit/
+
 import { useEffect, useRef, useState } from 'react'
 
 const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {

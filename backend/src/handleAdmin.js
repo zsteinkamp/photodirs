@@ -39,13 +39,16 @@ const updateMediaProperty = async (path, property, payload) => {
   await ep.open()
   const isVideo = fileTypes.isVideo(path)
   const isTitle = property === 'title'
-  const exifProperty = isVideo
-    ? isTitle
-      ? C.EXIF_VIDEO_TITLE_PROPERTY
-      : C.EXIF_VIDEO_DESCRIPTION_PROPERTY
-    : isTitle
-      ? C.EXIF_TITLE_PROPERTY
-      : C.EXIF_DESCRIPTION_PROPERTY
+  const exifProperty = {
+    video: {
+      title: C.EXIF_VIDEO_TITLE_PROPERTY,
+      description: C.EXIF_VIDEO_DESCRIPTION_PROPERTY,
+    },
+    photo: {
+      title: C.EXIF_TITLE_PROPERTY,
+      description: C.EXIF_DESCRIPTION_PROPERTY,
+    },
+  }[isVideo ? 'video' : 'photo'][property]
   await ep.writeMetadata(
     path,
     {
