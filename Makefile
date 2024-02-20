@@ -19,7 +19,7 @@ prod-compose: docker-compose.yml
 	bin/gen-compose
 
 clean:
-	rm docker-compose.yml
+	mv docker-compose.yml docker-compose.yml.BAK
 
 
 ## dev below
