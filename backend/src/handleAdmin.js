@@ -2,8 +2,12 @@
 
 import fs from 'fs'
 import yaml from 'js-yaml'
+import { ExiftoolProcess } from 'node-exiftool'
+import * as fileTypes from './util/fileTypes.js'
+import * as C from './constants.js'
 
 const updateAlbumYML = (path, property, payload) => {
+  console.log('UPDATE ALBUM YML', { path, property, payload })
   let lstat = null
   const albumYmlFname = path + '/album.yml'
 
@@ -28,11 +32,28 @@ const updateAlbumYML = (path, property, payload) => {
       console.log(err)
     }
   })
-
-  console.log('UPDATE ALBUM YML', { path, property, payload })
 }
-const updateMediaProperty = (path, property, payload) => {
+const updateMediaProperty = async (path, property, payload) => {
   console.log('UPDATE MEDIA PROPERTY', { path, property, payload })
+  const ep = new ExiftoolProcess('/usr/bin/exiftool')
+  await ep.open()
+  const isVideo = fileTypes.isVideo(path)
+  const isTitle = property === 'title'
+  const exifProperty = isVideo
+    ? isTitle
+      ? C.EXIF_VIDEO_TITLE_PROPERTY
+      : C.EXIF_VIDEO_DESCRIPTION_PROPERTY
+    : isTitle
+      ? C.EXIF_TITLE_PROPERTY
+      : C.EXIF_DESCRIPTION_PROPERTY
+  await ep.writeMetadata(
+    path,
+    {
+      [exifProperty]: payload.val,
+    },
+    ['overwrite_original'],
+  )
+  await ep.close()
 }
 
 export const adminCall = async (path, reqBody) => {

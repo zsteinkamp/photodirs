@@ -1,0 +1,23 @@
+.InlineEdit {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: rgba(var(--browse-color), 0.1);
+  border: inherit;
+  width: fit-content;
+  display: inline-block;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  outline: none;
+}
+
+.InlineEdit:focus {
+  outline: 1px solid rgba(var(--browse-color), 0.5);
+  border-color: rgba(var(--browse-color), 0.5);
+}
+
+textarea.InlineEdit {
+  resize: none;
+  overflow: hidden;
+  width: 100%;
+}

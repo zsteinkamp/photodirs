@@ -386,20 +386,18 @@ export default function PhotoElement({ data }) {
             currData.title
           )}
         </h1>
-        {currData.description && (
-          <p>
-            {isAdmin ? (
-              <InlineEdit
-                value={currData.description}
-                setValue={setDescription}
-                placeholder="Enter a description..."
-                options={{ textarea: true }}
-              />
-            ) : (
-              currData.description
-            )}
-          </p>
-        )}
+        <p>
+          {isAdmin ? (
+            <InlineEdit
+              value={currData.description}
+              setValue={setDescription}
+              placeholder="Enter a description..."
+              options={{ textarea: true }}
+            />
+          ) : (
+            currData.description
+          )}
+        </p>
         {currData.date && (
           <p>{dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}</p>
         )}

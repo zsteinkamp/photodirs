@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import './InlineEdit.css'
+
+import { useEffect, useRef, useState } from 'react'
+
 const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
   const [editingValue, setEditingValue] = useState(value)
 
@@ -14,16 +17,38 @@ const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
     setValue(event.target.value)
   }
 
+  const setHeight = (obj) => {
+    console.log('SETHEIGHT', { obj })
+    if (obj && obj.style) {
+      obj.style.height = obj.scrollHeight + 'px'
+    }
+  }
+
+  const textAreaRef = useRef()
+
+  useEffect(() => {
+    if (textAreaRef && textAreaRef.current) {
+      setHeight(textAreaRef.current)
+    }
+  }, [textAreaRef])
+
+  const onInput = (event) => {
+    setHeight(event.target)
+  }
+
   if (options.textarea) {
     // multiline
     return (
       <textarea
+        className="InlineEdit"
         rows={1}
+        ref={textAreaRef}
         aria-label="Field name"
         value={editingValue}
         onBlur={onBlur}
         onChange={onChange}
         placeholder={placeholder}
+        onInput={onInput}
       />
     )
   }
@@ -31,6 +56,7 @@ const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
   // regular old single line
   return (
     <input
+      className="InlineEdit"
       type="text"
       aria-label="Field name"
       value={editingValue}
