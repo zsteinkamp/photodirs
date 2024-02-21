@@ -145,9 +145,11 @@ export default function PhotoElement({ data }) {
 
   const keyCodeToAction = {
     27: returnToAlbum, // escape
-    //37: goToPrevPhoto, // left arrow
-    //39: goToNextPhoto, // right arrow
-    //70: toggleFullScreen, // letter f
+  }
+  if (!isAdmin) {
+    keyCodeToAction[37] = goToPrevPhoto // left arrow
+    keyCodeToAction[39] = goToNextPhoto // right arrow
+    keyCodeToAction[70] = toggleFullScreen // letter f
   }
 
   const handleKeypress = (event) => {
