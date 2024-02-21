@@ -118,6 +118,23 @@ export default function Browse() {
     return <PhotoElement data={data} />
   }
 
+  const editAlbumMetadata = async (payload) => {
+    try {
+      const response = await fetch(adminApiPath, {
+        method: 'POST', // or 'PUT'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+      const result = await response.json()
+      console.log('Success:', result)
+    } catch (error) {
+      console.error('Error:', error)
+    }
+    Object.assign(data, payload)
+  }
+
   /*
    * Main content section, all these cases share a layout
    */
@@ -133,26 +150,6 @@ export default function Browse() {
     }
 
     if (data.type === 'album') {
-      const editAlbumDescription = async (val) => {
-        try {
-          const response = await fetch(
-            (adminApiPath + '/description').replace('//', '/'),
-            {
-              method: 'POST', // or 'PUT'
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ val }),
-            }
-          )
-          const result = await response.json()
-          console.log('Success:', result)
-        } catch (error) {
-          console.error('Error:', error)
-        }
-        data.description = val
-      }
-
       const markdownDescription = <Markdown>{data.description}</Markdown>
 
       return (
@@ -167,7 +164,7 @@ export default function Browse() {
               <InlineEdit
                 placeholder="Enter a description..."
                 value={data.description}
-                setValue={editAlbumDescription}
+                setValue={(val) => editAlbumMetadata({ description: val })}
                 options={{ textarea: true }}
               >
                 {markdownDescription}
@@ -189,26 +186,6 @@ export default function Browse() {
     )
   }
 
-  const setObjectTitle = async (val) => {
-    console.log('SET OBJECT TITLE', val)
-    try {
-      const response = await fetch(
-        (adminApiPath + '/title').replace('//', '/'),
-        {
-          method: 'POST', // or 'PUT'
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ val }),
-        }
-      )
-      const result = await response.json()
-      console.log('Success:', result)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
   /*
    * Common layout for album/photo lists, loading, error
    */
@@ -223,7 +200,7 @@ export default function Browse() {
         {!loading && (
           <Breadcrumb
             crumbs={data ? data.breadcrumb : errorBreadcrumb}
-            onEdit={setObjectTitle}
+            onEdit={(val) => editAlbumMetadata({ title: val })}
           />
         )}
       </header>

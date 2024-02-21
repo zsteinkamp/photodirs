@@ -345,26 +345,15 @@ export default function PhotoElement({ data }) {
     }
   })
 
-  const setTitle = async (val) => {
-    await setObjectAttr('title', val)
-  }
-  const setDescription = async (val) => {
-    await setObjectAttr('description', val)
-  }
-
   const setObjectAttr = async (attr, val) => {
-    console.log('SET OBJECT ATTR', { attr, val })
     try {
-      const response = await fetch(
-        (adminApiPath + '/' + attr).replace('//', '/'),
-        {
-          method: 'POST', // or 'PUT'
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ val }),
-        }
-      )
+      const response = await fetch(adminApiPath, {
+        method: 'POST', // or 'PUT'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ [attr]: val }),
+      })
       const result = await response.json()
       console.log('Success:', result)
     } catch (error) {
@@ -380,7 +369,9 @@ export default function PhotoElement({ data }) {
             <InlineEdit
               placeholder="Enter a title..."
               value={currData.title}
-              setValue={setTitle}
+              setValue={(val) => {
+                setObjectAttr('title', val)
+              }}
             />
           ) : (
             currData.title
@@ -390,7 +381,9 @@ export default function PhotoElement({ data }) {
           {isAdmin ? (
             <InlineEdit
               value={currData.description}
-              setValue={setDescription}
+              setValue={(val) => {
+                setObjectAttr('description', val)
+              }}
               placeholder="Enter a description..."
               options={{ textarea: true }}
             />

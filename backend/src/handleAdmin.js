@@ -6,12 +6,11 @@ import { ExiftoolProcess } from 'node-exiftool'
 import * as fileTypes from './util/fileTypes.js'
 import * as C from './constants.js'
 
-const updateAlbumYML = (path, property, payload) => {
-  console.log('UPDATE ALBUM YML', { path, property, payload })
+const updateAlbumYML = (path, payload) => {
+  console.log('UPDATE ALBUM YML', { path, payload })
   let lstat = null
   const albumYmlFname = path + '/album.yml'
 
-  // try to see if the object referenced by pathStr exists
   try {
     lstat = fs.lstatSync(albumYmlFname)
   } catch (e) {
@@ -24,7 +23,9 @@ const updateAlbumYML = (path, property, payload) => {
     console.log('FIlE EXISTS ' + albumYmlFname)
     albumYmlData = yaml.load(fs.readFileSync(albumYmlFname, 'utf8'))
   }
-  albumYmlData[property] = payload.val
+
+  // override values from the YML with the payload
+  Object.assign(albumYmlData, payload)
 
   // write out the metadata to the album.yml file
   fs.writeFile(albumYmlFname, yaml.dump(albumYmlData), err => {
@@ -33,12 +34,14 @@ const updateAlbumYML = (path, property, payload) => {
     }
   })
 }
-const updateMediaProperty = async (path, property, payload) => {
-  console.log('UPDATE MEDIA PROPERTY', { path, property, payload })
+
+const updateMediaProperty = async (path, payload) => {
+  console.log('UPDATE MEDIA PROPERTY', { path, payload })
   const ep = new ExiftoolProcess('/usr/bin/exiftool')
   await ep.open()
   const isVideo = fileTypes.isVideo(path)
-  const isTitle = property === 'title'
+  const isTitle = !!(payload && payload.title)
+  const payloadProperty = isTitle ? 'title' : 'description'
   const exifProperty = {
     video: {
       title: C.EXIF_VIDEO_TITLE_PROPERTY,
@@ -48,11 +51,11 @@ const updateMediaProperty = async (path, property, payload) => {
       title: C.EXIF_TITLE_PROPERTY,
       description: C.EXIF_DESCRIPTION_PROPERTY,
     },
-  }[isVideo ? 'video' : 'photo'][property]
+  }[isVideo ? 'video' : 'photo'][payloadProperty]
   await ep.writeMetadata(
     path,
     {
-      [exifProperty]: payload.val,
+      [exifProperty]: payload[payloadProperty],
     },
     ['overwrite_original'],
   )
@@ -60,24 +63,19 @@ const updateMediaProperty = async (path, property, payload) => {
 }
 
 export const adminCall = async (path, reqBody) => {
-  const pathParts = path.split('/')
-  const property = pathParts.pop()
-
   let lstat = null
-  const pathStr = pathParts.join('/')
 
-  // try to see if the object referenced by pathStr exists
   try {
-    lstat = fs.lstatSync(pathStr)
+    lstat = fs.lstatSync(path)
   } catch (e) {
-    console.warn('Unknoown path [' + pathStr + ']')
-    return [404, { msg: 'Not Found', path: pathStr }]
+    console.warn('Unknown path', { path })
+    return [404, { msg: 'Not Found', path }]
   }
 
   if (lstat.isDirectory()) {
-    await updateAlbumYML(pathStr, property, reqBody)
+    await updateAlbumYML(path, reqBody)
   } else {
-    await updateMediaProperty(pathStr, property, reqBody)
+    await updateMediaProperty(path, reqBody)
   }
   return [200, { path, reqBody }]
 }
