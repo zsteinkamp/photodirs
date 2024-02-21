@@ -1,31 +1,36 @@
 .DEFAULT_GOAL := default
 
-default: prod-compose
-	docker compose build && docker compose up -d --force-recreate
+default: config
+	docker compose build && docker compose up -d --force-recreate --remove-orphans
 
-ps: prod-compose
+ps: config
 	docker compose ps
 
-logs: prod-compose
+logs: config
 	docker compose logs -f
 
-shell: prod-compose
+shell: config
 	docker compose exec watcher bash
 
-down: prod-compose
+down: config
 	docker compose down
 
-prod-compose: docker-compose.yml
-	bin/gen-compose
+rmvol: config
+	docker volume rm photodirs_prod_prod_albums
 
-clean:
+config: docker-compose.yml nginx.conf
+
+docker-compose.yml nginx.conf:
+	bin/gen-config
+
+clean: config
 	mv docker-compose.yml docker-compose.yml.BAK
 
 
 ## dev below
 
 dev:
-	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate
+	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate --remove-orphans
 
 devlogs:
 	cd photodirs-dev && docker compose logs -f
