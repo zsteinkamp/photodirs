@@ -7,6 +7,7 @@ import SVGFullscreen from './SVGFullscreen'
 import SVGClose from './SVGClose'
 import VideoIcon from './VideoIcon'
 import InlineEdit from './InlineEdit'
+import InlineEditArea from './InlineEditArea'
 
 import { AdminContext } from './AdminContext'
 
@@ -381,7 +382,7 @@ export default function PhotoElement({ data }) {
         </h1>
         <p>
           {isAdmin ? (
-            <InlineEdit
+            <InlineEditArea
               value={currData.description}
               setValue={(val) => {
                 setObjectAttr('description', val)

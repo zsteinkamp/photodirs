@@ -8,10 +8,10 @@ services:
       - admin
     ports:
       - '4444:3333'
-      - '4333:4333'
+      - '5444:4333'
     stop_signal: SIGKILL
     volumes:
-      - ../nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ../nginx-photodirs-common.conf:/etc/nginx/nginx-photodirs-common.conf:ro
       - dev_cache:/cache:ro
 

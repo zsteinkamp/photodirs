@@ -9,7 +9,7 @@ import Breadcrumb from './Breadcrumb'
 import AlbumList from './AlbumList'
 import FileList from './FileList'
 import PhotoElement from './PhotoElement'
-import InlineEdit from './InlineEdit'
+import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
 
 var utc = require('dayjs/plugin/utc')
@@ -161,14 +161,14 @@ export default function Browse() {
               </div>
             )}
             {isAdmin ? (
-              <InlineEdit
+              <InlineEditArea
                 placeholder="Enter a description..."
                 value={data.description}
                 setValue={(val) => editAlbumMetadata({ description: val })}
                 options={{ textarea: true }}
               >
                 {markdownDescription}
-              </InlineEdit>
+              </InlineEditArea>
             ) : (
               markdownDescription
             )}

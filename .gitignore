@@ -1,4 +1,4 @@
 .DS_Store
 .env
-docker-compose.yml
-nginx.conf
+./docker-compose.yml
+./nginx.conf
