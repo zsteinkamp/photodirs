@@ -53,7 +53,7 @@
 }
 
 .AlbumList .AlbumItem .body {
-  overflow:hidden;
+  overflow: hidden;
 }
 .AlbumList .AlbumItem .body h1 {
   padding: 0;
@@ -62,7 +62,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   font-family: var(--condensed-font);
-  font-size:1.5rem;
+  font-size: 1.5rem;
 }
 .AlbumList .AlbumItem .body .date {
   margin: 0;
@@ -82,4 +82,14 @@
   -webkit-line-clamp: 5;
   text-overflow: ellipsis;
   display: block;
+  background: -webkit-linear-gradient(
+    var(--album-link-color-visited) 65%,
+    var(--album-link-background-color)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.AlbumList .AlbumItem .body .desc p {
+  margin-top: 0;
 }
