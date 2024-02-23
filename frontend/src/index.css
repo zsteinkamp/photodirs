@@ -3,6 +3,7 @@
     BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
     'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   --main-bg-color: #eee;
+  --main-link-color: #446;
   --bg-link-color: #666;
   --album-link-color-visited: #000;
   --bg-text-color: #444;
@@ -32,6 +33,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --main-bg-color: hsl(0deg 0% 10%);
+    --main-link-color: #88a;
     --bg-link-color: hsl(0deg 0% 80%);
     --album-link-color-visited: hsl(0deg 0% 80%);
     --bg-text-color: hsl(0deg 0% 50%);
@@ -63,6 +65,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--main-bg-color);
+}
+
+a {
+  color: var(--main-link-color);
+  filter: drop-shadow(0 0.25rem 0.5rem var(--album-link-shadow-color));
+}
+
+a:visited {
+  color: var(--main-link-color);
 }
 
 /* Document level adjustments */

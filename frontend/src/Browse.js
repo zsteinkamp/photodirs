@@ -8,6 +8,7 @@ import Markdown from 'react-markdown'
 import Breadcrumb from './Breadcrumb'
 import AlbumList from './AlbumList'
 import FileList from './FileList'
+import AdminFileList from './AdminFileList'
 import PhotoElement from './PhotoElement'
 import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
@@ -150,8 +151,6 @@ export default function Browse() {
     }
 
     if (data.type === 'album') {
-      const markdownDescription = <Markdown>{data.description}</Markdown>
-
       return (
         <div className="album">
           <div className="header">
@@ -165,16 +164,19 @@ export default function Browse() {
                 placeholder="Enter a description..."
                 value={data.description}
                 setValue={(val) => editAlbumMetadata({ description: val })}
-                options={{ textarea: true }}
               >
-                {markdownDescription}
+                {data.description}
               </InlineEditArea>
             ) : (
-              markdownDescription
+              <Markdown>{data.description}</Markdown>
             )}
           </div>
           <AlbumList albums={data.albums} />
-          <FileList files={data.files} />
+          {isAdmin ? (
+            <AdminFileList files={data.files} />
+          ) : (
+            <FileList files={data.files} />
+          )}
         </div>
       )
     }

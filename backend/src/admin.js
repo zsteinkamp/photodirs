@@ -3,8 +3,9 @@
 import { logger as _logger } from 'express-winston'
 import express from 'express'
 import bodyParser from 'body-parser'
+import path from 'path'
 
-import { adminCall } from './handleAdmin.js'
+import { adminCall, SUCCESS as adminSUCCESS } from './handleAdmin.js'
 import { LOGGER, SIZE_PRESETS } from './constants.js'
 
 const logger = LOGGER
@@ -32,13 +33,25 @@ app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
 // duh no kidding how to do JSON REST
 app.use(bodyParser.json())
 
-app.all(new RegExp('^/api/admin(/.+)?'), async (req, res) => {
+app.all(new RegExp('^/api/admin/albums(/.*)'), async (req, res) => {
   try {
-    //logger.info('API Request Received', { path: req.path })
-    //res.status(200).send(req.path)
+    logger.info('API Request Received', { path: req.path })
     const reqBody = req.body
-    console.log({ reqBody })
-    const [status, body] = await adminCall(req.params[0], reqBody)
+    const objectPath = req.params[0] //.replace(/^\/admin/, '')
+    const [status, body] = await adminCall(objectPath, reqBody)
+    //console.log(
+    //  'OUT HERE', {
+    //  objectPath,
+    //  status,
+    //  adminSUCCESS,
+    //  is: status === adminSUCCESS }
+    //)
+    if (status === adminSUCCESS) {
+      // ping watcher with the path
+      const flushPath = path.dirname(objectPath)
+      //console.log('IN HERE', { flushPath })
+      await fetch('http://watcher:3000' + flushPath)
+    }
     res.status(status).json(body)
   } catch (e) {
     return res.status(500).send(e.message)
@@ -46,7 +59,7 @@ app.all(new RegExp('^/api/admin(/.+)?'), async (req, res) => {
 })
 
 app.all('*', (req, res) => {
-  res.status(404).json({ error: 404, msg: 'not found' })
+  res.status(404).json({ error: 404, msg: '404 not found' })
 })
 
 app.use((err, req, res, next) => {

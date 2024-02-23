@@ -1,15 +1,18 @@
 'use strict'
 
 import fs from 'fs'
+import { join } from 'path'
 import yaml from 'js-yaml'
 import { ExiftoolProcess } from 'node-exiftool'
 import * as fileTypes from './util/fileTypes.js'
 import * as C from './constants.js'
 
+export const SUCCESS = 200
+
 const updateAlbumYML = (path, payload) => {
-  console.log('UPDATE ALBUM YML', { path, payload })
+  //console.log('UPDATE ALBUM YML', { path, payload })
   let lstat = null
-  const albumYmlFname = path + '/album.yml'
+  const albumYmlFname = join(C.ALBUMS_ROOT, path, 'album.yml')
 
   try {
     lstat = fs.lstatSync(albumYmlFname)
@@ -20,7 +23,7 @@ const updateAlbumYML = (path, payload) => {
   let albumYmlData = {}
   if (lstat) {
     // file exists, so read in the YAML
-    console.log('FIlE EXISTS ' + albumYmlFname)
+    //console.log('FIlE EXISTS ' + albumYmlFname)
     albumYmlData = yaml.load(fs.readFileSync(albumYmlFname, 'utf8'))
   }
 
@@ -36,12 +39,13 @@ const updateAlbumYML = (path, payload) => {
 }
 
 const updateMediaProperty = async (path, payload) => {
-  console.log('UPDATE MEDIA PROPERTY', { path, payload })
-  const ep = new ExiftoolProcess('/usr/bin/exiftool')
-  await ep.open()
-  const isVideo = fileTypes.isVideo(path)
+  const fsPath = join(C.ALBUMS_ROOT, path)
+  //console.log('UPDATE MEDIA PROPERTY', { fsPath, payload })
+
+  const isVideo = fileTypes.isVideo(fsPath)
   const isTitle = !!(payload && payload.title)
   const payloadProperty = isTitle ? 'title' : 'description'
+
   const exifProperty = {
     video: {
       title: C.EXIF_VIDEO_TITLE_PROPERTY,
@@ -52,8 +56,11 @@ const updateMediaProperty = async (path, payload) => {
       description: C.EXIF_DESCRIPTION_PROPERTY,
     },
   }[isVideo ? 'video' : 'photo'][payloadProperty]
+
+  const ep = new ExiftoolProcess('/usr/bin/exiftool')
+  await ep.open()
   await ep.writeMetadata(
-    path,
+    fsPath,
     {
       [exifProperty]: payload[payloadProperty],
     },
@@ -66,7 +73,8 @@ export const adminCall = async (path, reqBody) => {
   let lstat = null
 
   try {
-    lstat = fs.lstatSync(path)
+    //console.warn('HEREZZZ', { path, fspath: join(C.ALBUMS_ROOT, path) })
+    lstat = fs.lstatSync(join(C.ALBUMS_ROOT, path))
   } catch (e) {
     console.warn('Unknown path', { path })
     return [404, { msg: 'Not Found', path }]
@@ -77,5 +85,5 @@ export const adminCall = async (path, reqBody) => {
   } else {
     await updateMediaProperty(path, reqBody)
   }
-  return [200, { path, reqBody }]
+  return [SUCCESS, { path, reqBody }]
 }

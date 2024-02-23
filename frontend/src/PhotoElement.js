@@ -1,25 +1,18 @@
 import './PhotoElement.css'
-import { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import SVGDownload from './SVGDownload'
 import SVGFullscreen from './SVGFullscreen'
 import SVGClose from './SVGClose'
 import VideoIcon from './VideoIcon'
-import InlineEdit from './InlineEdit'
-import InlineEditArea from './InlineEditArea'
-
-import { AdminContext } from './AdminContext'
 
 import dayjs from 'dayjs'
 const utc = require('dayjs/plugin/utc')
 dayjs.extend(utc)
 
 export default function PhotoElement({ data }) {
-  const isAdmin = useContext(AdminContext)
-
   const parentPath = data.album.uriPath
-
   const albumFiles = data.album.files
 
   const [careAboutScroll, setCareAboutScroll] = useState(true)
@@ -31,18 +24,7 @@ export default function PhotoElement({ data }) {
   )
   const [scrollCareTimeout, setScrollCareTimeout] = useState(null)
 
-  const makeAdminApiPath = (path) => {
-    return ('/api/admin/albums/' + path).replace('//', '/')
-  }
-
   const navigate = useNavigate()
-  const location = useLocation()
-  const [adminApiPath, setAdminApiPath] = useState(
-    makeAdminApiPath(location.pathname)
-  )
-  useEffect(() => {
-    setAdminApiPath(makeAdminApiPath(location.pathname))
-  }, [location])
   const carouselRef = useRef(null)
   const thumbsRef = useRef(null)
   const imageContainerRef = useRef(null)
@@ -146,11 +128,9 @@ export default function PhotoElement({ data }) {
 
   const keyCodeToAction = {
     27: returnToAlbum, // escape
-  }
-  if (!isAdmin) {
-    keyCodeToAction[37] = goToPrevPhoto // left arrow
-    keyCodeToAction[39] = goToNextPhoto // right arrow
-    keyCodeToAction[70] = toggleFullScreen // letter f
+    37: goToPrevPhoto, // left arrow
+    39: goToNextPhoto, // right arrow
+    70: toggleFullScreen, // letter f
   }
 
   const handleKeypress = (event) => {
@@ -348,55 +328,16 @@ export default function PhotoElement({ data }) {
     }
   })
 
-  const setObjectAttr = async (attr, val) => {
-    try {
-      const response = await fetch(adminApiPath, {
-        method: 'POST', // or 'PUT'
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ [attr]: val }),
-      })
-      const result = await response.json()
-      console.log('Success:', result)
-    } catch (error) {
-      console.error('Error:', error)
-    }
-  }
-
   return (
     <div className="PhotoElement">
       <div className="header">
-        <h1>
-          {isAdmin ? (
-            <InlineEdit
-              placeholder="Enter a title..."
-              value={currData.title}
-              setValue={(val) => {
-                setObjectAttr('title', val)
-              }}
-            />
-          ) : (
-            currData.title
-          )}
-        </h1>
-        <p>
-          {isAdmin ? (
-            <InlineEditArea
-              value={currData.description}
-              setValue={(val) => {
-                setObjectAttr('description', val)
-              }}
-              placeholder="Enter a description..."
-              options={{ textarea: true }}
-            />
-          ) : (
-            currData.description
-          )}
-        </p>
+        <h1>{currData.title}</h1>
         {currData.date && (
-          <p>{dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}</p>
+          <p className="date">
+            {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
+          </p>
         )}
+        <p className="description">{currData.description}</p>
       </div>
       <div ref={imageContainerRef} className="imageContainer">
         {mainElement}

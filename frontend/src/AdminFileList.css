@@ -1,0 +1,28 @@
+.AdminFileList {
+}
+
+.AdminFileList img {
+  max-height: 4rem;
+  max-width: 4rem;
+  border-radius: 0.5rem;
+}
+
+.AdminFileList .fileRow {
+  display: flex;
+  flex-direction: row;
+  align-items: top;
+  justify-content: flex-start;
+  padding: 0.5rem;
+}
+.AdminFileList .colImage {
+  margin: 0 0.5rem;
+}
+.AdminFileList .InlineEdit {
+  width: 30rem;
+  padding: 0.5rem;
+}
+.AdminFileList .InlineEditArea {
+  width: 30rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}

@@ -20,7 +20,7 @@ app.use(
   }),
 )
 app.get(new RegExp('^/'), async (req, res) => {
-  logger.debug('WATCHER PATH NOTIFY GOT', { path: req.path })
+  logger.info('WATCHER PATH NOTIFY GOT', { path: req.path })
   topqueueJob({
     // runAt: now
     path: req.path,
