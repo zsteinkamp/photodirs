@@ -2,22 +2,36 @@
 
 # Photodirs
 
-A filesystem-first photo and video serving, cropping, resizing, and browsing platform. Metadata is easily accessible from a full and open JSON API. New/Changed/Deleted files incorporated automatically. Comes with a very lightweight browsing UI that uses the API and looks good on any device or screen size.
+Filesystem-first media serving and browsing solution, with native support for HEIC, RAW, and most video formats. Auto-resizing image hosting, auto-transcoding video hosting, a straightforward browsing UI, and an efficient (and optional) Admin UI.
+
+Directory/album metadata is easily accessible from a full and open JSON file [API](api.md). Image and video metadata are stored in the files themselves, using standard EXIF metadata. New/Changed/Deleted files are auto-discovered and pre-resized/transcoded according to your configuration. The included browsing UI is also a good benchmark implementation of a Photodirs API client and looks good on any device or screen size.
 
 ![Hero Banner](images/hero.jpg)
+
+## Quick Start
+
+On your Docker Compose capable system, clone this repo then run:
+
+```
+make
+```
+
+This will begin an interactive configuration script then start the server!
+
+## Design Goals
 
 Photodirs was made with the following design goals:
 
 - Your directory structure is your album structure
 - Your originals are mounted read-only in the containers so there is no possibility of anything happening to them.
-- NEW: Optional Admin container allows you to manage your originals' metadata from a web GUI.
+- NEW: Optional Admin container allows you to manage your album and originals' metadata from a web GUI restricted to your private network.
 - Directories can be nested arbitrarily deep
-- New files or directories are detected. Common resizing and/or transcoding is triggered automatically, making for a lightning fast browsing experience.
+- New files or directories are detected automatically. Common resizing and/or transcoding is triggered automatically, making for a lightning fast browsing experience.
 - Ergonomic photo URLs, including simple URL-based resizing and cropping options (i.e. no UUIDs anywhere - see Fetching Photos below)
 - A fast, keyboard-supported, swipe-enabled, lightweight album/photo browsing web UI that implements lazy image loading and image `srcSet`s.
-- Publicly accessible (no authentication requried)
+- Publicly accessible (no authentication required)
 - Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
-  - Future: disable display, control photo sort order, optional file includelist, or anything else you would like to include
+  - Future: disable display, control photo sort order, optional file include list, or anything else you would like to include
 - Support for EXIF/XMP metadata
 - HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 - Converted/scaled images and videos are cached locally, and preserved between server restarts.
@@ -27,7 +41,7 @@ Photodirs was made with the following design goals:
 - Easy integration with HTML image Source Sets, e.g.  
   `<img src="x.jpg" srcset="x.jpg?size=500x500 500w, x.jpg?size=1000x1000 1000w">`
 
-# Screenshots
+## Screenshots
 
 | Home page:                                      | Album page:                                      |
 | ----------------------------------------------- | ------------------------------------------------ |
@@ -76,115 +90,6 @@ containers were coming up before the NFS connection was made, thus presenting
 Docker with empty mountpoints.
 
 Photodirs can generate a `docker-compose.yml` that will manage its own NFS connection. This is what I use, and it has been completely reliable for me so far.
-
-### Viewing Status
-
-To check on the running containers, run:
-
-```
-make ps
-```
-
-### Viewing Logs
-
-To see log output, run this command:
-
-```
-make logs
-```
-
-This will display logs from all of the Photodirs containers. Press Ctrl-C to
-stop the log display. The containers will continue running.
-
-### Getting a Shell
-
-To get a shell inside the `watcher` container, run this command:
-
-```
-make shell
-```
-
-Type `exit` or press `Ctrl-D` to exit from the shell.
-
-### Stopping Photodirs
-
-To stop Photodirs from running, run this command:
-
-```
-make down
-```
-
-Type `exit` or press `Ctrl-D` to exit from the shell.
-
-### Resetting the Configuration
-
-To re-initialize the Photodirs configuration, run this command:
-
-```
-make clean
-```
-
-This will remove the `docker-compose.yml` file, so that you can run `make` again
-to re-generate it.
-
-## Development Mode
-
-This brings up all the servers in "source code watch" mode and mounts the repo into the
-container. Use your text editor of choice and get auto-reloading without
-installing anything but Docker on your computer.
-
-To start the service in DEVELOPMENT mode, run:
-
-```
-make dev
-```
-
-### VSCode Devcontainer Support
-
-If you open the `frontend/` or `backend/` folders in VSCode, it should offer an
-option to "Open in Container". This is a great way to do development, since
-VSCode is running from inside the container, so it can manage `package.json` and
-`node_modules` directly, without having any junk installed on your computer.
-
-## Dev Status
-
-To see what containers are running in dev mode, run this command:
-
-```
-make devps
-```
-
-### Dev Logs
-
-This command will show the logs from the containers in the dev environment:
-
-```
-make devlogs
-```
-
-### Dev Shell
-
-To get a shell in the `watcher` container in the dev environment, run this command:
-
-```
-make devshell
-```
-
-### Stopping Dev
-
-To stop the dev containers, run this command:
-
-```
-make devdown
-```
-
-### Reset the Dev Cache
-
-To delete the cache volume in the dev environment to force re-generation of thumbnails, presizes, and transcoding.
-
-```
-make devreset
-```
 
 ## Album Metadata (album.yml)
 
@@ -284,104 +189,7 @@ the poster thumbnail will be an JPEG and the video source is an MP4.
 
 ## REST API
 
-### GET /api/albums
-
-### GET /api/albums/:album-path
-
-Return photo albums and any supported files in the given path. Note the HATEOS-friendly `apiPath` property.
-
-```
-{
-  "type": "album",
-  "title": "My Awesome Photo Gallery",
-  "description": "My cool collection of photos",
-  "thumb": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-  "albums": [
-    {
-      "type": "album",
-      "title": "Hawaii Vacation 2023",
-      "date": "2023-03-01T00:00:00.000Z",
-      "apiPath": "/api/album/2023-03-01_hawaii",
-      "path": "/2023-03-01_hawaii",
-      "uriPath": "/2023-03-01_hawaii",
-      "description": "Some cool photos",
-      "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-    }, ...  ],
-  "files": [
-    {
-      type: "photo",
-      name: "greydangle.jpg",
-      apiPath: "/api/albums/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg",
-      path: "/2023-02-10 Yahoo with Ben/greydangle.jpg",
-      photoPath: "/photo/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg",
-      albumPath: "/2023-02-10 Yahoo with Ben",
-      fileName: "greydangle.jpg",
-      title : "greydangle.jpg",
-      uriPath: "/2023-02-10%20Yahoo%20with%20Ben/greydangle.jpg"
-    },
-    ...
-  ]
-}
-```
-
-### GET /api/photo/:album/:file
-
-Returns metadata for a given photo. Metadata can come from the EXIF data
-embedded in the photo, an XMP sidecar file, or a YAML file with the same name
-as the photo, just with a `.yml` extension (e.g. `IMG_1024.jpg.yml`).
-
-VIDEO NOTE: If the file `type` is `video`, then it will have an additional property called `videoPath` which will contain the URL that can be used to download the transcoded video, e.g. used inside of an HTML `<video>` tag. The `photoPath` property of a `video` can be used to fetch the video's thumbnail image and supports the same cropping/resizing args as any other image here.
-
-```
-{
-  "type": "photo", # Could also be "video"
-  "name": "IMG_7809.JPG",
-  "path": "/2023-02-10_yahoo_with ben/IMG_7809.JPG",
-  "albumPath": "/2023-02-10_yahoo_with%20ben",
-  "photoPath": "/photo/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
-  "apiPath": "/api/albums/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
-  "fileName": "IMG_7809.JPG",
-  "title": "IMG_7809.JPG",
-  "uriPath": "/2023-02-10_yahoo_with%20ben/IMG_7809.JPG",
-  "exif": {
-    "Make": "Apple",
-    "Model": "iPhone 12 Pro",
-    "Orientation": "top-left",
-    "DateTime": "2023:02:09 13:47:02",
-    "ExposureTime": "1/173",
-    "ExposureProgram": "Normal program",
-    "ISOSpeedRatings": 25,
-    "ShutterSpeedValue": "1/173",
-    "ApertureValue": "2.40",
-    "ExposureBiasValue": "0",
-    "MeteringMode": "Pattern",
-    "Flash": "Flash did not fire, compulsory flash mode",
-    "FocalLength": "1.54 mm",
-    "ExposureMode": "Auto exposure",
-    "WhiteBalance": "Auto white balance",
-    "FocalLengthIn35mmFilm": 14,
-    "LensSpecification": "1.5399999618512084-6 mm f/2.4",
-    "LensMake": "Apple",
-    "LensModel": "iPhone 12 Pro back triple camera 1.54mm f/2.4",
-    "GPSLatitude": 37.41822777777777,
-    "GPSLongitude": 122.02579444444444,
-    "GPSAltitude": "32.95594792224006 m",
-    "GPSSpeed": "0",
-    "GPSSpeedRef": "Kilometers per hour",
-    "GPSImgDirection": "126.96919263456091"
-  },
-  "album": {
-    "type": "album",
-    "title": "Hawaii Vacation 2023",
-    "date": "2023-03-01T00:00:00.000Z",
-    "apiPath": "/api/album/2023-03-01_hawaii",
-    "path": "/2023-03-01_hawaii",
-    "uriPath": "/2023-03-01_hawaii",
-    "description": "Some cool photos",
-    "thumbnail": "/photo/2023-03-01_hawaii/CRW_1234.CR2"
-  }
-}
-```
+See the [Photodirs REST API doc](/API.md) for details.
 
 ## Utilizes / Props
 
@@ -398,7 +206,7 @@ You can still request any image size, and Photodirs will use the cached image th
 
 ## My Work Flows
 
-My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a first-rate API and browsing interface, with an eye on making common tasks efficient and sensible.
+My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a [first-rate API](api.md) and browsing interface, with an eye on making common tasks efficient and sensible.
 
 ### Mobile
 
@@ -420,6 +228,10 @@ convert/transcode them, read and cache their metadata, and resize them to the
 most commonly used sizes here. Album indices are updated up the folder
 hierarchy, and within seconds your images are available online, at any size or
 crop. HEIC and RAW files are supported automatically, as are most video formats.
+
+## Architecture
+
+![Photodirs Architecture Diagram](/images/architecture.png)
 
 ## Weird / Cool Stuff
 
