@@ -33,6 +33,7 @@ Photodirs was made with the following design goals:
 - Ergonomic photo URLs, including simple URL-based resizing and cropping options (i.e. no UUIDs anywhere - see Fetching Photos below)
 - A fast, keyboard-supported, swipe-enabled, lightweight album/photo browsing web UI that implements lazy image loading and image `srcSet`s.
 - Publicly accessible (no authentication required)
+- Uses regular HTML `<img>` and `<video>` tags to make "Save As...", copying, etc as easy as possible.
 - Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
   - Future: disable display, control photo sort order, optional file include list, or anything else you would like to include
 - Support for reading (and optional writing) EXIF/XMP metadata
