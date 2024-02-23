@@ -1,9 +1,13 @@
 :root {
   --thumbnail-height: 5rem;
   --thumbnail-border: 0.5rem;
-  --thumb-container-height: calc(var(--thumbnail-height) + (2 * var(--thumbnail-border)));
+  --thumb-container-height: calc(
+    var(--thumbnail-height) + (2 * var(--thumbnail-border))
+  );
   --header-height: 5rem;
-  --main-height: calc(100vh - var(--header-height) - var(--thumb-container-height));
+  --main-height: calc(
+    100vh - var(--header-height) - var(--thumb-container-height)
+  );
 }
 .PhotoElement {
   background-color: var(--photoelement-background-color);
@@ -15,9 +19,11 @@
   align-items: center;
   justify-content: center;
 }
-@supports(height: 100dvh) {
+@supports (height: 100dvh) {
   :root {
-    --main-height: calc(100dvh - var(--header-height) - var(--thumb-container-height));
+    --main-height: calc(
+      100dvh - var(--header-height) - var(--thumb-container-height)
+    );
   }
   .PhotoElement {
     height: 100dvh;
@@ -35,15 +41,24 @@
   text-align: center;
 }
 .PhotoElement .header h1 {
-  color:#ccc;
+  color: #ccc;
   font-size: 1.5rem;
   margin: 0.5rem auto;
   font-family: var(--condensed-font);
 }
 .PhotoElement .header p {
-  margin:0;
+  margin: 0;
   padding: 0;
   color: var(--photoelement-header-color);
+}
+.PhotoElement .header .date {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-top: -0.5rem;
+}
+.PhotoElement .header .description {
+  color: var(--bg-link-color);
 }
 .PhotoElement .imageContainer {
   display: flex;
@@ -65,7 +80,7 @@
   display: none;
 }
 .PhotoElement .imageContainer.fullscreen .carousel {
-  position:absolute;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
@@ -143,12 +158,12 @@
 }
 .PhotoElement .exifInner dt {
   text-transform: uppercase;
-  font-size:1rem;
+  font-size: 1rem;
 }
 .PhotoElement .imageContainer .exif dd {
   color: var(--exif-header-color);
   font-weight: bold;
-  font-size:1rem;
+  font-size: 1rem;
 }
 .PhotoElement .imageContainer .exif:hover .exifInner {
   margin-left: 0;
@@ -164,8 +179,8 @@
   flex-direction: row;
   flex-wrap: nowrap;
   overflow-x: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
   padding: 0 50vw;
 }
 .PhotoElement .thumbContainer::-webkit-scrollbar {
@@ -197,7 +212,7 @@
   cursor: pointer;
   right: 1em;
   top: 1rem;
-  margin-top:0.1rem;
+  margin-top: 0.1rem;
   opacity: 0.5;
 }
 .PhotoElement .fullscreenBtn:hover {
@@ -243,4 +258,3 @@
 .PhotoElement .fullscreenBtn svg g path {
   stroke: var(--photoelement-icon-fill);
 }
-

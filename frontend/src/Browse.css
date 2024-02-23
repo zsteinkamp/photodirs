@@ -1,12 +1,12 @@
 .Browse {
-  color: var(--browse-color);
+  color: rgb(var(--browse-color));
 }
 .Browse header {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   font-size: 1.75rem;
-  line-height:3.5rem;
+  line-height: 3.5rem;
   color: var(--bg-text-color);
   text-shadow: 0 0.1rem 0.25rem var(--browse-header-shadow-color);
 }
@@ -41,6 +41,9 @@
   white-space: nowrap;
   color: #666;
   font-weight: bold;
+}
+.Browse .editable {
+  border: 1px solid red;
 }
 .Browse footer {
   margin-top: 1rem;

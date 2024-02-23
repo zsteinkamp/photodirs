@@ -1,13 +1,16 @@
-import Browse from './Browse';
-import { ScrollRestoration } from 'react-router-dom';
+import Browse from './Browse'
+import { ScrollRestoration } from 'react-router-dom'
+import IsAdmin from './IsAdmin'
 
 function App() {
   return (
     <div className="App">
-      <Browse />
-      <ScrollRestoration />
+      <IsAdmin>
+        <Browse />
+        <ScrollRestoration />
+      </IsAdmin>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
