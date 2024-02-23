@@ -4,7 +4,7 @@
 
 Filesystem-first media serving and browsing solution, with native support for HEIC, RAW, and most video formats. Auto-resizing image hosting, auto-transcoding video hosting, a straightforward browsing UI, and an efficient (and optional) Admin UI.
 
-Directory/album metadata is easily accessible from a full and open JSON file [API](api.md). Image and video metadata are stored in the files themselves, using standard EXIF metadata. New/Changed/Deleted files are auto-discovered and pre-resized/transcoded according to your configuration. The included browsing UI is also a good benchmark implementation of a Photodirs API client and looks good on any device or screen size.
+Directory/album metadata is easily accessible from a full and open JSON file [API](API.md). Image and video metadata are stored in the files themselves, using standard EXIF metadata. New/Changed/Deleted files are auto-discovered and pre-resized/transcoded according to your configuration. The included browsing UI is also a good benchmark implementation of a Photodirs API client and looks good on any device or screen size.
 
 ![Hero Banner](images/hero.jpg)
 
@@ -189,7 +189,7 @@ the poster thumbnail will be an JPEG and the video source is an MP4.
 
 ## REST API
 
-See the [Photodirs REST API doc](/API.md) for details.
+See the [Photodirs REST API doc](API.md) for details.
 
 ## Utilizes / Props
 
@@ -206,7 +206,7 @@ You can still request any image size, and Photodirs will use the cached image th
 
 ## My Work Flows
 
-My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a [first-rate API](api.md) and browsing interface, with an eye on making common tasks efficient and sensible.
+My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a [first-rate API](API.md) and browsing interface, with an eye on making common tasks efficient and sensible.
 
 ### Mobile
 
