@@ -162,7 +162,7 @@ export default function Browse() {
           <div className="header">
             {data.path !== '/' && (
               <div className="date">
-                {dayjs(data.date).utc().format('YYYY-MM-DD (dddd)')}
+                {dayjs(data.date).utc().format('YYYY-MM-DD dddd')}
               </div>
             )}
             {isAdmin ? (

@@ -52,14 +52,14 @@
   color: var(--photoelement-header-color);
 }
 .PhotoElement .header .date {
-  font-size: 0.75rem;
+  font-size: 66%;
   font-weight: bold;
   text-transform: uppercase;
   margin-top: -0.5rem;
-  color: #999;
+  color: var(--breadcrumb-color);
 }
 .PhotoElement .header .description {
-  color: #777;
+  color: var(--bg-text-color);
 }
 .PhotoElement .imageContainer {
   display: flex;

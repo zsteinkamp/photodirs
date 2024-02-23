@@ -39,8 +39,10 @@
 }
 .Browse .pageBody .album .header .date {
   white-space: nowrap;
-  color: #666;
+  color: var(--breadcrumb-color);
   font-weight: bold;
+  text-transform: uppercase;
+  font-size: 66%;
 }
 .Browse .editable {
   border: 1px solid red;
