@@ -174,7 +174,9 @@ export default function Browse() {
                 {data.description}
               </InlineEditArea>
             ) : (
-              <Markdown>{data.description}</Markdown>
+              <div className="desc">
+                <Markdown>{data.description}</Markdown>
+              </div>
             )}
           </div>
           <AlbumList albums={data.albums} />
