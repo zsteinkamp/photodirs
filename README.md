@@ -4,7 +4,9 @@
 
 Filesystem-first media serving and browsing solution, with native support for HEIC, RAW, and most video formats. Auto-resizing image hosting, auto-transcoding video hosting, a straightforward browsing UI, and an efficient (and optional) Admin UI.
 
-Directory/album metadata is easily accessible from a full and open JSON file [API](API.md). Image and video metadata are stored in the files themselves, using standard EXIF metadata. New/Changed/Deleted files are auto-discovered and pre-resized/transcoded according to your configuration. The included browsing UI is also a good benchmark implementation of a Photodirs API client and looks good on any device or screen size.
+Directory/album metadata is stored in sensible `album.yml` files that can be useful with other tools, text editors, or future applications. Image and video metadata are stored in the files themselves, using standard EXIF metadata.
+
+New/Changed/Deleted files are auto-discovered and pre-resized/transcoded according to your configuration. The included browsing UI is also a good benchmark implementation of a Photodirs API client and looks good on any device or screen size.
 
 ![Hero Banner](images/hero.jpg)
 
@@ -23,6 +25,7 @@ This will begin an interactive configuration script then start the server!
 Photodirs was made with the following design goals:
 
 - Your directory structure is your album structure
+- Photodirs wants to leave your media directory better than it found it. You will use other software in the future, and Photodirs can make that as easy as possible by writing metadata using standard and sensible forms.
 - Your originals are mounted read-only in the containers so there is no possibility of anything happening to them.
 - NEW: Optional Admin container allows you to manage your album and originals' metadata from a web GUI restricted to your private network.
 - Directories can be nested arbitrarily deep
@@ -32,7 +35,7 @@ Photodirs was made with the following design goals:
 - Publicly accessible (no authentication required)
 - Directories can have an optional YAML metadata file to override title, set description, specify an album image, etc.
   - Future: disable display, control photo sort order, optional file include list, or anything else you would like to include
-- Support for EXIF/XMP metadata
+- Support for reading (and optional writing) EXIF/XMP metadata
 - HEIC and RAW files (DNG, CRW, CR2, etc) are converted to JPEG when served
 - Converted/scaled images and videos are cached locally, and preserved between server restarts.
 - CDN-friendly cache headers
@@ -91,6 +94,16 @@ Docker with empty mountpoints.
 
 Photodirs can generate a `docker-compose.yml` that will manage its own NFS connection. This is what I use, and it has been completely reliable for me so far.
 
+## Optional Admin
+
+One step in the configuration script asks if you want to run the Admin container. This allows you to manage album and media file metadata directly in your web browser. Otherwise you would need to edit the `album.yml` files and/or set EXIF metadata manually.
+
+Photodirs Admin container runs on a separate port from the public web server. This allows you to only allow access to the Admin port from your local LAN (by not forwarding or proxying the port to your public connection, if you have one).
+
+This special Admin UI server has access to the special Admin API server, which can mount your originals folder read/write in order to manage the metadata.
+
+Photodirs is against any sort of application lock-in, so all the metadata that is written is either standards-based (EXIF/XMP) or in a sensible, human-readable and editable form (`album.yml`). This gives you portability to future better solutions.
+
 ## Album Metadata (album.yml)
 
 Each directory in the tree under the `/albums` mount in Photodirs can optionally have an `album.yml` file.
@@ -98,17 +111,19 @@ Each directory in the tree under the `/albums` mount in Photodirs can optionally
 This file specifies metadata for the album. At the time, the following properties are supported:
 
 - _title_ - The album title. By default, the directory name is used as the title.
-- _description_ - A description of the album. Could be a string, or an array of strings (displayed as paragraphs). Defaults to nothing.
+- _description_ - A description of the album. Markdown is supported.
 - _thumbnail_ - The original name of of an image or video file that you would like to use as a thumbnail. By default, the first file in the directory is used.
 
 Here is an example with a multi-paragraph description:
 
-```
+```yaml
 title: Yahoo with Ben
-description:
-  - What a great chance to relive some epic memories with one of my favorite peoples.
-  - Ben and I were teammates when Yahoo! moved into this campus. We famously took a short walk out on the levees that turned into a 3+ hour ordeal due to some confusing twists and turns the trails take next to channels of muddy water.
-  - Google owns this property now, since Verizon (who purchased most of Yahoo!) moved out. They have held off occupying it though.
+description: |
+  What a great chance to relive some epic memories with one of my favorite peoples.
+
+  Ben and I were teammates when Yahoo! moved into this campus. We famously took a short walk out on the levees that turned into a 3+ hour ordeal due to some confusing twists and turns the trails take next to channels of muddy water.
+
+  Google owns this property now, since Verizon (who purchased most of Yahoo!) moved out. They have held off occupying it though.
 thumbnail: IMG_7807.JPG
 ```
 
@@ -232,6 +247,8 @@ crop. HEIC and RAW files are supported automatically, as are most video formats.
 ## Architecture
 
 ![Photodirs Architecture Diagram](/images/architecture.png)
+
+Photodirs is minimally the nginx, frontend, api, and watcher containers. The admin container is optional.
 
 ## Weird / Cool Stuff
 
