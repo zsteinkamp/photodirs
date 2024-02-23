@@ -8,7 +8,7 @@
   --album-link-color-visited: #000;
   --bg-text-color: #444;
   --bg-link-hover: var(--bg-text-color);
-  --browse-color: 0, 0, 0;
+  --browse-color: #000;
   --browse-page-background-color: hsl(0deg 0% 90%);
   --browse-page-body-border: #ddd;
   --browse-header-shadow-color: rgba(0, 0, 0, 0.1);
@@ -38,7 +38,7 @@
     --album-link-color-visited: hsl(0deg 0% 80%);
     --bg-text-color: hsl(0deg 0% 50%);
     --bg-link-hover: var(--bg-text-color);
-    --browse-color: 204, 204, 204;
+    --browse-color: #ccc;
     --browse-page-background-color: hsl(0deg 0% 5%);
     --browse-page-color: hsl(0deg 0% 80%);
     --browse-page-body-border: hsl(0deg 0% 8%);

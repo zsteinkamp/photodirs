@@ -84,7 +84,7 @@
   display: block;
   background: -webkit-linear-gradient(
     var(--album-link-color-visited) 65%,
-    var(--album-link-background-color)
+    transparent
   );
   background-clip: text;
   -webkit-background-clip: text;
