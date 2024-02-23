@@ -16,9 +16,9 @@ export default function AlbumList(props) {
         album.description = [album.description]
       }
       const descriptionParagraph = album.description && (
-        <p className="desc">
+        <div className="desc">
           <Markdown>{album.description[0]}</Markdown>
-        </p>
+        </div>
       )
 
       return (

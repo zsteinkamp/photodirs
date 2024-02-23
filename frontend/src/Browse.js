@@ -150,7 +150,13 @@ export default function Browse() {
       )
     }
 
+    const updateAlbumThumb = (val) => {
+      editAlbumMetadata({ thumbnail: val })
+    }
+
     if (data.type === 'album') {
+      const thumbnailFname =
+        data.thumbnail && data.thumbnail.split('/').reverse()[0]
       return (
         <div className="album">
           <div className="header">
@@ -173,7 +179,11 @@ export default function Browse() {
           </div>
           <AlbumList albums={data.albums} />
           {isAdmin ? (
-            <AdminFileList files={data.files} />
+            <AdminFileList
+              files={data.files}
+              thumbnail={thumbnailFname}
+              updateAlbumThumb={updateAlbumThumb}
+            />
           ) : (
             <FileList files={data.files} />
           )}

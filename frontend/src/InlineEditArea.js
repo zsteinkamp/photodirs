@@ -4,7 +4,7 @@ import './InlineEditArea.css'
 
 import { useEffect, useRef, useState } from 'react'
 
-const InlineEditArea = ({ placeholder, value, setValue }) => {
+const InlineEditArea = ({ placeholder, value, setValue, tabIndex }) => {
   const [editingValue, setEditingValue] = useState(value)
 
   const onChange = (event) => setEditingValue(event.target.value)
@@ -46,6 +46,7 @@ const InlineEditArea = ({ placeholder, value, setValue }) => {
       onChange={onChange}
       placeholder={placeholder}
       onInput={onInput}
+      tabIndex={tabIndex}
     />
   )
 }

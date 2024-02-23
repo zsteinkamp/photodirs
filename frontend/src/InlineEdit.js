@@ -4,7 +4,7 @@ import './InlineEdit.css'
 
 import { useState } from 'react'
 
-const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
+const InlineEdit = ({ placeholder, value, setValue, tabIndex }) => {
   const [editingValue, setEditingValue] = useState(value)
 
   const onChange = (event) => setEditingValue(event.target.innerText)
@@ -35,6 +35,7 @@ const InlineEdit = ({ placeholder, value, setValue, options = {} }) => {
       onKeyDown={onKeyDown}
       onBlur={onBlur}
       placeholder={placeholder}
+      tabIndex={tabIndex}
     >
       {editingValue}
     </span>

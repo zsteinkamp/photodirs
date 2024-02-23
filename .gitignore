@@ -2,4 +2,4 @@
 .env
 /docker-compose.yml
 /nginx.conf
-/test-album
+/test-album/*
