@@ -126,9 +126,9 @@
   background: linear-gradient(
     180deg,
     var(--album-link-color-visited) 0%,
-    var(--album-link-color-visited) 40%,
-    transparent 90%,
-    transparent 100%
+    var(--album-link-color-visited) calc(var(--header-height) - 2rem),
+    transparent calc(var(--header-height) - 0.5rem),
+    transparent var(--header-height)
   );
   background-clip: text;
   -webkit-background-clip: text;
