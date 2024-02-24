@@ -37,8 +37,8 @@
   display: none;
 }
 :root {
-  --left-column-margin: 8rem;
-  --column-margin: 12rem;
+  --left-column-margin: 10rem;
+  --column-margin: 10rem;
   --column-gutter: 1rem;
   --half-column-gutter: calc(0.5 * var(--column-gutter));
   --negative-column-gutter: calc(-1 * var(--column-gutter));
@@ -46,23 +46,22 @@
 .PhotoElement .header {
   height: var(--header-height);
   display: flex;
+  align-items: center;
   margin-top: 0.5rem;
 }
 .PhotoElement .header > div {
-  text-overflow: ellipsis;
 }
 .PhotoElement .header .headerTitle {
   width: calc(50vw - var(--left-column-margin));
   max-width: calc(50vw - var(--left-column-margin));
   margin-right: var(--column-gutter);
-  white-space: nowrap;
   display: flex;
   align-items: flex-end;
-  overflow: hidden;
   text-align: right;
   flex-direction: column;
 }
 .PhotoElement .header .headerTitle.solomente {
+  margin-right: 0;
   align-items: normal;
   text-align: center;
   width: calc(100dvw - var(--column-margin));
@@ -70,14 +69,19 @@
 }
 .PhotoElement .header .headerTitle h1 {
   color: var(--photoelement-heading-color);
+  width: 100%;
+  max-width: 100%;
   font-size: 2.25rem;
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  margin: 0.25rem 0;
+  margin: 0 auto;
+  padding: 0;
   font-family: var(--condensed-font);
 }
 .PhotoElement .header .headerTitle p.date {
-  margin-top: -0.5rem;
+  padding-top: 0;
+  margin-top: 0;
 }
 .PhotoElement .header .headerElems {
   width: calc(50vw - var(--column-margin));
@@ -185,6 +189,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-right: 2.25rem;
 }
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem video,
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem img,
