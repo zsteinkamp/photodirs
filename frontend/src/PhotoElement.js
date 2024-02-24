@@ -1,6 +1,6 @@
 import './PhotoElement.css'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import SVGDownload from './SVGDownload'
 import SVGFullscreen from './SVGFullscreen'
