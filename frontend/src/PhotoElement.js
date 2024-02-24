@@ -335,7 +335,7 @@ export default function PhotoElement({ data }) {
     <div className="PhotoElement">
       <div className="header">
         <div className="headerTitle">
-          <h1>{currData.title}</h1>
+          <h1 title={currData.title}>{currData.title}</h1>
           {currData.date && (
             <p className="date">
               {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}

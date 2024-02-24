@@ -25,6 +25,7 @@
   --photoelement-background-color: var(--main-bg-color);
   --photoelement-heading-color: #333;
   --photoelement-header-color: #666;
+  --photoelement-date-color: #888;
   --photoelement-fullscreen-background-color: #fff;
   --photoelement-item-background-color: var(--main-bg-color);
   --photoelement-thumb-link-hover: rgba(0, 0, 0, 0.8);
@@ -56,6 +57,7 @@
     --photoelement-background-color: var(--main-bg-color);
     --photoelement-heading-color: #eee;
     --photoelement-header-color: #999;
+    --photoelement-date-color: #888;
     --photoelement-fullscreen-background-color: black;
     --photoelement-item-background-color: var(--main-bg-color);
     --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
