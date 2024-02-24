@@ -37,7 +37,8 @@
   display: none;
 }
 :root {
-  --column-margin: 8rem;
+  --left-column-margin: 8rem;
+  --column-margin: 12rem;
   --column-gutter: 1rem;
   --half-column-gutter: calc(0.5 * var(--column-gutter));
   --negative-column-gutter: calc(-1 * var(--column-gutter));
@@ -48,12 +49,11 @@
   margin-top: 0.5rem;
 }
 .PhotoElement .header > div {
-  width: calc(50vw - 7rem);
-  max-width: calc(50vw - 7rem);
   text-overflow: ellipsis;
-  flex-grow: 1;
 }
 .PhotoElement .header .headerTitle {
+  width: calc(50vw - var(--left-column-margin));
+  max-width: calc(50vw - var(--left-column-margin));
   margin-right: var(--column-gutter);
   white-space: nowrap;
   display: flex;
@@ -65,12 +65,11 @@
 .PhotoElement .header .headerTitle.solomente {
   align-items: normal;
   text-align: center;
-  width: 100%;
+  width: calc(100dvw - var(--column-margin));
+  max-width: calc(100dvw - var(--column-margin));
 }
 .PhotoElement .header .headerTitle h1 {
   color: var(--photoelement-heading-color);
-  width: calc(50vw - 7rem);
-  max-width: calc(50vw - 7rem);
   font-size: 2.25rem;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -81,6 +80,8 @@
   margin-top: -0.5rem;
 }
 .PhotoElement .header .headerElems {
+  width: calc(50vw - var(--column-margin));
+  max-width: calc(50vw - var(--column-margin));
   border-left: 2px solid var(--shadow-color);
   padding-left: var(--column-gutter);
   display: flex;
