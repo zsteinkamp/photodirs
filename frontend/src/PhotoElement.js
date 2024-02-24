@@ -334,7 +334,9 @@ export default function PhotoElement({ data }) {
   return (
     <div className="PhotoElement">
       <div className="header">
-        <div className="headerTitle">
+        <div
+          className={`headerTitle ${currData.description ? '' : 'solomente'}`}
+        >
           <h1 title={currData.title}>{currData.title}</h1>
           {currData.date && (
             <p className="date">
@@ -342,16 +344,18 @@ export default function PhotoElement({ data }) {
             </p>
           )}
         </div>
-        <div className="headerElems">
-          <div className="description">
-            <div className="descriptionPlaceholder">
-              {currData.description || <em>No Description</em>}
-            </div>
-            <div className="descriptionLong">
-              <Markdown>{currData.description}</Markdown>
+        {currData.description && (
+          <div className="headerElems">
+            <div className="description">
+              <div className="descriptionPlaceholder">
+                {currData.description || <em>No Description</em>}
+              </div>
+              <div className="descriptionLong">
+                <Markdown>{currData.description}</Markdown>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
       <div ref={imageContainerRef} className="imageContainer">
         {mainElement}

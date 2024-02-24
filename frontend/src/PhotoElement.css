@@ -62,6 +62,11 @@
   text-align: right;
   flex-direction: column;
 }
+.PhotoElement .header .headerTitle.solomente {
+  align-items: normal;
+  text-align: center;
+  width: 100%;
+}
 .PhotoElement .header .headerTitle h1 {
   color: var(--photoelement-heading-color);
   width: calc(50vw - 7rem);

@@ -15,8 +15,15 @@
   justify-content: flex-start;
   padding: 0.5rem;
 }
+.AdminFileList input {
+  display: none;
+}
+.AdminFileList input:checked + label div img {
+  outline: 0.5rem solid #6cf;
+}
+
 .AdminFileList .colImage {
-  margin: 0 0.5rem;
+  margin: 0 2rem;
 }
 .AdminFileList .InlineEdit {
   width: 30rem;

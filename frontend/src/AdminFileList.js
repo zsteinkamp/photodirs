@@ -43,20 +43,23 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }) {
           <div className="colDefault">
             <input
               type="radio"
+              id={file.fileName}
               name="defaultImg"
               value={file.fileName}
               checked={file.fileName === currThumb}
               tabIndex={idx}
               onChange={updateThumb}
             />
-          </div>
-          <div className="colImage">
-            <img
-              src={file.photoPath + '?size=300x300&crop'}
-              alt={file.name}
-              loading="lazy"
-            />
-            {file.type === 'video' && <VideoIcon />}
+            <label for={file.fileName}>
+              <div className="colImage">
+                <img
+                  src={file.photoPath + '?size=300x300&crop'}
+                  alt={file.name}
+                  loading="lazy"
+                />
+                {file.type === 'video' && <VideoIcon />}
+              </div>
+            </label>
           </div>
           <div className="colTitleDesc">
             <div>
