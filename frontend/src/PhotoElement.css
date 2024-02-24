@@ -59,6 +59,7 @@
   color: var(--breadcrumb-color);
 }
 .PhotoElement .header .description {
+  margin-top: 0.5rem;
   color: var(--bg-text-color);
 }
 .PhotoElement .imageContainer {
@@ -134,6 +135,8 @@
   transition: width 0.2s, padding 0.2s;
   border-radius: 0 1rem 1rem 0;
   position: relative;
+  filter: drop-shadow(0 0.25rem 0.5rem var(--filelist-link-shadow-color));
+  margin-right: 1rem;
 }
 .PhotoElement .imageContainer .exif:hover {
   width: 20rem;
@@ -166,12 +169,14 @@
 }
 .PhotoElement .exifInner dt {
   text-transform: uppercase;
-  font-size: 1rem;
+  font-size: 66%;
+  font-weight: bold;
 }
 .PhotoElement .imageContainer .exif dd {
   color: var(--exif-header-color);
-  font-weight: bold;
-  font-size: 1rem;
+  margin-left: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
 }
 .PhotoElement .imageContainer .exif:hover .exifInner {
   margin-left: 0;
