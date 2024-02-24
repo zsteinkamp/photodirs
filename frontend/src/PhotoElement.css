@@ -104,6 +104,8 @@
   height: var(--main-height);
   max-width: 100vw;
   background: var(--photoelement-item-background-color);
+  display: flex;
+  align-items: center;
 }
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem {
   height: 100vh;

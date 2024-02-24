@@ -238,25 +238,27 @@ export default function PhotoElement({ data }) {
         onClick={handleClick}
         className="carouselItem"
       >
-        {file.type === 'video' ? (
-          <video
-            draggable="false"
-            controls
-            autoPlay={false}
-            poster={`${file.photoPath}?size=1600x1600`}
-            preload="none"
-          >
-            <source src={file.videoPath} type="video/mp4" />
-          </video>
-        ) : (
-          <img
-            draggable="false"
-            src={`${file.photoPath}?size=1600x1600`}
-            srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x400 800w, ${file.photoPath}?size=1600x1600 1600w`}
-            alt={file.title}
-            loading="lazy"
-          />
-        )}
+        <div>
+          {file.type === 'video' ? (
+            <video
+              draggable="false"
+              controls
+              autoPlay={false}
+              poster={`${file.photoPath}?size=1600x1600`}
+              preload="none"
+            >
+              <source src={file.videoPath} type="video/mp4" />
+            </video>
+          ) : (
+            <img
+              draggable="false"
+              src={`${file.photoPath}?size=1600x1600`}
+              srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x400 800w, ${file.photoPath}?size=1600x1600 1600w`}
+              alt={file.title}
+              loading="lazy"
+            />
+          )}
+        </div>
       </div>
     )
   })
