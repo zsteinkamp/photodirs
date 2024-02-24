@@ -343,16 +343,14 @@ export default function PhotoElement({ data }) {
           )}
         </div>
         <div className="headerElems">
-          {currData.description && (
-            <div className="description">
-              <div className="descriptionPlaceholder">
-                {currData.description}
-              </div>
-              <div className="descriptionLong">
-                <Markdown>{currData.description}</Markdown>
-              </div>
+          <div className="description">
+            <div className="descriptionPlaceholder">
+              {currData.description || <em>No Description</em>}
             </div>
-          )}
+            <div className="descriptionLong">
+              <Markdown>{currData.description}</Markdown>
+            </div>
+          </div>
         </div>
       </div>
       <div ref={imageContainerRef} className="imageContainer">

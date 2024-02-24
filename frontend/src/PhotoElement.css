@@ -45,40 +45,30 @@
 .PhotoElement .header {
   height: var(--header-height);
   display: flex;
+  margin-top: 0.5rem;
 }
 .PhotoElement .header > div {
-  width: 50%;
-  margin: 0 var(--half-column-gutter);
-}
-.PhotoElement .header h1 {
-  color: var(--photoelement-heading-color);
-  font-size: 2.25rem;
-  white-space: nowrap;
-  overflow: hidden;
+  width: calc(50vw - 7rem);
   text-overflow: ellipsis;
-  margin: 0.25rem 0;
-  font-family: var(--condensed-font);
+  flex-grow: 1;
 }
 .PhotoElement .header .headerTitle {
-  margin-left: var(--column-margin);
+  margin-right: var(--column-gutter);
+  white-space: nowrap;
   display: flex;
   align-items: flex-end;
   text-align: right;
   flex-direction: column;
 }
-.PhotoElement .header .headerElems {
-  border-left: 2px solid var(--shadow-color);
-  padding-left: var(--column-gutter);
-  margin-right: var(--column-margin);
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+.PhotoElement .header .headerTitle h1 {
+  color: var(--photoelement-heading-color);
+  font-size: 2.25rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 0.25rem 0;
+  font-family: var(--condensed-font);
 }
-.PhotoElement .header p {
-  margin: 0;
-  padding: 0;
-}
-.PhotoElement .header .date {
+.PhotoElement .header .headerTitle .date {
   font-size: 66%;
   font-weight: bold;
   text-transform: uppercase;
@@ -86,12 +76,23 @@
   opacity: 0.6;
   color: var(--breadcrumb-color);
 }
-.PhotoElement .header .description {
+.PhotoElement .header .headerElems {
+  border-left: 2px solid var(--shadow-color);
+  padding-left: var(--column-gutter);
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+.PhotoElement .header .headerElems p {
+  margin: 0;
+  padding: 0;
+}
+.PhotoElement .header .headerElems .description {
   position: relative;
   margin-top: 0.5rem;
   color: var(--bg-text-color);
 }
-.PhotoElement .header .description .descriptionLong {
+.PhotoElement .header .headerElems .description .descriptionLong {
   position: absolute;
   z-index: 1;
   background-color: var(--main-bg-color);
@@ -107,16 +108,15 @@
   transition: max-height 0.4s, opacity 0.4s, border-color 0.4s;
 }
 .PhotoElement .headerElems:has(> .description:hover) {
-  /* TODO contains */
   border-color: var(--main-bg-color);
 }
-.PhotoElement .header .description:hover .descriptionLong {
+.PhotoElement .header .headerElems .description:hover .descriptionLong {
   max-height: 100dvh;
   height: auto;
   opacity: 1;
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
 }
-.PhotoElement .header .descriptionPlaceholder {
+.PhotoElement .header .headerElems .descriptionPlaceholder {
   padding-right: var(--column-gutter);
   max-height: var(--header-height);
   overflow: hidden;
