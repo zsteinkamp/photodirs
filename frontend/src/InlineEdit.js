@@ -31,6 +31,7 @@ const InlineEdit = ({ placeholder, value, setValue, tabIndex }) => {
       className="InlineEdit"
       type="text"
       aria-label="Field name"
+      role="textbox"
       onChange={onChange}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
