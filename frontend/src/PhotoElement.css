@@ -4,7 +4,7 @@
   --thumb-container-height: calc(
     var(--thumbnail-height) + (2 * var(--thumbnail-border))
   );
-  --header-height: 5rem;
+  --header-height: 3.7rem;
   --main-height: calc(
     100vh - var(--header-height) - var(--thumb-container-height)
   );
@@ -36,15 +36,15 @@
 .PhotoElement .invisible-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.PhotoElement .header {
-  height: var(--header-height);
-  display: flex;
-}
 :root {
-  --column-margin: 10rem;
+  --column-margin: 8rem;
   --column-gutter: 1rem;
   --half-column-gutter: calc(0.5 * var(--column-gutter));
   --negative-column-gutter: calc(-1 * var(--column-gutter));
+}
+.PhotoElement .header {
+  height: var(--header-height);
+  display: flex;
 }
 .PhotoElement .header > div {
   width: 50%;
@@ -52,8 +52,11 @@
 }
 .PhotoElement .header h1 {
   color: var(--photoelement-heading-color);
-  font-size: 1.5rem;
-  margin: 0.5rem 0;
+  font-size: 2.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0.25rem 0;
   font-family: var(--condensed-font);
 }
 .PhotoElement .header .headerTitle {
@@ -64,6 +67,8 @@
   flex-direction: column;
 }
 .PhotoElement .header .headerElems {
+  border-left: 2px solid var(--shadow-color);
+  padding-left: var(--column-gutter);
   margin-right: var(--column-margin);
   display: flex;
   align-items: flex-start;
@@ -86,9 +91,6 @@
   margin-top: 0.5rem;
   color: var(--bg-text-color);
 }
-:root {
-  --description-len: 3.75rem;
-}
 .PhotoElement .header .description .descriptionLong {
   position: absolute;
   z-index: 1;
@@ -98,26 +100,35 @@
   top: var(--negative-column-gutter);
   left: var(--negative-column-gutter);
   border-radius: 0.5rem;
-  opacity: 0.5;
+  opacity: 0;
   overflow: hidden;
-  transition: opacity 0.2s;
-  height: var(--description-len);
+  max-height: var(--header-height);
+  height: var(--header-height);
+  transition: max-height 0.4s, opacity 0.4s, border-color 0.4s;
+}
+.PhotoElement .headerElems:has(> .description:hover) {
+  /* TODO contains */
+  border-color: var(--main-bg-color);
 }
 .PhotoElement .header .description:hover .descriptionLong {
+  max-height: 100dvh;
   height: auto;
   opacity: 1;
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
 }
 .PhotoElement .header .descriptionPlaceholder {
   padding-right: var(--column-gutter);
-  max-height: var(--description-len);
+  max-height: var(--header-height);
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   text-overflow: ellipsis;
-  background: -webkit-linear-gradient(
-    var(--album-link-color-visited) 3rem,
-    transparent
+  background: linear-gradient(
+    180deg,
+    var(--album-link-color-visited) 0%,
+    var(--album-link-color-visited) 40%,
+    transparent 90%,
+    transparent 100%
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -196,7 +207,7 @@
   border-radius: 0 1rem 1rem 0;
   position: relative;
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
-  margin-right: 1rem;
+  margin-right: 2rem;
   transition: width 0.2s, color 0.2s, padding 0.2s;
 }
 .PhotoElement .imageContainer .exif:hover {
@@ -213,7 +224,7 @@
   line-height: 0.5rem;
   padding: 0.75rem 1rem;
   border-radius: 0 0 1rem 1rem;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s;
 }
 .PhotoElement .imageContainer .exif:hover .tag {
   opacity: 0;
