@@ -1,6 +1,7 @@
 import './PhotoElement.css'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Markdown from 'react-markdown'
 
 import SVGDownload from './SVGDownload'
 import SVGFullscreen from './SVGFullscreen'
@@ -333,13 +334,26 @@ export default function PhotoElement({ data }) {
   return (
     <div className="PhotoElement">
       <div className="header">
-        <h1>{currData.title}</h1>
-        {currData.date && (
-          <p className="date">
-            {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
-          </p>
-        )}
-        <p className="description">{currData.description}</p>
+        <div className="headerTitle">
+          <h1>{currData.title}</h1>
+          {currData.date && (
+            <p className="date">
+              {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
+            </p>
+          )}
+        </div>
+        <div className="headerElems">
+          {currData.description && (
+            <div className="description">
+              <div className="descriptionPlaceholder">
+                {currData.description}
+              </div>
+              <div className="descriptionLong">
+                <Markdown>{currData.description}</Markdown>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       <div ref={imageContainerRef} className="imageContainer">
         {mainElement}

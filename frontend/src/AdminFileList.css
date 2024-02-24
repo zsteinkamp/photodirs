@@ -1,9 +1,10 @@
 .AdminFileList {
+  margin-top: 2rem;
 }
 
 .AdminFileList img {
-  max-height: 4rem;
-  max-width: 4rem;
+  max-height: 12rem;
+  max-width: 12rem;
   border-radius: 0.5rem;
 }
 

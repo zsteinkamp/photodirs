@@ -14,6 +14,7 @@ export const EXIF_VIDEO_DATE_PROPERTY = 'CreateDate'
 export const EXIF_DETAIL_PROPERTIES = [
   'Make',
   'Model',
+  'CreateDate',
   'LensMake',
   'LensModel',
   'LensType',

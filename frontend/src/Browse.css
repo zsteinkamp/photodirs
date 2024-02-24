@@ -8,7 +8,7 @@
   font-size: 1.75rem;
   line-height: 3.5rem;
   color: var(--bg-text-color);
-  text-shadow: 0 0.1rem 0.25rem var(--browse-header-shadow-color);
+  text-shadow: 0 0.1rem 0.25rem var(--shadow-color);
 }
 .Browse header .logo {
   margin-top: 0.3rem;
