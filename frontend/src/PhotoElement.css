@@ -59,6 +59,7 @@
   align-items: flex-end;
   text-align: right;
   flex-direction: column;
+  padding-top: 0.8rem;
 }
 .PhotoElement .header .headerTitle.solomente {
   margin-right: 0;
