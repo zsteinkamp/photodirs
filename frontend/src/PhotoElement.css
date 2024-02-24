@@ -200,7 +200,7 @@
   transition: width 0.2s, color 0.2s, padding 0.2s;
 }
 .PhotoElement .imageContainer .exif:hover {
-  width: 20rem;
+  width: 38rem;
 }
 .PhotoElement .imageContainer .exif .tag {
   position: absolute;
@@ -219,14 +219,17 @@
   opacity: 0;
 }
 .PhotoElement .exifInner {
-  margin-left: -40rem;
   padding-left: 1rem;
   max-height: calc(var(--main-height) - 5rem);
-  transition: margin-left 0.2s;
   display: flex;
   flex-direction: column;
   padding-right: 1rem;
   overflow-y: auto;
+  margin-left: -40rem;
+  transition: margin-left 0.2s;
+}
+.PhotoElement .imageContainer .exif:hover .exifInner {
+  margin-left: 0;
 }
 .PhotoElement .exifInner dt {
   text-transform: uppercase;
@@ -238,9 +241,6 @@
   margin-left: 1rem;
   margin-bottom: 0.5rem;
   font-size: 0.8rem;
-}
-.PhotoElement .imageContainer .exif:hover .exifInner {
-  margin-left: 0;
 }
 
 .PhotoElement .thumbContainer {
