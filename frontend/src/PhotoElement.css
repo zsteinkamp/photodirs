@@ -73,11 +73,7 @@
   font-family: var(--condensed-font);
 }
 .PhotoElement .header .headerTitle p.date {
-  font-size: 66%;
-  font-weight: bold;
-  text-transform: uppercase;
   margin-top: -0.5rem;
-  color: var(--photoelement-date-color);
 }
 .PhotoElement .header .headerElems {
   border-left: 2px solid var(--shadow-color);

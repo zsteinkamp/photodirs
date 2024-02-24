@@ -69,10 +69,7 @@
 }
 .AlbumList .AlbumItem .body .date {
   margin: 0;
-  font-weight: bold;
-  font-size: 75%;
   padding: 0.5rem 0 0 0;
-  opacity: 0.8;
 }
 .AlbumList .AlbumItem .body .desc {
   margin: 0;

@@ -35,7 +35,7 @@ export default function AlbumList(props) {
             )}
             <div className="body">
               <p className="date">
-                {dayjs(album.date).utc().format('YYYY-MM-DD')}
+                {dayjs(album.date).utc().format('YYYY-MM-DD dddd')}
               </p>
               <h1>{album.title}</h1>
               {descriptionParagraph}

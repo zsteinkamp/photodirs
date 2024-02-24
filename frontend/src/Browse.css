@@ -37,13 +37,6 @@
   line-height: 1.5rem;
   margin-bottom: 2rem;
 }
-.Browse .pageBody .album .header .date {
-  white-space: nowrap;
-  color: var(--breadcrumb-color);
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 66%;
-}
 .Browse .editable {
   border: 1px solid red;
 }

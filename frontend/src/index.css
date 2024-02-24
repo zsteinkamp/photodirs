@@ -30,6 +30,8 @@
   --photoelement-item-background-color: var(--main-bg-color);
   --photoelement-thumb-link-hover: rgba(0, 0, 0, 0.8);
   --photoelement-icon-fill: #000;
+  --date-color: #888;
+  --date-size: 0.8rem;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -62,6 +64,7 @@
     --photoelement-item-background-color: var(--main-bg-color);
     --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
     --photoelement-icon-fill: white;
+    --date-color: #888;
   }
 }
 
@@ -82,6 +85,13 @@ a {
 
 a:visited {
   color: var(--main-link-color);
+}
+.date {
+  white-space: nowrap;
+  font-size: var(--date-size);
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--date-color);
 }
 
 /* Document level adjustments */
