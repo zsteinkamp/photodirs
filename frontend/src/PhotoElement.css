@@ -106,23 +106,25 @@
   background: var(--photoelement-item-background-color);
   display: flex;
   align-items: center;
+  justify-content: center;
 }
+.PhotoElement .imageContainer.fullscreen .carousel .carouselItem video,
+.PhotoElement .imageContainer.fullscreen .carousel .carouselItem img,
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem {
-  height: 100vh;
-  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  background: var(--photoelement-fullscreen-background-color);
 }
 .PhotoElement .imageContainer .carouselItem video,
 .PhotoElement .imageContainer .carouselItem img {
   outline-width: 0;
   object-fit: contain;
-  height: auto;
-  width: auto;
   border: 2rem solid var(--filelist-link-background-color);
   border-radius: 1rem;
   filter: drop-shadow(0 0.25rem 0.5rem var(--filelist-link-shadow-color));
   transition: background-color 0.2s;
-  max-height: calc(100% - 1rem);
   max-width: 100%;
+  max-height: calc(100dvh - 12rem);
 }
 
 .PhotoElement .imageContainer .exif {
