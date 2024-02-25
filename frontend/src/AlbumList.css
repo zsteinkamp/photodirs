@@ -16,7 +16,6 @@
   flex-wrap: nowrap;
   min-width: 25rem;
   margin: 0 0;
-  transform: translateX(-1rem);
 }
 .AlbumList .AlbumItem > a:visited {
   color: var(--album-link-color-visited);
