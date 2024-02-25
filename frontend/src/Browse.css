@@ -9,6 +9,8 @@
   line-height: 3.5rem;
   color: var(--bg-text-color);
   text-shadow: 0 0.1rem 0.25rem var(--shadow-color);
+  filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
+  background: var(--main-bg-color);
 }
 .Browse header .logo {
   margin-top: 0.3rem;
