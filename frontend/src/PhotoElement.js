@@ -337,7 +337,19 @@ export default function PhotoElement({ data }) {
         <div
           className={`headerTitle ${currData.description ? '' : 'solomente'}`}
         >
-          <h1 title={currData.title}>{currData.title}</h1>
+          <h1 className="titlePlaceholder" title={currData.title}>
+            {currData.title}
+          </h1>
+          {currData.description && (
+            <h1 className="titleLong">
+              {currData.title}
+              {currData.date && (
+                <p className="date">
+                  {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
+                </p>
+              )}
+            </h1>
+          )}
           {currData.date && (
             <p className="date">
               {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}

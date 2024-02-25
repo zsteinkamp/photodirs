@@ -49,9 +49,8 @@
   align-items: center;
   margin-top: 0.5rem;
 }
-.PhotoElement .header > div {
-}
 .PhotoElement .header .headerTitle {
+  position: relative;
   width: calc(50vw - var(--left-column-margin));
   max-width: calc(50vw - var(--left-column-margin));
   margin-right: var(--column-gutter);
@@ -80,6 +79,33 @@
   padding: 0;
   font-family: var(--condensed-font);
 }
+.PhotoElement .header .headerTitle h1.titlePlaceholder {
+}
+.PhotoElement .header .headerTitle h1.titleLong {
+  margin-right: -1.1rem;
+  margin-top: -0.3rem;
+  padding-top: 0.3rem;
+  width: calc(100% + 1.1rem);
+  max-width: calc(100% + 1.1rem);
+  position: absolute;
+  opacity: 0;
+  filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
+  transition: all;
+  padding-right: 1rem;
+  border-radius: 0.5rem;
+  transition: opacity 0.4s;
+}
+.PhotoElement .header .headerTitle:hover h1.titleLong {
+  overflow: auto;
+  white-space: initial;
+  text-overflow: initial;
+  background-color: var(--main-bg-color);
+  height: auto;
+  display: block;
+  opacity: 1;
+  z-index: 1;
+}
+
 .PhotoElement .header .headerTitle p.date {
   padding-top: 0;
   margin-top: 0;
