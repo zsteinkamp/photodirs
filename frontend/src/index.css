@@ -6,7 +6,6 @@
   --main-link-color: #446;
   --bg-link-color: #666;
   --shadow-color: rgba(0, 0, 0, 0.1);
-  --album-link-color-visited: #000;
   --bg-text-color: #444;
   --bg-link-hover: var(--bg-text-color);
   --selection-outline: #fff;
@@ -14,6 +13,7 @@
   --browse-page-background-color: hsl(0deg 0% 90%);
   --browse-page-body-border: #ddd;
   --breadcrumb-color: black;
+  --album-link-color-visited: #000;
   --album-link-background-color: #fafafa;
   --album-link-hover-background-color: #eee;
   --filelist-link-background-color: #fff;
@@ -40,7 +40,6 @@
     --selection-outline: #000;
     --bg-link-color: hsl(0deg 0% 80%);
     --shadow-color: rgba(0, 0, 0, 0.4);
-    --album-link-color-visited: hsl(0deg 0% 60%);
     --bg-text-color: #888;
     --bg-link-hover: var(--bg-text-color);
     --browse-color: 203, 203, 203;
@@ -48,7 +47,8 @@
     --browse-page-color: hsl(0deg 0% 80%);
     --browse-page-body-border: hsl(0deg 0% 8%);
     --breadcrumb-color: white;
-    --album-link-background-color: hsl(0deg 0% 10%);
+    --album-link-color-visited: hsl(0deg 0% 60%);
+    --album-link-background-color: hsl(0deg 0% 0%);
     --album-link-hover-background-color: hsl(0deg 0% 0%);
     --filelist-link-background-color: hsl(0deg 0% 0%);
     --filelist-link-hover-background-color: hsl(0deg 0% 10%);
@@ -89,6 +89,7 @@ a:visited {
 .date {
   white-space: nowrap;
   font-size: var(--date-size);
+  font-family: sans-serif;
   font-weight: bold;
   text-transform: uppercase;
   color: var(--date-color);

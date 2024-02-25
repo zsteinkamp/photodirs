@@ -83,7 +83,7 @@
   text-overflow: ellipsis;
   display: block;
   background: -webkit-linear-gradient(
-    var(--album-link-color-visited) 65%,
+    var(--album-link-color-visited) 75%,
     transparent
   );
   background-clip: text;
