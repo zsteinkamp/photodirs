@@ -9,7 +9,6 @@
   line-height: 3.5rem;
   color: var(--bg-text-color);
   text-shadow: 0 0.1rem 0.25rem var(--shadow-color);
-  filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
   background: var(--main-bg-color);
 }
 .Browse header .logo {
@@ -23,9 +22,10 @@
 .Browse .pageBody {
   padding: 1rem 1rem;
   min-height: 90vh;
-  background-color: var(--browse-page-background-color);
+  background-color: var(--main-bg-color);
   border-top: 1px solid var(--browse-page-body-border);
   border-bottom: 1px solid var(--browse-page-body-border);
+  padding: 0 5.5rem 2rem;
 }
 .Browse .pageBody > .album > .desc {
   margin-left: 20rem;
@@ -33,11 +33,11 @@
 .Browse .pageBody .album .header {
   max-width: calc(100vw - 2rem);
   width: 36rem;
-  margin: 0 auto;
+  margin: 0 0;
 }
 .Browse .pageBody .album .header .desc {
   line-height: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 .Browse .editable {
   border: 1px solid red;

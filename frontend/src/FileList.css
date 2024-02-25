@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
   align-items: flex-start;
   align-content: flex-start;
   gap: 2rem;
@@ -11,6 +10,7 @@
 }
 
 .FileList > div {
+  transform: translateX(-1rem);
   width: 17rem;
   height: 17rem;
 }
