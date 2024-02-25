@@ -223,6 +223,7 @@
 .PhotoElement .imageContainer.fullscreen .carousel .carouselItem {
   max-height: 100vh;
   max-height: 100dvh;
+  padding-right: 0;
   background: var(--photoelement-fullscreen-background-color);
 }
 .PhotoElement .imageContainer .carouselItem video,
