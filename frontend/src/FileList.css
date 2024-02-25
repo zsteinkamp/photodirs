@@ -10,7 +10,7 @@
 }
 
 .FileList > div {
-  transform: translateX(-1rem);
+  transform: translateX(-0.8rem);
   width: 17rem;
   height: 17rem;
 }
