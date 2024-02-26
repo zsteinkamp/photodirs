@@ -66,6 +66,7 @@
   text-overflow: ellipsis;
   font-family: var(--condensed-font);
   font-size: 1.5rem;
+  color: var(--bg-text-color);
 }
 .AlbumList .AlbumItem .body .date {
   margin: 0;
@@ -75,7 +76,6 @@
   margin: 0;
   line-height: 1.5rem;
   padding: 0.5rem 1rem 0 0;
-  opacity: 0.5;
   max-height: 5rem;
   overflow: hidden;
   -webkit-box-orient: vertical;
