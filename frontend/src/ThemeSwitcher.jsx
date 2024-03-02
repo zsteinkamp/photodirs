@@ -76,6 +76,7 @@ export default function ThemeSwitcher() {
     <>
       <button
         key="themeToggle"
+        title="Toggle Dark / Light Mode"
         onClick={toggleTheme}
         data-theme={theme}
         className="ThemeSwitcher"

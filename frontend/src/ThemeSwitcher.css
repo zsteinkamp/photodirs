@@ -4,6 +4,7 @@
   right: 1rem;
   border: none;
   background: transparent;
+  cursor: pointer;
 }
 .ThemeSwitcher .svg-dark {
   fill: #333;
