@@ -1,0 +1,13 @@
+.ThemeSwitcher {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  border: none;
+  background: transparent;
+}
+.ThemeSwitcher .svg-dark {
+  fill: #333;
+}
+.ThemeSwitcher .svg-light {
+  fill: #fc3;
+}

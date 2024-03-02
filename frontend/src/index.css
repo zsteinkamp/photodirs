@@ -33,39 +33,37 @@
   --date-color: #888;
   --date-size: 0.8rem;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --main-bg-color: hsl(0deg 0% 10%);
-    --main-link-color: #88a;
-    --selection-outline: #000;
-    --bg-link-color: hsl(0deg 0% 80%);
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --bg-text-color: #ccc;
-    --bg-link-hover: var(--bg-text-color);
-    --browse-color: 240, 240, 240;
-    --browse-page-background-color: hsl(0deg 0% 15%);
-    --browse-page-color: hsl(0deg 0% 80%);
-    --browse-page-body-border: hsl(0deg 0% 8%);
-    --breadcrumb-color: white;
-    --album-link-color-visited: hsl(0deg 0% 60%);
-    --album-link-background-color: hsl(0deg 0% 0%);
-    --album-link-hover-background-color: hsl(0deg 0% 0%);
-    --filelist-link-background-color: hsl(0deg 0% 0%);
-    --filelist-link-hover-background-color: hsl(0deg 0% 10%);
-    --exif-bg-color: #000;
-    --exif-tab-text-color: #aaa;
-    --exif-text-color: #999;
-    --exif-header-color: #eee;
-    --photoelement-background-color: var(--main-bg-color);
-    --photoelement-heading-color: #eee;
-    --photoelement-header-color: #999;
-    --photoelement-date-color: #888;
-    --photoelement-fullscreen-background-color: black;
-    --photoelement-item-background-color: var(--main-bg-color);
-    --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
-    --photoelement-icon-fill: white;
-    --date-color: #888;
-  }
+html.dark:root {
+  --main-bg-color: hsl(0deg 0% 10%);
+  --main-link-color: #88a;
+  --selection-outline: #000;
+  --bg-link-color: hsl(0deg 0% 80%);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --bg-text-color: #ccc;
+  --bg-link-hover: var(--bg-text-color);
+  --browse-color: 240, 240, 240;
+  --browse-page-background-color: hsl(0deg 0% 15%);
+  --browse-page-color: hsl(0deg 0% 80%);
+  --browse-page-body-border: hsl(0deg 0% 8%);
+  --breadcrumb-color: white;
+  --album-link-color-visited: hsl(0deg 0% 60%);
+  --album-link-background-color: hsl(0deg 0% 0%);
+  --album-link-hover-background-color: hsl(0deg 0% 0%);
+  --filelist-link-background-color: hsl(0deg 0% 0%);
+  --filelist-link-hover-background-color: hsl(0deg 0% 10%);
+  --exif-bg-color: #000;
+  --exif-tab-text-color: #aaa;
+  --exif-text-color: #999;
+  --exif-header-color: #eee;
+  --photoelement-background-color: var(--main-bg-color);
+  --photoelement-heading-color: #eee;
+  --photoelement-header-color: #999;
+  --photoelement-date-color: #888;
+  --photoelement-fullscreen-background-color: black;
+  --photoelement-item-background-color: var(--main-bg-color);
+  --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
+  --photoelement-icon-fill: white;
+  --date-color: #888;
 }
 
 body {
