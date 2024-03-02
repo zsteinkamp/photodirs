@@ -6,9 +6,12 @@
   background: transparent;
   cursor: pointer;
 }
-.ThemeSwitcher .svg-dark {
-  fill: #333;
+@media only screen and (max-width: 600px) {
+  .ThemeSwitcher {
+    position: absolute;
+  }
 }
+.ThemeSwitcher .svg-dark,
 .ThemeSwitcher .svg-light {
-  fill: #fc3;
+  fill: var(--dark-switch-fill);
 }

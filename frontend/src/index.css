@@ -32,6 +32,7 @@
   --photoelement-icon-fill: #000;
   --date-color: #888;
   --date-size: 0.8rem;
+  --dark-switch-fill: #fc3;
 }
 html.dark:root {
   --main-bg-color: hsl(0deg 0% 10%);
@@ -64,6 +65,7 @@ html.dark:root {
   --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
   --photoelement-icon-fill: white;
   --date-color: #888;
+  --dark-switch-fill: #333;
 }
 
 body {
