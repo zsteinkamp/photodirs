@@ -128,28 +128,6 @@ description: |
 thumbnail: IMG_7807.JPG
 ```
 
-## Setting Photo Title / Description
-
-This repo contains a utility in `bin/exif-set` that you can use to set the correct title and description in your image files. To use it, you will need the `exiftool` command installed in your system. Install with your favorite package manager, e.g.:
-
-- MAC: `brew install exiftool`
-- LINUX: `sudo apt install exiftool`
-
-To use it, just run the command from the terminal (you may want to copy the script to somewhere in your `$PATH`), passing a filename as an arg:
-
-```
-> exif-set kimchi_hands.jpg
-Title []: Kimchi Hands
-Description []: Hands after mixing the cabbage with the kimchi paste.
-Keywords []:
-    1 image files updated
-Object Name                     : Kimchi Hands
-Caption-Abstract                : Hands after mixing the cabbage with the kimchi paste.
-Keywords                        : -
-```
-
-I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
-
 ## Fetching Photos
 
 ### GET /photo/:path?:options
@@ -287,6 +265,28 @@ html {
 
 You can play with the coefficient next to `vmin` for intermediate scaling
 behavior.
+
+## Setting Photo Title / Description
+
+If you don't want to use the Admin web GUI or have a use case where the command line would help, this repo contains a utility called `bin/exif-set` that you can use to set the correct title and description in your image files. To use it, you will need the `exiftool` command installed in your system. Install with your favorite package manager, e.g.:
+
+- MAC: `brew install exiftool`
+- LINUX: `sudo apt install exiftool`
+
+To use it, just run the command from the terminal (you may want to copy the script to somewhere in your `$PATH`), passing a filename as an arg:
+
+```
+> exif-set kimchi_hands.jpg
+Title []: Kimchi Hands
+Description []: Hands after mixing the cabbage with the kimchi paste.
+Keywords []:
+    1 image files updated
+Object Name                     : Kimchi Hands
+Caption-Abstract                : Hands after mixing the cabbage with the kimchi paste.
+Keywords                        : -
+```
+
+I decided that leaning more heavily into EXIF was a good choice for investing this work of naming things to work better with other/future tools. I have written many photo galleries, and the data format is always different. EXIF just makes sense here.
 
 ## TODO
 
