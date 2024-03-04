@@ -333,7 +333,7 @@
 .PhotoElement .fullscreenBtn {
   position: absolute;
   cursor: pointer;
-  right: 1em;
+  right: 3.75em;
   top: 1rem;
   margin-top: 0.1rem;
   opacity: 0.3;
@@ -351,7 +351,7 @@
 .PhotoElement .downloadBtn {
   position: absolute;
   cursor: pointer;
-  right: 3.75em;
+  right: 6.5em;
   top: 1rem;
   opacity: 0.3;
 }

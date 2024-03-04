@@ -14,7 +14,8 @@ export default function ThemeSwitcher() {
   const THEME_DARK = 'dark'
   const THEME_KEY = 'theme'
 
-  const toggleTheme = () => {
+  const toggleTheme = (e) => {
+    console.log(e)
     setTheme(theme === THEME_DARK ? THEME_LIGHT : THEME_DARK)
   }
 

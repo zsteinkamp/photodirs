@@ -2,15 +2,24 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
+  transform: translateY(0.1rem);
   border: none;
   background: transparent;
   cursor: pointer;
-  opacity: 0.6;
+  opacity: 0.4;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .ThemeSwitcher:hover {
   opacity: 1;
 }
 .ThemeSwitcher .svg-dark,
 .ThemeSwitcher .svg-light {
-  fill: var(--dark-switch-fill);
+  fill: var(--photoelement-icon-fill);
 }

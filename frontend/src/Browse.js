@@ -12,7 +12,6 @@ import AdminFileList from './AdminFileList'
 import PhotoElement from './PhotoElement'
 import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
-import ThemeSwitcher from './ThemeSwitcher'
 
 var utc = require('dayjs/plugin/utc')
 dayjs.extend(utc)
@@ -207,7 +206,6 @@ export default function Browse() {
   return (
     <div className="Browse">
       <header>
-        <ThemeSwitcher />
         <div className="logo">
           <Link to="/">
             <img src="/logo.svg" alt="Photodirs Logo" />

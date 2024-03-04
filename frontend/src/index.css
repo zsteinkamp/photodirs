@@ -104,7 +104,7 @@ html {
 *:before,
 *:after {
   box-sizing: inherit;
-  transition: all 0.2s;
+  transition: background-color 2s;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
