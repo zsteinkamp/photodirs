@@ -198,9 +198,18 @@ Converting large RAW or HEIF images is slow, as is resizing large JPEGs. Photodi
 
 You can still request any image size, and Photodirs will use the cached image that is equal to or greater than the size you are requesting to fulfill your request, resizing it on-the-fly to your specification. The `Cache-control: public` header is sent with images, so that intermediate web caches, CDNs, and browsers will cache the final output.
 
-## My Work Flows
+## My Photodirs Workflow
+
+I'm a constant optimizer. When I see opportunities for reducing steps in a
+process, I am energized to explore them. Digital media is a big part of our
+lives now, and I think it's important that we retain ownership and stewardship
+of our digitial lives. Softwares as a service and cloud providers will come and
+go, but your memories are yours alone and should be treated as such.
 
 My [NAS](https://truenas.com/) is the heart of my home network. On it, I have a shared called `photos` which holds of all the photos I want to keep and share. I wrote Photodirs to interface with this data (read-only) and provide a [first-rate API](API.md) and browsing interface, with an eye on making common tasks efficient and sensible.
+
+This all fits together into a really seamless experience. Let's start with
+mobile first...
 
 ### Mobile
 
@@ -222,6 +231,8 @@ convert/transcode them, read and cache their metadata, and resize them to the
 most commonly used sizes here. Album indices are updated up the folder
 hierarchy, and within seconds your images are available online, at any size or
 crop. HEIC and RAW files are supported automatically, as are most video formats.
+
+No further steps are necessary to publish your media.
 
 ## Architecture
 
