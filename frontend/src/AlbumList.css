@@ -7,6 +7,8 @@
   align-content: flex-start;
   gap: 2rem;
   margin-top: 1rem;
+  margin-left: -1rem;
+  margin-right: -1rem;
 }
 
 .AlbumList .AlbumItem {

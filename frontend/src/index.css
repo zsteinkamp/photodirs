@@ -5,7 +5,7 @@
   --main-bg-color: #f4f4f4;
   --main-link-color: #446;
   --bg-link-color: #666;
-  --shadow-color: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.05);
   --bg-text-color: #444;
   --bg-link-hover: var(--bg-text-color);
   --selection-outline: #fff;
@@ -65,7 +65,7 @@ html.dark:root {
   --photoelement-thumb-link-hover: rgba(255, 255, 255, 0.8);
   --photoelement-icon-fill: white;
   --date-color: #888;
-  --dark-switch-fill: #333;
+  --dark-switch-fill: #444;
 }
 
 body {
@@ -104,6 +104,7 @@ html {
 *:before,
 *:after {
   box-sizing: inherit;
+  transition: all 0.2s;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',

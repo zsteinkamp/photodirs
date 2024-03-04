@@ -1,15 +1,14 @@
 .ThemeSwitcher {
-  position: fixed;
+  position: absolute;
   top: 1rem;
   right: 1rem;
   border: none;
   background: transparent;
   cursor: pointer;
+  opacity: 0.6;
 }
-@media only screen and (max-width: 600px) {
-  .ThemeSwitcher {
-    position: absolute;
-  }
+.ThemeSwitcher:hover {
+  opacity: 1;
 }
 .ThemeSwitcher .svg-dark,
 .ThemeSwitcher .svg-light {
