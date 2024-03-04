@@ -1,21 +1,19 @@
 .FileList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  align-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 2rem;
   margin-top: 2rem;
   margin-bottom: 2rem;
   margin-left: -0.7rem;
+  margin-right: -0.7rem;
+  list-style: none;
+  padding: 0;
 }
 
-.FileList > div {
-  width: 17rem;
-  height: 17rem;
+.FileList > li {
 }
 
-.FileList > div a {
+.FileList > li a {
   padding: 0.8rem;
   display: block;
   background-color: var(--filelist-link-background-color);
@@ -28,11 +26,11 @@
   transition: outline-width 0.2s;
   position: relative;
 }
-.FileList > div a:hover {
+.FileList > li a:hover {
   outline-width: 0.25rem;
 }
 
-.FileList > div a img {
+.FileList > li a img {
   height: 100%;
   width: 100%;
   border-radius: 0.5rem;

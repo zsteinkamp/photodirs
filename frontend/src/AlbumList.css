@@ -1,7 +1,6 @@
 .AlbumList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   justify-content: center;
   align-items: flex-start;
   align-content: flex-start;
@@ -9,6 +8,8 @@
   margin-top: 1rem;
   margin-left: -1rem;
   margin-right: -1rem;
+  list-style: none;
+  padding: 0;
 }
 
 .AlbumList .AlbumItem {
