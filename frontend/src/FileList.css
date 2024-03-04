@@ -9,11 +9,9 @@
   list-style: none;
   padding: 0;
 }
-
-.FileList > li {
+.FileList > div {
 }
-
-.FileList > li a {
+.FileList > div a {
   padding: 0.8rem;
   display: block;
   background-color: var(--filelist-link-background-color);
@@ -26,15 +24,11 @@
   transition: outline-width 0.2s;
   position: relative;
 }
-.FileList > li a:hover {
+.FileList > div a:hover {
   outline-width: 0.25rem;
 }
-
-.FileList > li a img {
+.FileList > div a img {
   height: 100%;
   width: 100%;
   border-radius: 0.5rem;
-}
-.FileList li p {
-  margin-top: 0.25rem;
 }

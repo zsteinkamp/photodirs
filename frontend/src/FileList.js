@@ -11,7 +11,7 @@ export default function FileList(props) {
     const fileListItems = props.files.map((file) => {
       //console.log(file.photoPath);
       return (
-        <li key={file.apiPath}>
+        <div key={file.apiPath}>
           <Link title={file.title} to={file.uriPath}>
             <img
               src={file.photoPath + '?size=300x300&crop'}
@@ -20,11 +20,10 @@ export default function FileList(props) {
             />
             {file.type === 'video' && <VideoIcon />}
           </Link>
-          <p>{file.name}</p>
-        </li>
+        </div>
       )
     })
-    fileList = <ul className="FileList">{fileListItems}</ul>
+    fileList = <div className="FileList">{fileListItems}</div>
   }
 
   return fileList
