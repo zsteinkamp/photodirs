@@ -47,21 +47,13 @@ Photodirs was made with the following design goals:
 
 ## Screenshots
 
-| Home page:                                      | Album page:                                      |
-| ----------------------------------------------- | ------------------------------------------------ |
-| ![Photodirs Home](images/screenshot1-home.jpeg) | ![Photodirs Home](images/screenshot2-album.jpeg) |
+| Home Page (Light)                                | Home Page (Dark)                               |
+| ------------------------------------------------ | ---------------------------------------------- |
+| ![Photodirs Home - Light](images/light-mode.png) | ![Photodirs Home - Dark](images/dark-mode.png) |
 
-| Scroll down Album page:                               | Photo/Video viewer:                               |
-| ----------------------------------------------------- | ------------------------------------------------- |
-| ![Photodirs Home](images/screenshot3-scrolldown.jpeg) | ![Photodirs Home](images/screenshot4-detail.jpeg) |
-
-| Works well on small screens:                     | Works well on big screens:                           |
-| ------------------------------------------------ | ---------------------------------------------------- |
-| ![Photodirs Home](images/screenshot7-phone.jpeg) | ![Photodirs Home](images/screenshot6-bigscreen.jpeg) |
-
-| EXIF panel slides out:                          | Plays videos everywhere:                              |
-| ----------------------------------------------- | ----------------------------------------------------- |
-| ![Photodirs Home](images/screenshot5-exif.jpeg) | ![Photodirs Home](images/screenshot8-phonevideo.jpeg) |
+| Album Page                           | Photo/Video viewer:                  |
+| ------------------------------------ | ------------------------------------ |
+| ![Album Page](images/album-page.png) | ![Photo Page](images/photo-page.png) |
 
 ## Requirements
 
