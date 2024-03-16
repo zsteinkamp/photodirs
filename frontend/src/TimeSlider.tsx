@@ -15,6 +15,14 @@ type TimeSliderProps = {
   setFilteredData: (arg0: RecordType[]) => void
 }
 
+const SSK_MIN_DATE = 'minDate'
+const SSK_MAX_DATE = 'maxDate'
+const SSK_FILTER = 'filter'
+
+const hasSessionStorage = () => {
+  return !!(typeof window !== 'undefined' && window.sessionStorage)
+}
+
 const TimeSlider: React.FC<TimeSliderProps> = ({
   data,
   filteredData,
@@ -29,12 +37,41 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   const [maxSlider, setMaxSlider] = useState(dateBins.maxDate)
   const [filter, setFilter] = useState('')
 
+  const updateMinSlider = (val: number) => {
+    hasSessionStorage() &&
+      window.sessionStorage.setItem(SSK_MIN_DATE, val.toString())
+    setMinSlider(val)
+  }
+  const updateMaxSlider = (val: number) => {
+    hasSessionStorage() &&
+      window.sessionStorage.setItem(SSK_MAX_DATE, val.toString())
+    setMaxSlider(val)
+  }
+  const updateFilterVal = (filterVal: string) => {
+    hasSessionStorage() && window.sessionStorage.setItem(SSK_FILTER, filterVal)
+    setFilter(filterVal)
+  }
+
+  useEffect(() => {
+    if (hasSessionStorage()) {
+      updateMinSlider(
+        parseInt(window.sessionStorage.getItem(SSK_MIN_DATE) || '0') ||
+        dateBins.minDate
+      )
+      updateMaxSlider(
+        parseInt(window.sessionStorage.getItem(SSK_MAX_DATE) || '0') ||
+        dateBins.maxDate
+      )
+      updateFilterVal(window.sessionStorage.getItem(SSK_FILTER) || '')
+    }
+  }, [])
+
   const handleSliderChange = (e: number[]) => {
     if (undefined === dateBins.granularity) {
       return
     }
-    setMinSlider(dayjs(e[0]).utc().startOf(dateBins.granularity).valueOf())
-    setMaxSlider(dayjs(e[1]).utc().endOf(dateBins.granularity).valueOf())
+    updateMinSlider(dayjs(e[0]).utc().startOf(dateBins.granularity).valueOf())
+    updateMaxSlider(dayjs(e[1]).utc().endOf(dateBins.granularity).valueOf())
     //console.log("SLIDER CHANGE", { e })
   }
 
@@ -84,7 +121,8 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
           <input
             placeholder='Filter...'
             type='text'
-            onChange={(e) => setFilter(e.target.value)}
+            value={filter}
+            onChange={(e) => updateFilterVal(e.target.value)}
             className='tsFilterInner'
           />
         </div>
