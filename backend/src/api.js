@@ -25,7 +25,7 @@ app.get(new RegExp('^/api/?$'), async (req, res) => {
   const body = {
     albums: '/api/albums',
   }
-  res.status(200).send(body)
+  res.status(200).header({ 'cache-control': 'no-cache' }).send(body)
 })
 
 // indicates no admin capability
@@ -40,7 +40,7 @@ app.get(new RegExp('^/api/admin/?$'), async (req, res) => {
 app.get(new RegExp('^/api/albums(/.+)?'), async (req, res) => {
   try {
     const [status, body] = await apiGet(req.params[0] || '/')
-    res.status(status).send(body)
+    res.status(status).header({ 'cache-control': 'no-cache' }).send(body)
   } catch (e) {
     return res.status(500).send(e.message)
   }
