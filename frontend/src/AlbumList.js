@@ -1,11 +1,9 @@
 import './AlbumList.css'
 
 import dayjs from 'dayjs'
+import 'dayjs/plugin/utc'
 import { Link } from 'react-router-dom'
 import Markdown from 'react-markdown'
-
-const utc = require('dayjs/plugin/utc')
-dayjs.extend(utc)
 
 export default function AlbumList(props) {
   let albumList = null
@@ -16,25 +14,25 @@ export default function AlbumList(props) {
         album.description = [album.description]
       }
       const descriptionParagraph = album.description && (
-        <div className="desc">
+        <div className='desc'>
           <Markdown>{album.description[0]}</Markdown>
         </div>
       )
 
       return (
-        <div className="AlbumItem" key={album.apiPath}>
+        <div className='AlbumItem' key={album.apiPath}>
           <Link to={album.uriPath}>
             {album.thumbnail && (
-              <div className="thumbnail">
+              <div className='thumbnail'>
                 <img
                   src={`${album.thumbnail}?size=300x300&crop`}
-                  loading="lazy"
+                  loading='lazy'
                   alt={album.title}
                 />
               </div>
             )}
-            <div className="body">
-              <p className="date">
+            <div className='body'>
+              <p className='date'>
                 {dayjs(album.date).utc().format('YYYY-MM-DD dddd')}
               </p>
               <h1>{album.title}</h1>
@@ -44,7 +42,7 @@ export default function AlbumList(props) {
         </div>
       )
     })
-    albumList = <div className="AlbumList">{albumListItems}</div>
+    albumList = <div className='AlbumList'>{albumListItems}</div>
   }
   return albumList
 }

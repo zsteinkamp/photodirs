@@ -9,8 +9,7 @@ import SVGClose from './SVGClose'
 import VideoIcon from './VideoIcon'
 
 import dayjs from 'dayjs'
-const utc = require('dayjs/plugin/utc')
-dayjs.extend(utc)
+import 'dayjs/plugin/utc'
 
 export default function PhotoElement({ data }) {
   const parentPath = data.album.uriPath
@@ -213,11 +212,11 @@ export default function PhotoElement({ data }) {
     })
 
     exifElement = (
-      <div className="exif">
-        <div className="exifInner invisible-scrollbar">
+      <div className='exif'>
+        <div className='exifInner invisible-scrollbar'>
           <dl>{exifDetails}</dl>
         </div>
-        <div className="tag">EXIF / INFO</div>
+        <div className='tag'>EXIF / INFO</div>
       </div>
     )
   }
@@ -237,26 +236,26 @@ export default function PhotoElement({ data }) {
         ref={(el) => (tileRefs.current[i] = el)}
         key={file.uriPath}
         onClick={handleClick}
-        className="carouselItem"
+        className='carouselItem'
       >
         <div>
           {file.type === 'video' ? (
             <video
-              draggable="false"
+              draggable='false'
               controls
               autoPlay={false}
               poster={`${file.photoPath}?size=1600x1600`}
-              preload="none"
+              preload='none'
             >
-              <source src={file.videoPath} type="video/mp4" />
+              <source src={file.videoPath} type='video/mp4' />
             </video>
           ) : (
             <img
-              draggable="false"
+              draggable='false'
               src={`${file.photoPath}?size=1600x1600`}
               srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x400 800w, ${file.photoPath}?size=1600x1600 1600w`}
               alt={file.title}
-              loading="lazy"
+              loading='lazy'
             />
           )}
         </div>
@@ -295,10 +294,10 @@ export default function PhotoElement({ data }) {
         onClick={(e) => handleThumbClick(i)}
       >
         <img
-          draggable="false"
+          draggable='false'
           src={`${file.photoPath}?size=400x400`}
           alt={file.title}
-          loading="lazy"
+          loading='lazy'
         />
         {file.type === 'video' && <VideoIcon />}
       </Link>
@@ -306,7 +305,7 @@ export default function PhotoElement({ data }) {
   })
 
   const mainElement = (
-    <div ref={carouselRef} className="carousel">
+    <div ref={carouselRef} className='carousel'>
       {tiles}
     </div>
   )
@@ -332,66 +331,66 @@ export default function PhotoElement({ data }) {
   })
 
   return (
-    <div className="PhotoElement">
-      <div className="header">
+    <div className='PhotoElement'>
+      <div className='header'>
         <div
           className={`headerTitle ${currData.description ? '' : 'solomente'}`}
         >
-          <h1 className="titlePlaceholder" title={currData.title}>
+          <h1 className='titlePlaceholder' title={currData.title}>
             {currData.title}
           </h1>
           {currData.description && (
-            <h1 className="titleLong">
+            <h1 className='titleLong'>
               {currData.title}
               {currData.date && (
-                <p className="date">
+                <p className='date'>
                   {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
                 </p>
               )}
             </h1>
           )}
           {currData.date && (
-            <p className="date">
+            <p className='date'>
               {dayjs(currData.date).utc().format('YYYY-MM-DD dddd')}
             </p>
           )}
         </div>
         {currData.description && (
-          <div className="headerElems">
-            <div className="description">
-              <div className="descriptionPlaceholder">
+          <div className='headerElems'>
+            <div className='description'>
+              <div className='descriptionPlaceholder'>
                 {currData.description || <em>No Description</em>}
               </div>
-              <div className="descriptionLong">
+              <div className='descriptionLong'>
                 <Markdown>{currData.description}</Markdown>
               </div>
             </div>
           </div>
         )}
       </div>
-      <div ref={imageContainerRef} className="imageContainer">
+      <div ref={imageContainerRef} className='imageContainer'>
         {mainElement}
         {exifElement}
       </div>
-      <div ref={thumbsRef} className="thumbContainer">
+      <div ref={thumbsRef} className='thumbContainer'>
         {thumbnails}
       </div>
-      <Link title="Return to Album" className="closeBtn" to={parentPath}>
+      <Link title='Return to Album' className='closeBtn' to={parentPath}>
         <SVGClose />
       </Link>
       <Link
-        title="Full Screen"
-        className="fullscreenBtn"
+        title='Full Screen'
+        className='fullscreenBtn'
         onClick={toggleFullScreen}
-        to="#"
+        to='#'
       >
         <SVGFullscreen />
       </Link>
       <Link
-        title="Download Original"
-        className="downloadBtn"
+        title='Download Original'
+        className='downloadBtn'
         onClick={downloadOriginal}
-        to="#"
+        to='#'
       >
         <SVGDownload />
       </Link>

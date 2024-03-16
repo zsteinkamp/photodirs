@@ -141,7 +141,10 @@
   overflow: hidden;
   max-height: var(--header-height);
   height: var(--header-height);
-  transition: max-height 0.4s, opacity 0.4s, border-color 0.4s;
+  transition:
+    max-height 0.4s,
+    opacity 0.4s,
+    border-color 0.4s;
 }
 .PhotoElement .headerElems:has(> .description:hover) {
   border-color: var(--main-bg-color);
@@ -246,7 +249,10 @@
   position: relative;
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
   margin-right: 2rem;
-  transition: width 0.2s, color 0.2s, padding 0.2s;
+  transition:
+    width 0.2s,
+    color 0.2s,
+    padding 0.2s;
 }
 .PhotoElement .imageContainer .exif:hover {
   width: 38rem;

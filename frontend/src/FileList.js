@@ -16,14 +16,14 @@ export default function FileList(props) {
             <img
               src={file.photoPath + '?size=300x300&crop'}
               alt={file.name}
-              loading="lazy"
+              loading='lazy'
             />
             {file.type === 'video' && <VideoIcon />}
           </Link>
         </div>
       )
     })
-    fileList = <div className="FileList">{fileListItems}</div>
+    fileList = <div className='FileList'>{fileListItems}</div>
   }
 
   return fileList

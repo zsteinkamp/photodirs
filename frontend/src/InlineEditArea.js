@@ -37,10 +37,10 @@ const InlineEditArea = ({ placeholder, value, setValue, tabIndex }) => {
 
   return (
     <textarea
-      className="InlineEditArea"
+      className='InlineEditArea'
       rows={1}
       ref={textAreaRef}
-      aria-label="Field name"
+      aria-label='Field name'
       value={editingValue}
       onBlur={onBlur}
       onChange={onChange}

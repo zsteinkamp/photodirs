@@ -1,0 +1,66 @@
+.TimeSlider {
+  /* sticky top-0 bg-pagebg-light pt-[0.9rem] dark:bg-pagebg-dark */
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: var(--main-bg-color);
+  padding-top: 0rem;
+}
+.TimeSlider .tsHeader {
+  /* grid grid-cols-2 */
+  display: grid;
+  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.TimeSlider .tsHeader .tsShowing {
+  /* text-text-light dark:text-text-dark */
+  font-family: var(--condensed-font);
+  font-weight: normal;
+  color: var(--histogram-bar-hover);
+}
+.TimeSlider .tsHeader .tsFilterOuter {
+  /* text-right */
+  text-align: right;
+}
+.TimeSlider .tsHeader .tsFilterOuter .tsFilterInner {
+  /* rounded px-1 text-xs */
+  border-radius: 0.25rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border: 1px solid var(--date-color);
+}
+.TimeSlider .tsSliderHolder {
+  /* pb-10 */
+  padding-bottom: 2.5rem;
+}
+.TimeSlider .tsSliderHolder .tsSliderClassName {
+  /* mt-[-1rem] */
+  margin-top: -1rem;
+}
+.TimeSlider .tsSliderHolder .tsSliderThumbClassName {
+  /*text-xs font-bold w-10 rounded text-center mt-1 pt-1 pb-1 text-white dark:text-black bg-link-base-light dark:bg-link-base-dark hover:bg-link-hover-light hover:dark:bg-link-hover-dark cursor-pointer */
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: bold;
+  width: 2.5rem;
+  border-radius: 0.25rem;
+  text-align: center;
+  margin-top: 0.25rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  color: var(--main-bg-color);
+  background-color: var(--bg-text-color);
+  cursor: pointer;
+}
+.TimeSlider .tsSliderHolder .tsSliderThumbClassName:hover {
+  background-color: var(--bg-link-hover);
+}
+.TimeSlider .tsSliderHolder .tsSliderTrackClassName {
+  /* h-4 mt-4 ml-2 mr-2 */
+  height: 1rem;
+  margin-top: 1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}

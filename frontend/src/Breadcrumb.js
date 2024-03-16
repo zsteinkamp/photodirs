@@ -13,7 +13,7 @@ export default function Breadcrumb(props) {
       if (isAdmin) {
         itemMarkup = (
           <InlineEdit
-            placeholder="Enter a title..."
+            placeholder='Enter a title...'
             value={crumb.title}
             setValue={props.onEdit}
           />
@@ -26,5 +26,5 @@ export default function Breadcrumb(props) {
     }
     return <div key={crumb.path}>{itemMarkup}</div>
   })
-  return <div className="Breadcrumb">{crumbArr}</div>
+  return <div className='Breadcrumb'>{crumbArr}</div>
 }

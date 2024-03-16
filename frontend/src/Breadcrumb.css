@@ -15,8 +15,8 @@
 .Breadcrumb > div::before {
   content: '/';
   color: var(--bg-text-color);
-  margin:0 0.5em 0 0; 
-  padding:0; 
+  margin: 0 0.5em 0 0;
+  padding: 0;
 }
 .Breadcrumb > div a:visited {
   color: var(--bg-link-color);

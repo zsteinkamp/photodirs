@@ -39,32 +39,32 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }) {
     const fileListItems = files.map((file, idx) => {
       //console.log(file)
       return (
-        <div className="fileRow" key={file.apiPath}>
-          <div className="colDefault">
+        <div className='fileRow' key={file.apiPath}>
+          <div className='colDefault'>
             <input
-              type="radio"
+              type='radio'
               id={file.fileName}
-              name="defaultImg"
+              name='defaultImg'
               value={file.fileName}
               checked={file.fileName === currThumb}
               tabIndex={idx}
               onChange={updateThumb}
             />
             <label for={file.fileName}>
-              <div className="colImage">
+              <div className='colImage'>
                 <img
                   src={file.photoPath + '?size=300x300&crop'}
                   alt={file.name}
-                  loading="lazy"
+                  loading='lazy'
                 />
                 {file.type === 'video' && <VideoIcon />}
               </div>
             </label>
           </div>
-          <div className="colTitleDesc">
+          <div className='colTitleDesc'>
             <div>
               <InlineEdit
-                placeholder="Enter a title..."
+                placeholder='Enter a title...'
                 value={file.title}
                 setValue={(val) => editMediaMetadata(file, { title: val })}
                 tabIndex={1000 + 2 * idx}
@@ -72,7 +72,7 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }) {
             </div>
             <div>
               <InlineEditArea
-                placeholder="Enter a description..."
+                placeholder='Enter a description...'
                 value={file.description}
                 setValue={(val) =>
                   editMediaMetadata(file, { description: val })
@@ -86,7 +86,7 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }) {
         </div>
       )
     })
-    adminFileList = <div className="AdminFileList">{fileListItems}</div>
+    adminFileList = <div className='AdminFileList'>{fileListItems}</div>
   }
 
   return adminFileList

@@ -1,6 +1,8 @@
 import './Browse.css'
 
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
 import { useContext, useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Markdown from 'react-markdown'
@@ -10,11 +12,9 @@ import AlbumList from './AlbumList'
 import FileList from './FileList'
 import AdminFileList from './AdminFileList'
 import PhotoElement from './PhotoElement'
+import TimeSlider from './TimeSlider'
 import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
-
-var utc = require('dayjs/plugin/utc')
-dayjs.extend(utc)
 
 export default function Browse() {
   const isAdmin = useContext(AdminContext)
@@ -25,6 +25,7 @@ export default function Browse() {
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname))
   const [adminApiPath, setAdminApiPath] = useState(apiPath)
   const [data, setData] = useState(null)
+  const [filteredData, setFilteredData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
@@ -81,7 +82,9 @@ export default function Browse() {
           )
         }
         let actualData = await response.json()
+        //console.log({ actualData })
         setData(actualData)
+        setFilteredData(actualData.albums)
 
         // set page title
         if (actualData.album && actualData.album.title && actualData.title) {
@@ -96,6 +99,7 @@ export default function Browse() {
       } catch (err) {
         setError(err.message)
         setData(null)
+        setFilteredData(null)
       } finally {
         setLoading(false)
       }
@@ -141,12 +145,12 @@ export default function Browse() {
    */
   const getPageBody = (loading, error, data) => {
     if (loading) {
-      return <div className="loading">Loading...</div>
+      return <div className='loading'>Loading...</div>
     }
 
     if (error) {
       return (
-        <div className="error">{`There is a problem fetching the data - ${error}`}</div>
+        <div className='error'>{`There is a problem fetching the data - ${error}`}</div>
       )
     }
 
@@ -158,28 +162,36 @@ export default function Browse() {
       const thumbnailFname =
         data.thumbnail && data.thumbnail.split('/').reverse()[0]
       return (
-        <div className="album">
-          <div className="header">
+        <div className='album'>
+          <div className='header'>
             {data.path !== '/' && (
-              <div className="date">
+              <div className='date'>
                 {dayjs(data.date).utc().format('YYYY-MM-DD dddd')}
               </div>
             )}
             {isAdmin ? (
               <InlineEditArea
-                placeholder="Enter a description..."
+                placeholder='Enter a description...'
                 value={data.description}
                 setValue={(val) => editAlbumMetadata({ description: val })}
               >
                 {data.description}
               </InlineEditArea>
             ) : (
-              <div className="desc">
+              <div className='desc'>
                 <Markdown>{data.description}</Markdown>
               </div>
             )}
           </div>
-          <AlbumList albums={data.albums} />
+          {location.pathname !== '/' ? null : (
+            <TimeSlider
+              data={data.albums}
+              filteredData={filteredData}
+              setFilteredData={setFilteredData}
+              className=''
+            />
+          )}
+          <AlbumList albums={filteredData} />
           {isAdmin ? (
             <AdminFileList
               files={data.files}
@@ -194,7 +206,7 @@ export default function Browse() {
     }
 
     return (
-      <div className="error">
+      <div className='error'>
         Unknown type <pre>{data.type}</pre>.
       </div>
     )
@@ -204,11 +216,11 @@ export default function Browse() {
    * Common layout for album/photo lists, loading, error
    */
   return (
-    <div className="Browse">
+    <div className='Browse'>
       <header>
-        <div className="logo">
-          <Link to="/">
-            <img src="/logo.svg" alt="Photodirs Logo" />
+        <div className='logo'>
+          <Link to='/'>
+            <img src='/logo.svg' alt='Photodirs Logo' />
           </Link>
         </div>
         {!loading && (
@@ -218,20 +230,20 @@ export default function Browse() {
           />
         )}
       </header>
-      <div className="pageBody">{getPageBody(loading, error, data)}</div>
+      <div className='pageBody'>{getPageBody(loading, error, data)}</div>
       <footer>
         <div>
           Check out out{' '}
           <a
-            rel="noreferrer"
-            href="https://github.com/zsteinkamp/photodirs"
-            target="_blank"
+            rel='noreferrer'
+            href='https://github.com/zsteinkamp/photodirs'
+            target='_blank'
           >
             Photodirs on GitHub
           </a>
         </div>
         <div>
-          by <a href="https://steinkamp.us/">Zack Steinkamp</a>
+          by <a href='https://steinkamp.us/'>Zack Steinkamp</a>
         </div>
       </footer>
     </div>
