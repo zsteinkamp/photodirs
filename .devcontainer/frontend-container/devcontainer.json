@@ -1,0 +1,17 @@
+{
+  "dockerComposeFile": "../../photodirs-dev/docker-compose.yml",
+  "service": "frontend",
+  "workspaceFolder": "/app/frontend",
+  "shutdownAction": "none",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rvest.vs-code-prettier-eslint",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

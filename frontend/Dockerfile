@@ -1,7 +1,7 @@
 FROM node:18 AS dev
 
 # node packages
-WORKDIR /app
+WORKDIR /app/frontend
 COPY package*.json ./
 RUN npm ci
 

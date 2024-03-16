@@ -1,0 +1,37 @@
+.DateBins {
+  /* grid grid-flow-col gap-1 */
+  display: grid;
+  grid-auto-flow: column;
+  gap: 0.25rem;
+}
+.DateBins .dbBin {
+  /* group relative h-12 cursor-pointer bg-pagebg-light text-center font-sans text-xs font-normal uppercase dark:bg-pagebg-dark */
+  position: relative;
+  height: 3rem;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+.DateBins .dbBin .dbBar {
+  /* absolute left-0 bottom-0 w-full bg-shadeshadow-light group-hover:bg-shadeshadow-light dark:bg-mid-dark dark:group-hover:bg-mid-dark */
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: var(--histogram-bar);
+}
+.DateBins .dbBin:hover .dbBar {
+  background-color: var(--histogram-bar-hover);
+}
+.DateBins .dbBin .dbLabel {
+  /* absolute top-0 hidden w-full group-hover:block */
+  position: absolute;
+  top: 0;
+  display: none;
+  width: 100%;
+}
+.DateBins .dbBin:hover .dbLabel {
+  display: block;
+}

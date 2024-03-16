@@ -1,17 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/logo.svg" type="image/svg+xml" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="__META_DESCRIPTION__"/>
-    <meta name="og:title" content="__META_OG_TITLE__"/>
-    <meta name="og:description" content="__META_OG_DESCRIPTION__"/>
-    <meta name="og:image" content="__META_OG_IMAGE__"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="description" content="__META_DESCRIPTION__" />
+    <meta name="og:title" content="__META_OG_TITLE__" />
+    <meta name="og:description" content="__META_OG_DESCRIPTION__" />
+    <meta name="og:image" content="__META_OG_IMAGE__" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
     <meta
       name="description"
       content="A directory-first photo browsing and resizing service with seamless RAW and HEIC support."
@@ -32,6 +35,15 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>photodirs</title>
+    <script id="theme.util.jsx" strategy="beforeInteractive">
+      // eliminate non-themed flash
+      let themeLocalStorage = localStorage.getItem('theme')
+      let themeSystem = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
+        ? 'dark'
+        : 'light'
+      document.documentElement.classList.add(themeLocalStorage ?? themeSystem)
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

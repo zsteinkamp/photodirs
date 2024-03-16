@@ -1,78 +1,60 @@
-'use strict';
+'use strict'
 
-const fsp = require('fs/promises');
-const glob = require('glob');
-const path = require('path');
+import { stat, readdir, access } from 'fs/promises'
+import glob from 'glob'
+import { join } from 'path'
 
-const C = require('../constants');
-const logger = C.LOGGER;
-const fileTypes = require('./fileTypes');
+import { LOGGER, ALBUMS_ROOT } from '../constants.js'
+import { isSupportedImageFile } from './fileTypes.js'
 
-const fileUtils = module.exports = {
-  /*
-   * promisify glob
-   */
-  globPromise: async (pattern) => {
-    return new Promise((resolve, reject) => {
-      glob(pattern, (err, files) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(files);
-        }
-      });
-    });
-  },
+const logger = LOGGER
 
-  /*
-   * returns whether the given testFile is older than any of the files in compareArr
-   */
-  isFileOlderThanAny: async (testFile, compareArr) => {
-    if (await fileUtils.fileExists(testFile)) {
-      const testFileMtime = (await fsp.stat(testFile)).mtime;
-      for (const compareFile of compareArr) {
-        if (await fileUtils.fileExists(compareFile)) {
-          if (testFileMtime < (await fsp.stat(compareFile)).mtime) {
-            return true;
-          }
+export async function globPromise(pattern) {
+  return new Promise((resolve, reject) => {
+    glob(pattern, (err, files) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(files)
+      }
+    })
+  })
+}
+export async function isFileOlderThanAny(testFile, compareArr) {
+  if (await fileExists(testFile)) {
+    const testFileMtime = (await stat(testFile)).mtime
+    for (const compareFile of compareArr) {
+      if (await fileExists(compareFile)) {
+        if (testFileMtime < (await stat(compareFile)).mtime) {
+          return true
         }
       }
-    }
-    return false;
-  },
-
-  /*
-   * return a list of filenames of supported files in the given dirName
-   */
-  getSupportedFiles: async (dirName) => {
-    const albumDir = path.join(C.ALBUMS_ROOT, dirName);
-    try {
-      const dirFiles = (await fsp.readdir(albumDir, { withFileTypes: true }))
-        .filter((dirEnt) => (dirEnt.isFile() && fileTypes.isSupportedImageFile(dirEnt.name)))
-        .map((dirEnt) => dirEnt.name);
-      logger.debug('getSupportedFiles', { dirName, dirFiles });
-      return dirFiles;
-    } catch (e) {
-      if (e.code === 'PERM' || e.code === 'EACCES') {
-        logger.info('Permission Denied', { error: e });
-        return [];
-      }
-      logger.error('readdir error4', e);
-      throw e;
-    }
-  },
-
-  /*
-   * Return whether a given file or directory exists and is readable. Not sure
-   * why this isn't just in the fs lib as a boolean function not requiring
-   * try/catch...
-   */
-  fileExists: async (filePath) => {
-    try {
-      await fsp.access(filePath);
-      return true;
-    } catch {
-      return false;
     }
   }
-};
+  return false
+}
+export async function getSupportedFiles(dirName) {
+  const albumDir = join(ALBUMS_ROOT, dirName)
+  try {
+    const dirFiles = (await readdir(albumDir, { withFileTypes: true }))
+      .filter(dirEnt => dirEnt.isFile() && isSupportedImageFile(dirEnt.name))
+      .map(dirEnt => dirEnt.name)
+    logger.debug('getSupportedFiles', { dirName, dirFiles })
+    return dirFiles
+  } catch (e) {
+    if (e.code === 'PERM' || e.code === 'EACCES') {
+      logger.info('Permission Denied', { error: e })
+      return []
+    }
+    logger.error('readdir error4', e)
+    throw e
+  }
+}
+export async function fileExists(filePath) {
+  try {
+    await access(filePath)
+    return true
+  } catch (e) {
+    return false
+  }
+}

@@ -1,0 +1,36 @@
+.AdminFileList {
+  margin-top: 2rem;
+}
+
+.AdminFileList img {
+  max-height: 12rem;
+  max-width: 12rem;
+  border-radius: 0.5rem;
+}
+
+.AdminFileList .fileRow {
+  display: flex;
+  flex-direction: row;
+  align-items: top;
+  justify-content: flex-start;
+  padding: 0.5rem;
+}
+.AdminFileList input {
+  display: none;
+}
+.AdminFileList input:checked + label div img {
+  outline: 0.5rem solid #6cf;
+}
+
+.AdminFileList .colImage {
+  margin: 0 2rem;
+}
+.AdminFileList .InlineEdit {
+  width: 30rem;
+  padding: 0.5rem;
+}
+.AdminFileList .InlineEditArea {
+  width: 30rem;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}

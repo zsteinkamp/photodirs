@@ -1,1 +1,5 @@
 .DS_Store
+.env
+/docker-compose.yml
+/nginx.conf
+/test-album/*
