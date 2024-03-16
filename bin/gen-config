@@ -1,0 +1,272 @@
+#!/bin/bash
+
+##
+# Script to generate an nginx.conf and docker-compose.yml file in cwd.
+##
+
+if [ ! -d .git ]
+then
+  echo 'This script must be run from the project root directory.'
+fi
+
+# load .env if it's there
+if [ -f .env ]
+then
+  # shellcheck disable=SC2046
+  export $(xargs < .env)
+fi
+
+# all variables
+export PHOTODIRS_WEB_PORT=${PHOTODIRS_WEB_PORT:=3333}
+export PHOTODIRS_ENABLE_ADMIN=${PHOTODIRS_ENABLE_ADMIN:=true}
+export PHOTODIRS_ADMIN_PORT=${PHOTODIRS_ADMIN_PORT:=4333}
+export PHOTODIRS_MOUNT_TYPE=${PHOTODIRS_MOUNT_TYPE:=bind}
+export PHOTODIRS_MOUNT_PATH=${PHOTODIRS_MOUNT_PATH:=/photos}
+export PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST:=truenas.lan}
+export PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH:=/mnt/data-pool/shared/photos}
+export PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR:=/mnt/shared/photos}
+
+echo
+echo '=================================================================='
+echo 'Photodirs setup...'
+echo '=================================================================='
+echo
+read -r -p "Web port? [${PHOTODIRS_WEB_PORT}] " PHOTODIRS_WEB_PORT_INPUT
+PHOTODIRS_WEB_PORT=${PHOTODIRS_WEB_PORT_INPUT:=${PHOTODIRS_WEB_PORT}}
+
+read -r -p "Run Admin? [${PHOTODIRS_ENABLE_ADMIN}] " PHOTODIRS_ENABLE_ADMIN_INPUT
+PHOTODIRS_ENABLE_ADMIN=${PHOTODIRS_ENABLE_ADMIN_INPUT:=${PHOTODIRS_ENABLE_ADMIN}}
+
+if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+then
+  read -r -p "Admin port? [$PHOTODIRS_ADMIN_PORT] " PHOTODIRS_ADMIN_PORT_INPUT
+  PHOTODIRS_ADMIN_PORT=${PHOTODIRS_ADMIN_PORT_INPUT:=${PHOTODIRS_ADMIN_PORT}}
+fi
+
+read -r -p "Mount type (bind | nfs)? [$PHOTODIRS_MOUNT_TYPE] " PHOTODIRS_MOUNT_TYPE_INPUT
+PHOTODIRS_MOUNT_TYPE=${PHOTODIRS_MOUNT_TYPE_INPUT:=${PHOTODIRS_MOUNT_TYPE}}
+
+if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+then
+  # nfs mount
+  read -r -p "NFS Host? [$PHOTODIRS_NFS_HOST] " PHOTODIRS_NFS_HOST_INPUT
+  PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST_INPUT:=${PHOTODIRS_NFS_HOST}}
+  read -r -p "NFS Path? [$PHOTODIRS_NFS_PATH] " PHOTODIRS_NFS_PATH_INPUT
+  PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH_INPUT:=${PHOTODIRS_NFS_PATH}}
+elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
+then
+  # bind mount
+  read -r -p "Originals Directory? [$PHOTODIRS_ORIG_DIR] " PHOTODIRS_ORIG_DIR_INPUT
+  PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR_INPUT:=${PHOTODIRS_ORIG_DIR}}
+else
+  # error
+  echo 'Unsupported mount type. :('
+  exit 1
+fi
+
+cat << EOF > docker-compose.yml
+name: photodirs_prod
+services:
+  nginx:
+    image: nginx:1
+    depends_on:
+      - frontend
+      - api
+EOF
+# ADMIN SERVICE DEPENDENCY
+if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+then
+  cat << EOF >> docker-compose.yml
+      - admin
+EOF
+fi
+cat << EOF >> docker-compose.yml
+    ports:
+      - '${PHOTODIRS_WEB_PORT}:3333'
+EOF
+# ADMIN PORT ON NGINX
+if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+then
+  cat << EOF >> docker-compose.yml
+      - '${PHOTODIRS_ADMIN_PORT}:4333'
+EOF
+fi
+cat << EOF >> docker-compose.yml
+    restart: unless-stopped
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx-photodirs-common.conf:/etc/nginx/nginx-photodirs-common.conf:ro
+      - prod_cache:/cache:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    volumes:
+      - prod_cache:/cache
+EOF
+  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+  then
+    cat << EOF >> docker-compose.yml
+      - prod_albums:/albums:ro
+EOF
+  else
+  cat << EOF >> docker-compose.yml
+      - ${PHOTODIRS_ORIG_DIR}:/albums:ro
+EOF
+  fi
+  cat << EOF >> docker-compose.yml
+
+  watcher:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    command: 'npm run start:watcher'
+    volumes:
+      - prod_cache:/cache
+EOF
+  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+  then
+    cat << EOF >> docker-compose.yml
+      - prod_albums:/albums:ro
+EOF
+  else
+  cat << EOF >> docker-compose.yml
+      - ${PHOTODIRS_ORIG_DIR}:/albums:ro
+EOF
+  fi
+  cat << EOF >> docker-compose.yml
+EOF
+
+if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+then
+  cat << EOF >> docker-compose.yml
+  admin:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+    command: 'npm run start:admin'
+    volumes:
+      - prod_cache:/cache
+EOF
+  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+  then
+    cat << EOF >> docker-compose.yml
+      - prod_albums:/albums:rw
+EOF
+  else
+  cat << EOF >> docker-compose.yml
+      - ${PHOTODIRS_ORIG_DIR}:/albums:rw
+EOF
+  fi
+fi
+
+cat << EOF >> docker-compose.yml
+volumes:
+  prod_cache:
+  prod_albums:
+EOF
+if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+then
+  cat << EOF >> docker-compose.yml
+    driver: local
+    driver_opts:
+      type: 'nfs4'
+      o: 'addr=${PHOTODIRS_NFS_HOST},vers=4,soft,nolock'
+      device: ':${PHOTODIRS_NFS_PATH}'
+EOF
+elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
+then
+  cat << EOF >> docker-compose.yml
+    driver_opts:
+      type: none
+      device: '${PHOTODIRS_ORIG_DIR}'
+      o: bind
+EOF
+fi
+
+cat << EOF > nginx.conf
+worker_processes  auto;
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  keepalive_timeout 65;
+  log_format main_ext '\$remote_addr - \$remote_user [\$time_local] "\$request" '
+                      '\$status \$body_bytes_sent "\$http_referer" '
+                      '"\$http_user_agent" "\$http_x_forwarded_for" '
+                      '"\$host" sn="\$server_name" '
+                      'rt=\$request_time '
+                      'ua="\$upstream_addr" us="\$upstream_status" '
+                      'ut="\$upstream_response_time" ul="\$upstream_response_length" '
+                      'cs=\$upstream_cache_status';
+  access_log /var/log/nginx/access.log main_ext;
+
+  # NGINX Proxy Cache - obeys standard cache headers
+  proxy_cache_path /tmp/nginx  levels=1:2  keys_zone=STATIC:10m inactive=24h  max_size=10g;
+
+  server {
+    listen ${PHOTODIRS_WEB_PORT};
+    listen [::]:${PHOTODIRS_WEB_PORT};
+
+    include "nginx-photodirs-common.conf";
+  }
+EOF
+
+if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+then
+  cat << EOF >> nginx.conf
+  # ADMIN SERVER
+  server {
+    listen ${PHOTODIRS_ADMIN_PORT};
+    listen [::]:${PHOTODIRS_ADMIN_PORT};
+
+    location /api/admin {
+      proxy_pass http://admin:3000;
+      proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+      proxy_set_header Host \$host;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade \$http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
+    include "nginx-photodirs-common.conf";
+  }
+EOF
+fi
+
+cat << EOF >> nginx.conf
+}
+EOF
+
+echo
+echo '=================================================================='
+echo 'Done!'
+echo 'Now run "make" to build and start the production server.'
+echo '=================================================================='
+echo
+echo 'Put the following into a file named ".env" to save these defaults:'
+env | grep PHOTODIRS
+echo
+exit 0

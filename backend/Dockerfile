@@ -31,8 +31,7 @@ RUN apt-get install -y \
 
 WORKDIR /usr/local/src
 
-# build the head of the stable 8.13 branch
-ARG VIPS_BRANCH=8.13
+ARG VIPS_BRANCH=8.14
 ARG VIPS_URL=https://github.com/libvips/libvips/tarball
 
 RUN mkdir libvips-${VIPS_BRANCH} \
@@ -52,7 +51,7 @@ RUN cd libvips-${VIPS_BRANCH} \
 ##
 
 # node packages
-WORKDIR /app
+WORKDIR /app/backend
 COPY package*.json ./
 RUN npm ci
 

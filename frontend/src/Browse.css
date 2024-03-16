@@ -1,14 +1,15 @@
 .Browse {
-  color: var(--browse-color);
+  color: rgb(var(--browse-color));
 }
 .Browse header {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   font-size: 1.75rem;
-  line-height:3.5rem;
+  line-height: 3.5rem;
   color: var(--bg-text-color);
-  text-shadow: 0 0.1rem 0.25rem var(--browse-header-shadow-color);
+  text-shadow: 0 0.1rem 0.25rem var(--shadow-color);
+  background: var(--main-bg-color);
 }
 .Browse header .logo {
   margin-top: 0.3rem;
@@ -19,28 +20,26 @@
   margin-left: 1rem;
 }
 .Browse .pageBody {
-  padding: 1rem 1rem;
   min-height: 90vh;
-  background-color: var(--browse-page-background-color);
-  border-top: 1px solid var(--browse-page-body-border);
-  border-bottom: 1px solid var(--browse-page-body-border);
+  background-color: var(--main-bg-color);
+  padding: 0 5.5rem 2rem;
 }
 .Browse .pageBody > .album > .desc {
   margin-left: 20rem;
 }
 .Browse .pageBody .album .header {
-  max-width: calc(100vw - 2rem);
-  width: 36rem;
-  margin: 0 auto;
+  max-width: calc(36rem);
+  margin: 0 0;
 }
 .Browse .pageBody .album .header .desc {
   line-height: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
-.Browse .pageBody .album .header .date {
-  white-space: nowrap;
-  color: #666;
-  font-weight: bold;
+.Browse .pageBody .album .header .desc p {
+  margin-top: 0;
+}
+.Browse .editable {
+  border: 1px solid red;
 }
 .Browse footer {
   margin-top: 1rem;
