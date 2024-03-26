@@ -74,7 +74,7 @@ export const getCachedImagePath = async (filePath, resizeOptions) => {
       logger.info('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath })
     }
     await plumbing().catch(async err => {
-      logger.error('IMG CACHE PIPELINE ERROR', { filePath, cachePath, err })
+      logger.error('IMG CACHE PIPELINE ERROR 2', { filePath, cachePath, err })
       // make sure we don't leave a zero-length file
       await fsp.rm(cachePath, { force: true })
       return null
@@ -121,7 +121,11 @@ export const jpegFileForRaw = async filePath => {
     logger.info('JPEG_FILE_FOR_RAW:WROTE_JPG', { filePath, cachePath })
   }
   await plumbing().catch(async err => {
-    logger.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', { err })
+    logger.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', {
+      filePath,
+      cachePath,
+      err,
+    })
     // make sure we don't leave a zero-length file
     await fsp.rm(cachePath, { force: true })
     return null
@@ -157,6 +161,8 @@ export const jpegFileForVideo = async filePath => {
     'thumbnail=100', // look across 100 frames
     '-frames:v',
     '1', // and pick one
+    '-update',
+    '1', // something something update
     cachePath, // and write to the cachePath
   ])
 

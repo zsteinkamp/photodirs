@@ -82,7 +82,11 @@ export const handleImage = async (filePath, size, crop, res) => {
     await pipeline(readStream, transform, res)
   }
   await plumbing().catch(err => {
-    logger.error('IMG CACHE PIPELINE ERROR', { filePath, cachedImagePath, err })
+    logger.error('IMG CACHE PIPELINE ERROR 1', {
+      filePath,
+      cachedImagePath,
+      err,
+    })
     res.end()
   })
 }

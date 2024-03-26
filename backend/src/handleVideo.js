@@ -7,7 +7,7 @@ import { getCachedVideoPath } from './util/video.js'
 const logger = LOGGER
 
 export const handleVideo = async (filePath, res) => {
-  // getCachedImagePath is also responsible for resizing the image and caching it
+  // getCachedVideoPath is also responsible for resizing the image and caching it
   const cachedVideoPath = await getCachedVideoPath(filePath)
 
   if (!cachedVideoPath) {
