@@ -22,8 +22,8 @@ shell: config ## Get a shell in the production 'watcher' container
 down: config ## Stop and rm production containers
 	docker compose down
 
-rmvol: config ## Reset the production originals docker volume
-	docker volume rm photodirs_prod_prod_albums
+rmvol: config ## Reset the production cache docker volume
+	docker volume rm photodirs_prod_prod_cache
 
 config: docker-compose.yml nginx.conf ## Run setup script to generate docker-compose.yml and nginx.conf files
 
