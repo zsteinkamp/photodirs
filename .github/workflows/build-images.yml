@@ -27,8 +27,12 @@ jobs:
       packages: write
       # 
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # Need to check out repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Generate the default config (port 3333, admin=true)
+      - run: bin/gen-config
 
       # Uses the `docker/login-action` action to log in to the Container
       # registry registry using the account and password that will publish the
@@ -40,13 +44,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Need to check out repo
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # Generate the default config (port 3333, admin=true)
-      - run: bin/gen-config
 
       # This step uses
       # [docker/metadata-action](https://github.com/docker/metadata-action#about)
