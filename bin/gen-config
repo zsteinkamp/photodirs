@@ -26,42 +26,46 @@ export PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST:=truenas.lan}
 export PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH:=/mnt/data-pool/shared/photos}
 export PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR:=/mnt/shared/photos}
 
-echo
-echo '=================================================================='
-echo 'Photodirs setup...'
-echo '=================================================================='
-echo
-read -r -p "Web port? [${PHOTODIRS_WEB_PORT}] " PHOTODIRS_WEB_PORT_INPUT
-PHOTODIRS_WEB_PORT=${PHOTODIRS_WEB_PORT_INPUT:=${PHOTODIRS_WEB_PORT}}
-
-read -r -p "Run Admin? [${PHOTODIRS_ENABLE_ADMIN}] " PHOTODIRS_ENABLE_ADMIN_INPUT
-PHOTODIRS_ENABLE_ADMIN=${PHOTODIRS_ENABLE_ADMIN_INPUT:=${PHOTODIRS_ENABLE_ADMIN}}
-
-if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+# interactive setup if interactive terminal
+if [ -n $PS1 ]
 then
-  read -r -p "Admin port? [$PHOTODIRS_ADMIN_PORT] " PHOTODIRS_ADMIN_PORT_INPUT
-  PHOTODIRS_ADMIN_PORT=${PHOTODIRS_ADMIN_PORT_INPUT:=${PHOTODIRS_ADMIN_PORT}}
-fi
+  echo
+  echo '=================================================================='
+  echo 'Photodirs setup...'
+  echo '=================================================================='
+  echo
+  read -r -p "Web port? [${PHOTODIRS_WEB_PORT}] " PHOTODIRS_WEB_PORT_INPUT
+  PHOTODIRS_WEB_PORT=${PHOTODIRS_WEB_PORT_INPUT:=${PHOTODIRS_WEB_PORT}}
 
-read -r -p "Mount type (bind | nfs)? [$PHOTODIRS_MOUNT_TYPE] " PHOTODIRS_MOUNT_TYPE_INPUT
-PHOTODIRS_MOUNT_TYPE=${PHOTODIRS_MOUNT_TYPE_INPUT:=${PHOTODIRS_MOUNT_TYPE}}
+  read -r -p "Run Admin? [${PHOTODIRS_ENABLE_ADMIN}] " PHOTODIRS_ENABLE_ADMIN_INPUT
+  PHOTODIRS_ENABLE_ADMIN=${PHOTODIRS_ENABLE_ADMIN_INPUT:=${PHOTODIRS_ENABLE_ADMIN}}
 
-if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
-then
-  # nfs mount
-  read -r -p "NFS Host? [$PHOTODIRS_NFS_HOST] " PHOTODIRS_NFS_HOST_INPUT
-  PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST_INPUT:=${PHOTODIRS_NFS_HOST}}
-  read -r -p "NFS Path? [$PHOTODIRS_NFS_PATH] " PHOTODIRS_NFS_PATH_INPUT
-  PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH_INPUT:=${PHOTODIRS_NFS_PATH}}
-elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
-then
-  # bind mount
-  read -r -p "Originals Directory? [$PHOTODIRS_ORIG_DIR] " PHOTODIRS_ORIG_DIR_INPUT
-  PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR_INPUT:=${PHOTODIRS_ORIG_DIR}}
-else
-  # error
-  echo 'Unsupported mount type. :('
-  exit 1
+  if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
+  then
+    read -r -p "Admin port? [$PHOTODIRS_ADMIN_PORT] " PHOTODIRS_ADMIN_PORT_INPUT
+    PHOTODIRS_ADMIN_PORT=${PHOTODIRS_ADMIN_PORT_INPUT:=${PHOTODIRS_ADMIN_PORT}}
+  fi
+
+  read -r -p "Mount type (bind | nfs)? [$PHOTODIRS_MOUNT_TYPE] " PHOTODIRS_MOUNT_TYPE_INPUT
+  PHOTODIRS_MOUNT_TYPE=${PHOTODIRS_MOUNT_TYPE_INPUT:=${PHOTODIRS_MOUNT_TYPE}}
+
+  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
+  then
+    # nfs mount
+    read -r -p "NFS Host? [$PHOTODIRS_NFS_HOST] " PHOTODIRS_NFS_HOST_INPUT
+    PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST_INPUT:=${PHOTODIRS_NFS_HOST}}
+    read -r -p "NFS Path? [$PHOTODIRS_NFS_PATH] " PHOTODIRS_NFS_PATH_INPUT
+    PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH_INPUT:=${PHOTODIRS_NFS_PATH}}
+  elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
+  then
+    # bind mount
+    read -r -p "Originals Directory? [$PHOTODIRS_ORIG_DIR] " PHOTODIRS_ORIG_DIR_INPUT
+    PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR_INPUT:=${PHOTODIRS_ORIG_DIR}}
+  else
+    # error
+    echo 'Unsupported mount type. :('
+    exit 1
+  fi
 fi
 
 cat << EOF > docker-compose.yml

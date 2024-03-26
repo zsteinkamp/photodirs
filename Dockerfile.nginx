@@ -1,0 +1,6 @@
+# vim:syn=dockerfile
+FROM nginx:1
+
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx-photodirs-common.conf /etc/nginx/nginx-photodirs-common.conf
+
