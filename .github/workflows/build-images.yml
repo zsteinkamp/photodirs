@@ -52,7 +52,7 @@ jobs:
       # and labels.
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_BASE }}-nginx
       # This step uses the `docker/build-push-action` action to build the
@@ -65,7 +65,7 @@ jobs:
       # It uses the `tags` and `labels` parameters to tag and label the image
       # with the output from the "meta" step.
       - name: Build and push Docker image
-        uses: docker/build-push-action@5
+        uses: docker/build-push-action@v5
         with:
           file: ./Dockerfile.nginx
           platforms: linux/amd64,linux/arm64
