@@ -66,6 +66,8 @@ jobs:
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
           labels: ${{ steps.nginx_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       ## API CONTAINER
       - name: api Docker meta
@@ -77,7 +79,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha
-      - name: Build and push Docker image
+      - name: api Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: backend/
@@ -86,6 +88,8 @@ jobs:
           push: true
           tags: ${{ steps.api_meta.outputs.tags }}
           labels: ${{ steps.api_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       ## WATCHER CONTAINER
       - name: watcher Docker meta
@@ -97,7 +101,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha
-      - name: Build and push Docker image
+      - name: watcher Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: backend/
@@ -106,6 +110,8 @@ jobs:
           push: true
           tags: ${{ steps.watcher_meta.outputs.tags }}
           labels: ${{ steps.watcher_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       ## ADMIN CONTAINER
       - name: admin Docker meta
@@ -117,7 +123,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha
-      - name: Build and push Docker image
+      - name: admin Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: backend/
@@ -126,3 +132,5 @@ jobs:
           push: true
           tags: ${{ steps.admin_meta.outputs.tags }}
           labels: ${{ steps.admin_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
