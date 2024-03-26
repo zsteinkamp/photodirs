@@ -47,6 +47,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=branch
+            type=sha
+
       # This step uses the `docker/build-push-action` action to build the
       # image, based on your repository's `Dockerfile`. If the build succeeds,
       # it pushes the image to GitHub Packages.
@@ -63,7 +75,5 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          images: |
-            ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx
-          tags: |
-            type=sha
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
