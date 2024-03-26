@@ -177,9 +177,10 @@ export const preResize = async absFname => {
       return o.pregenerate && o.size !== 'orig'
     })
     .map(o => {
+      const [height, width] = o.size.split('x')
       return {
-        height: parseInt(o.size.split('x')[0]),
-        width: parseInt(o.size.split('x')[1]),
+        height: parseInt(height),
+        width: parseInt(width),
       }
     })
     .map(o => {

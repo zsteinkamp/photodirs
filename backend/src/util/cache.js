@@ -3,7 +3,7 @@
 import { rm } from 'fs/promises'
 import { join, dirname } from 'path'
 
-import { LOGGER, CACHE_ROOT } from '../constants.js'
+import { LOGGER, CACHE_ROOT, MAX_PARALLEL_JOBS } from '../constants.js'
 import { promiseAllInBatches } from './batch.js'
 import { getOutputTypeForFile } from './fileTypes.js'
 import { globPromise } from './file.js'
@@ -47,5 +47,9 @@ export async function cleanUpCacheFor(albumFilePath) {
   files.push(join(CACHE_ROOT, 'albums', albumPath, 'album.json'))
   files.push(join(CACHE_ROOT, 'albums', albumPath, 'album.extended.json'))
   logger.debug('CleanUpCacheFor', { files })
-  await promiseAllInBatches(files, file => rm(file, { force: true }), 10)
+  await promiseAllInBatches(
+    files,
+    file => rm(file, { force: true }),
+    MAX_PARALLEL_JOBS,
+  )
 }

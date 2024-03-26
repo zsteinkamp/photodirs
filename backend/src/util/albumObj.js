@@ -4,13 +4,14 @@ import { readdir, readFile, mkdir, writeFile } from 'fs/promises'
 import { join, dirname, basename } from 'path'
 
 import {
-  LOGGER,
-  CACHE_ROOT,
   ALBUMS_ROOT,
-  MAC_FORBIDDEN_FILES_REGEX,
-  TYPE_ALBUM,
   API_BASE,
+  CACHE_ROOT,
+  LOGGER,
+  MAC_FORBIDDEN_FILES_REGEX,
+  MAX_PARALLEL_JOBS,
   PHOTO_URL_BASE,
+  TYPE_ALBUM,
 } from '../constants.js'
 import { promiseAllInBatches } from './batch.js'
 import { getFileObjMetadataFname } from './cache.js'
@@ -132,7 +133,7 @@ export const getExtendedAlbumObj = async extAlbumObj => {
   const albumResult = await promiseAllInBatches(
     dirs,
     dir => getAlbumObj(join('/', extAlbumObj.path, dir.name)),
-    10,
+    MAX_PARALLEL_JOBS,
   )
 
   // Sort albums in descending date order
@@ -146,7 +147,7 @@ export const getExtendedAlbumObj = async extAlbumObj => {
   const fileResult = await promiseAllInBatches(
     files,
     file => getFileObj(extAlbumObj.path, file.name),
-    10,
+    MAX_PARALLEL_JOBS,
   )
   //
   fileResult.sort((a, b) => {
@@ -225,7 +226,7 @@ export const getAlbumObj = async dirName => {
       const exifArr = await promiseAllInBatches(
         supportedFiles,
         fName => getExifObjForFile(join(dirName, fName)),
-        10,
+        MAX_PARALLEL_JOBS,
       )
       logger.debug('GET_ALBUM_OBJ', { dirName, exifArr })
       for (const exif of exifArr) {

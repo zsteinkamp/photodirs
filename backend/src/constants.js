@@ -37,6 +37,7 @@ export const LOGGER = logger.default
 export const MAC_FORBIDDEN_FILES_REGEX =
   /(\.fseventsd|\.DocumentRevisions-V100|\.TemporaryItems|\.Trashes)/
 export const MAX_DIMENSION = 3000
+export const MAX_PARALLEL_JOBS = process.env['MAX_PARALLEL_JOBS'] || 4
 export const MIN_DIMENSION = 16
 export const PHOTO_URL_BASE = '/photo'
 export const VIDEO_URL_BASE = '/video'
