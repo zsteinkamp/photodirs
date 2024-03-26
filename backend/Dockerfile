@@ -67,9 +67,16 @@ RUN echo "alias ..='cd ..'" >> /root/.bashrc
 CMD [ "npm", "run", "watch:api" ]
 
 ## PRODUCTION BUILD BELOW
-FROM dev AS prod
+FROM dev AS prod-base
 ENV NODE_ENV=production
 COPY ./src/ ./src/
 # run the production api server (no watching)
 
+FROM prod-base AS api
 CMD [ "npm", "run", "start:api" ]
+
+FROM prod-base AS watcher
+CMD [ "npm", "run", "start:watcher" ]
+
+FROM prod-base AS admin
+CMD [ "npm", "run", "start:admin" ]

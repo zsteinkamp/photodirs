@@ -102,16 +102,12 @@ cat << EOF >> docker-compose.yml
     build:
       context: ./frontend
       target: prod
-    environment:
-      NODE_ENV: production
     restart: unless-stopped
 
   api:
     build:
       context: ./backend
-      target: prod
-    environment:
-      NODE_ENV: production
+      target: api
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
@@ -131,11 +127,8 @@ EOF
   watcher:
     build:
       context: ./backend
-      target: prod
-    environment:
-      NODE_ENV: production
+      target: watcher
     restart: unless-stopped
-    command: 'npm run start:watcher'
     volumes:
       - prod_cache:/cache
 EOF
@@ -158,11 +151,8 @@ then
   admin:
     build:
       context: ./backend
-      target: prod
-    environment:
-      NODE_ENV: production
+      target: admin
     restart: unless-stopped
-    command: 'npm run start:admin'
     volumes:
       - prod_cache:/cache
 EOF
