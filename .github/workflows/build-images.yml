@@ -41,6 +41,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # Need to check out repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
       # Generate the default config (port 3333, admin=true)
       - run: bin/gen-config
 
