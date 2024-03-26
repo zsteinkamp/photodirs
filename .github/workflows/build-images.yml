@@ -67,6 +67,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags:
-            - ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx:latest
-            - ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx:${{ steps.sha.outputs.sha_short }}
+          tags: ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx:latest ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx:${{ steps.sha.outputs.sha_short }}
