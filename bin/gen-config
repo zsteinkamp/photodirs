@@ -65,10 +65,11 @@ else
 fi
 
 cat << EOF > docker-compose.yml
-name: photodirs_prod
+name: photodirs
 services:
   nginx:
-    image: nginx:1
+    build:
+      dockerfile: ./Dockerfile.nginx
     depends_on:
       - frontend
       - api
@@ -94,8 +95,6 @@ fi
 cat << EOF >> docker-compose.yml
     restart: unless-stopped
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx-photodirs-common.conf:/etc/nginx/nginx-photodirs-common.conf:ro
       - prod_cache:/cache:ro
 
   frontend:
