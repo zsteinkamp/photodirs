@@ -181,8 +181,8 @@ then
   cat << EOF >> docker-compose.yml
     driver: local
     driver_opts:
-      type: 'nfs4'
-      o: 'addr=${PHOTODIRS_NFS_HOST},vers=4,soft,nolock'
+      type: 'nfs'
+      o: 'addr=${PHOTODIRS_NFS_HOST},nfsvers=4,soft,nolock'
       device: ':${PHOTODIRS_NFS_PATH}'
 EOF
 elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
