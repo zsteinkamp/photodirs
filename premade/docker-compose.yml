@@ -1,7 +1,7 @@
 name: photodirs_imgs
 services:
   nginx:
-    image: ghcr.io/zsteinkamp/photodirs-nginx:main
+    image: ghcr.io/zsteinkamp/photodirs-nginx
     depends_on:
       - frontend
       - api
@@ -14,24 +14,24 @@ services:
       - prod_cache:/cache:ro
 
   frontend:
-    image: ghcr.io/zsteinkamp/photodirs-frontend:main
+    image: ghcr.io/zsteinkamp/photodirs-frontend
     restart: unless-stopped
 
   api:
-    image: ghcr.io/zsteinkamp/photodirs-api:main
+    image: ghcr.io/zsteinkamp/photodirs-api
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:ro
 
   watcher:
-    image: ghcr.io/zsteinkamp/photodirs-api:main
+    image: ghcr.io/zsteinkamp/photodirs-api
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:ro
   admin:
-    image: ghcr.io/zsteinkamp/photodirs-admin:main
+    image: ghcr.io/zsteinkamp/photodirs-admin
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
@@ -43,4 +43,4 @@ volumes:
     driver_opts:
       type: 'nfs'
       o: 'addr=truenas.lan,nfsvers=4,soft,nolock'
-      device: ':/mnt/data-pool/shared/photos'
+      device: ':/mnt/data-pool/shared/photos/zzz_blog_images'
