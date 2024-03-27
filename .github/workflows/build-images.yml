@@ -62,7 +62,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-nginx
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest
             type=sha
       - name: nginx Build and push Docker image
         uses: docker/build-push-action@v5
@@ -84,7 +84,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-frontend
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest
             type=sha
       - name: frontend Build and push Docker image
         uses: docker/build-push-action@v5
@@ -106,7 +106,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-api
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest
             type=sha
       - name: api Build and push Docker image
         uses: docker/build-push-action@v5
@@ -128,7 +128,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-watcher
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest
             type=sha
       - name: watcher Build and push Docker image
         uses: docker/build-push-action@v5
@@ -150,7 +150,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-admin
           tags: |
-            type=ref,event=branch
+            type=raw,value=latest
             type=sha
       - name: admin Build and push Docker image
         uses: docker/build-push-action@v5
