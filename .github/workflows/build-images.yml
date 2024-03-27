@@ -86,7 +86,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: frontend/
-          target: frontend
+          target: prod
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
