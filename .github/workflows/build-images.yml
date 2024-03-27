@@ -27,6 +27,9 @@ jobs:
       packages: write
       # 
     steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -66,6 +69,28 @@ jobs:
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
           labels: ${{ steps.nginx_meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      ## FRONTEND CONTAINER
+      - name: frontend Docker meta
+        id: frontend_meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/zsteinkamp/${{ env.IMAGE_BASE }}-frontend
+          tags: |
+            type=ref,event=branch
+            type=sha
+      - name: frontend Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend/
+          target: frontend
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.frontend_meta.outputs.tags }}
+          labels: ${{ steps.frontend_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
