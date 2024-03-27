@@ -114,18 +114,7 @@ cat << EOF >> docker-compose.yml
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
-EOF
-  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
-  then
-    cat << EOF >> docker-compose.yml
       - prod_albums:/albums:ro
-EOF
-  else
-  cat << EOF >> docker-compose.yml
-      - ${PHOTODIRS_ORIG_DIR}:/albums:ro
-EOF
-  fi
-  cat << EOF >> docker-compose.yml
 
   watcher:
     build:
@@ -134,18 +123,8 @@ EOF
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
-EOF
-  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
-  then
-    cat << EOF >> docker-compose.yml
       - prod_albums:/albums:ro
-EOF
-  else
-  cat << EOF >> docker-compose.yml
-      - ${PHOTODIRS_ORIG_DIR}:/albums:ro
-EOF
-  fi
-  cat << EOF >> docker-compose.yml
+
 EOF
 
 if [ "true" == "$PHOTODIRS_ENABLE_ADMIN" ]
@@ -158,17 +137,8 @@ then
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
-EOF
-  if [ "nfs" == "$PHOTODIRS_MOUNT_TYPE" ]
-  then
-    cat << EOF >> docker-compose.yml
       - prod_albums:/albums:rw
 EOF
-  else
-  cat << EOF >> docker-compose.yml
-      - ${PHOTODIRS_ORIG_DIR}:/albums:rw
-EOF
-  fi
 fi
 
 cat << EOF >> docker-compose.yml
@@ -185,13 +155,12 @@ then
       o: 'addr=${PHOTODIRS_NFS_HOST},nfsvers=4,soft,nolock'
       device: ':${PHOTODIRS_NFS_PATH}'
 EOF
-elif [ "bind" == "$PHOTODIRS_MOUNT_TYPE" ]
-then
+else
   cat << EOF >> docker-compose.yml
     driver_opts:
       type: none
-      device: '${PHOTODIRS_ORIG_DIR}'
       o: bind
+      device: '${PHOTODIRS_ORIG_DIR}'
 EOF
 fi
 
