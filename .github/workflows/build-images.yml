@@ -22,9 +22,6 @@ jobs:
   build-and-push-image:
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        architecture: [amd64, arm64]
     permissions:
       contents: read
       packages: write
@@ -71,7 +68,7 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
-          platforms: linux/${{ matrix.architecture }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.nginx_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -93,7 +90,7 @@ jobs:
           target: prod
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
-          platforms: linux/${{ matrix.architecture }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.frontend_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -115,7 +112,7 @@ jobs:
           target: api
           push: true
           tags: ${{ steps.api_meta.outputs.tags }}
-          platforms: linux/${{ matrix.architecture }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.api_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -137,7 +134,7 @@ jobs:
           target: watcher
           push: true
           tags: ${{ steps.watcher_meta.outputs.tags }}
-          platforms: linux/${{ matrix.architecture }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.watcher_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -159,7 +156,7 @@ jobs:
           target: admin
           push: true
           tags: ${{ steps.admin_meta.outputs.tags }}
-          platforms: linux/${{ matrix.architecture }}
+          platforms: linux/amd64,linux/arm64
           labels: ${{ steps.admin_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
