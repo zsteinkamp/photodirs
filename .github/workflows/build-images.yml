@@ -86,7 +86,7 @@ jobs:
       - name: frontend Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile.gh
+          file: ./frontend/Dockerfile.gh
           context: frontend/
           target: prod
           push: true
@@ -109,7 +109,7 @@ jobs:
       - name: api Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile.gh
+          file: ./backend/Dockerfile.gh
           context: backend/
           target: api
           push: true
@@ -132,7 +132,7 @@ jobs:
       - name: watcher Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile.gh
+          file: ./backend/Dockerfile.gh
           context: backend/
           target: watcher
           push: true
@@ -155,7 +155,7 @@ jobs:
       - name: admin Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          file: ./Dockerfile.gh
+          file: ./backend/Dockerfile.gh
           context: backend/
           target: admin
           push: true
