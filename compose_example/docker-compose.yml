@@ -23,16 +23,10 @@ services:
 
   frontend:
     image: ghcr.io/zsteinkamp/photodirs-frontend
-    build:
-      context: ./frontend
-      target: prod
     restart: unless-stopped
 
   api:
     image: ghcr.io/zsteinkamp/photodirs-api
-    build:
-      context: ./backend
-      target: api
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
@@ -40,9 +34,6 @@ services:
 
   watcher:
     image: ghcr.io/zsteinkamp/photodirs-watcher
-    build:
-      context: ./backend
-      target: watcher
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
@@ -50,9 +41,6 @@ services:
 
   admin:
     image: ghcr.io/zsteinkamp/photodirs-admin
-    build:
-      context: ./backend
-      target: admin
     restart: unless-stopped
     volumes:
       - prod_cache:/cache
