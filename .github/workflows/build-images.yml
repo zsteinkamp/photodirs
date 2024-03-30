@@ -20,11 +20,10 @@ env:
 # available version of Ubuntu.
 jobs:
   build-and-push-image:
-    runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     strategy:
       matrix:
-        architecture: [amd64, arm64]
+        os: [ubuntu-latest, macos-latest]
     permissions:
       contents: read
       packages: write
