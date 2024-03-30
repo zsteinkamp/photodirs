@@ -21,6 +21,7 @@ env:
 jobs:
   build-and-push-image:
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
