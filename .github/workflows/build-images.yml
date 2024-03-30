@@ -22,6 +22,9 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    strategy:
+      matrix:
+        architecture: [amd64, arm64]
     permissions:
       contents: read
       packages: write
@@ -66,9 +69,9 @@ jobs:
         with:
           file: ./Dockerfile.nginx
           context: .
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.nginx_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -88,9 +91,9 @@ jobs:
         with:
           context: frontend/
           target: prod
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.frontend_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -110,9 +113,9 @@ jobs:
         with:
           context: backend/
           target: api
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.api_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.api_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -132,9 +135,9 @@ jobs:
         with:
           context: backend/
           target: watcher
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.watcher_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.watcher_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -154,9 +157,9 @@ jobs:
         with:
           context: backend/
           target: admin
-          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.admin_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.admin_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
