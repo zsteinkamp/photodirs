@@ -2,6 +2,8 @@
 
 This directory contains a `docker-compose.yml` file that you can customize for your needs.
 
+[Download the file to your computer now](/zsteinkamp/photodirs/blob/main/compose_example/docker-compose.yml) so that you can modify it for your needs.
+
 It will fetch pre-built containers from the Github Container Registry, so the ony thing you need to do is to change the path to your originals directory in the `volumes:` section near the top of the file.
 
 ```
