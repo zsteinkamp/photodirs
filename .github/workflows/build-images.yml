@@ -71,6 +71,7 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.nginx_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -92,6 +93,7 @@ jobs:
           target: prod
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.frontend_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -113,6 +115,7 @@ jobs:
           target: api
           push: true
           tags: ${{ steps.api_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.api_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -134,6 +137,7 @@ jobs:
           target: watcher
           push: true
           tags: ${{ steps.watcher_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.watcher_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -155,6 +159,7 @@ jobs:
           target: admin
           push: true
           tags: ${{ steps.admin_meta.outputs.tags }}
+          platforms: linux/${{ matrix.architecture }}
           labels: ${{ steps.admin_meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
