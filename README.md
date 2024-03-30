@@ -20,6 +20,8 @@ make
 
 This will begin an interactive configuration script then start the server!
 
+If you want to just run the pre-built containers, check out the [docker compose example](./compose_example/) directory.
+
 ## Design Goals
 
 Photodirs was made with the following design goals:
