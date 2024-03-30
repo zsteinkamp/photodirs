@@ -1,0 +1,58 @@
+name: photodirs-compose
+services:
+  nginx:
+    image: ghcr.io/zsteinkamp/photodirs-nginx
+    depends_on:
+      - frontend
+      - api
+      - admin
+    ports:
+      - '5333:3333'
+      - '6333:4333'
+    restart: unless-stopped
+    volumes:
+      - prod_cache:/cache:ro
+
+  frontend:
+    image: ghcr.io/zsteinkamp/photodirs-frontend
+    build:
+      context: ./frontend
+      target: prod
+    restart: unless-stopped
+
+  api:
+    image: ghcr.io/zsteinkamp/photodirs-api
+    build:
+      context: ./backend
+      target: api
+    restart: unless-stopped
+    volumes:
+      - prod_cache:/cache
+      - prod_albums:/albums:ro
+
+  watcher:
+    image: ghcr.io/zsteinkamp/photodirs-watcher
+    build:
+      context: ./backend
+      target: watcher
+    restart: unless-stopped
+    volumes:
+      - prod_cache:/cache
+      - prod_albums:/albums:ro
+  admin:
+    image: ghcr.io/zsteinkamp/photodirs-admin
+    build:
+      context: ./backend
+      target: admin
+    restart: unless-stopped
+    volumes:
+      - prod_cache:/cache
+      - prod_albums:/albums:rw
+volumes:
+  prod_cache:
+  prod_albums:
+    driver_opts:
+      type: none
+      ## CHANGE PATH BELOW FOR YOUR ORIGINALS DIRECTORY ##
+      device: '/Volumes/shared/photos/2024-02-18_tire-repair'
+      o: bind
