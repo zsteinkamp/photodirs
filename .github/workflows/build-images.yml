@@ -69,7 +69,7 @@ jobs:
         with:
           file: ./Dockerfile.nginx
           context: .
-            #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.nginx_meta.outputs.tags }}
           labels: ${{ steps.nginx_meta.outputs.labels }}
@@ -91,7 +91,7 @@ jobs:
         with:
           context: frontend/
           target: prod
-            #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.frontend_meta.outputs.tags }}
           labels: ${{ steps.frontend_meta.outputs.labels }}
@@ -113,7 +113,7 @@ jobs:
         with:
           context: backend/
           target: api
-            #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.api_meta.outputs.tags }}
           labels: ${{ steps.api_meta.outputs.labels }}
@@ -135,7 +135,7 @@ jobs:
         with:
           context: backend/
           target: watcher
-            #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.watcher_meta.outputs.tags }}
           labels: ${{ steps.watcher_meta.outputs.labels }}
@@ -157,7 +157,7 @@ jobs:
         with:
           context: backend/
           target: admin
-            #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.admin_meta.outputs.tags }}
           labels: ${{ steps.admin_meta.outputs.labels }}
