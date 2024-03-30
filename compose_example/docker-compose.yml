@@ -1,47 +1,47 @@
 name: photodirs-compose
 volumes:
-  photodirs_prod_cache:
-  photodirs_prod_albums:
+  prod_cache:
+  prod_albums:
     driver_opts:
       type: none
       ## CHANGE PATH BELOW FOR YOUR ORIGINALS DIRECTORY ##
       device: '/Volumes/shared/photos/2024-02-18_tire-repair'
       o: bind
 services:
-  photodirs-nginx:
+  nginx:
     image: ghcr.io/zsteinkamp/photodirs-nginx
     depends_on:
-      - photodirs-frontend
-      - photodirs-api
-      - photodirs-admin
+      - frontend
+      - api
+      - admin
     ports:
       - '5333:3333'
       - '6333:4333'
     restart: unless-stopped
     volumes:
-      - photodirs_prod_cache:/cache:ro
+      - prod_cache:/cache:ro
 
-  photodirs-frontend:
+  frontend:
     image: ghcr.io/zsteinkamp/photodirs-frontend
     restart: unless-stopped
 
-  photodirs-api:
+  api:
     image: ghcr.io/zsteinkamp/photodirs-api
     restart: unless-stopped
     volumes:
-      - photodirs_prod_cache:/cache
-      - photodirs_prod_albums:/albums:ro
+      - prod_cache:/cache
+      - prod_albums:/albums:ro
 
-  photodirs-watcher:
+  watcher:
     image: ghcr.io/zsteinkamp/photodirs-watcher
     restart: unless-stopped
     volumes:
-      - photodirs_prod_cache:/cache
-      - photodirs_prod_albums:/albums:ro
+      - prod_cache:/cache
+      - prod_albums:/albums:ro
 
-  photodirs-admin:
+  admin:
     image: ghcr.io/zsteinkamp/photodirs-admin
     restart: unless-stopped
     volumes:
-      - photodirs_prod_cache:/cache
-      - photodirs_prod_albums:/albums:rw
+      - prod_cache:/cache
+      - prod_albums:/albums:rw
