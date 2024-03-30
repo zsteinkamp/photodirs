@@ -1,4 +1,4 @@
-FROM node:18 AS dev
+FROM --platform=linux/amd64 node:18 AS dev
 
 # node packages
 WORKDIR /app/frontend
