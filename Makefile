@@ -14,7 +14,7 @@ ps: config ## Show running production containers
 	docker compose ps
 
 logs: config ## Tail production container logs
-	docker compose logs -f
+	docker compose logs -f --tail 100 -t
 
 shell: config ## Get a shell in the production 'watcher' container
 	docker compose exec watcher bash
