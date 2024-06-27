@@ -1,5 +1,5 @@
 {
-  "dockerComposeFile": "../../photodirs-dev/docker-compose.yml",
+  "dockerComposeFile": "../../dev/docker-compose.yml",
   "service": "frontend",
   "workspaceFolder": "/app/frontend",
   "shutdownAction": "none",

@@ -37,20 +37,20 @@ clean: config ## Remove docker-compose.yml and nginx.conf files
 ## dev below
 
 dev: ## Start dev containers
-	cd photodirs-dev && docker compose build && docker compose up -d --force-recreate --remove-orphans
+	cd dev && docker compose build && docker compose up -d --force-recreate --remove-orphans
 
 devlogs: ## Tail dev container logs
-	cd photodirs-dev && docker compose logs -f
+	cd dev && docker compose logs -f
 
 devps: ## Show running dev containers
-	cd photodirs-dev && docker compose ps
+	cd dev && docker compose ps
 
 devshell: ## Get a shell in the dev 'watcher' container
-	cd photodirs-dev && docker compose exec watcher bash
+	cd dev && docker compose exec watcher bash
 
 devdown: ## Stop and rm dev containers
-	cd photodirs-dev && docker compose down
+	cd dev && docker compose down
 
 devrmvol: ## Reset the dev originals docker volume
-	cd photodirs-dev && docker volume rm photodirs-dev_dev_cache
+	cd dev && docker volume rm photodirs-dev_dev_cache
 
