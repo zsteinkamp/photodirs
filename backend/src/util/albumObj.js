@@ -151,7 +151,11 @@ export const getExtendedAlbumObj = async extAlbumObj => {
   )
   //
   fileResult.sort((a, b) => {
-    return a.date < b.date ? -1 : 1
+    if (extAlbumObj.sort && extAlbumObj.sort === 'fname') {
+      return a.fileName < b.fileName ? -1 : 1
+    } else {
+      return a.date < b.date ? -1 : 1
+    }
   })
   extAlbumObj.files = fileResult
 
