@@ -233,7 +233,7 @@
 .PhotoElement .imageContainer .carouselItem img {
   outline-width: 0;
   object-fit: contain;
-  border: 2rem solid var(--filelist-link-background-color);
+  border: 0rem solid var(--filelist-link-background-color);
   border-radius: 1rem;
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
   transition: background-color 0.2s;
