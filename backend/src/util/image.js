@@ -33,9 +33,13 @@ export const getCachedImagePath = async (filePath, resizeOptions) => {
   )
 
   let cacheStat = {}
+  let origStat = {}
+
+  //logger.info('FILE PATH: ' + filePath)
 
   try {
     cacheStat = await fsp.stat(cachePath)
+    origStat = await fsp.stat(filePath)
   } catch (e) {
     if (e.code !== 'ENOENT') {
       logger.error('CACHESTAT returned error', { e })
@@ -52,10 +56,14 @@ export const getCachedImagePath = async (filePath, resizeOptions) => {
   // Generate the file if it doesn't exist or has a zero length.
   // Zero length files can happen due to a bug in the pre-generator
   // that is a TODO.
-  if (typeof cacheStat.size === 'undefined' || cacheStat.size === 0) {
-    // Now cache the intermediate size
+  if (
+    typeof cacheStat.size === 'undefined' ||
+    cacheStat.size === 0 ||
+    cacheStat.mtime < origStat.mtime // orig file updated
+  ) {
+    // Now generate and store the intermediate size
     await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 })
-    logger.debug('GET_CACHED_IMAGE_PATH', {
+    logger.debug('GEN_AND_CACHE_IMAGE', {
       filePath,
       cachePath,
       resizeOptions,
