@@ -230,6 +230,7 @@ export default function PhotoElement({ data }) {
     }
   }
 
+  const hashParam = file.hash ? '&hash=' + file.hash : ''
   const tiles = albumFiles.map((file, i) => {
     return (
       <div
@@ -252,8 +253,8 @@ export default function PhotoElement({ data }) {
           ) : (
             <img
               draggable='false'
-              src={`${file.photoPath}?size=1600x1600`}
-              srcSet={`${file.photoPath}?size=400x400 400w, ${file.photoPath}?size=800x400 800w, ${file.photoPath}?size=1600x1600 1600w`}
+              src={`${file.photoPath}?size=1600x1600${hashParam}`}
+              srcSet={`${file.photoPath}?size=400x400${hashParam} 400w, ${file.photoPath}?size=800x800${hashParam} 800w, ${file.photoPath}?size=1600x1600${hashParam} 1600w`}
               alt={file.title}
               loading='lazy'
             />
@@ -286,6 +287,7 @@ export default function PhotoElement({ data }) {
   }
 
   const thumbnails = albumFiles.map((file, i) => {
+    const hashParam = file.hash ? '&hash=' + file.hash : ''
     return (
       <Link
         ref={(el) => (thumbRefs.current[i] = el)}
@@ -295,7 +297,7 @@ export default function PhotoElement({ data }) {
       >
         <img
           draggable='false'
-          src={`${file.photoPath}?size=400x400`}
+          src={`${file.photoPath}?size=400x400${hashParam}`}
           alt={file.title}
           loading='lazy'
         />

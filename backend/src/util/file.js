@@ -7,7 +7,29 @@ import { join } from 'path'
 import { LOGGER, ALBUMS_ROOT } from '../constants.js'
 import { isSupportedImageFile } from './fileTypes.js'
 
+import * as fs from 'fs'
+import * as crypto from 'crypto'
+
 const logger = LOGGER
+
+export async function getFileHash(filePath) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256') // You can use 'md5', 'sha1', etc.
+    const fileStream = fs.createReadStream(filePath)
+
+    fileStream.on('data', data => {
+      hash.update(data)
+    })
+
+    fileStream.on('end', () => {
+      resolve(hash.digest('hex')) // Resolve the promise with the hash
+    })
+
+    fileStream.on('error', err => {
+      reject(`Error reading file: ${err.message}`) // Reject the promise on error
+    })
+  })
+}
 
 export async function globPromise(pattern) {
   return new Promise((resolve, reject) => {

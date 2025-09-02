@@ -14,7 +14,11 @@ export default function FileList(props) {
         <div key={file.apiPath}>
           <Link title={file.title} to={file.uriPath}>
             <img
-              src={file.photoPath + '?size=300x300&crop'}
+              src={
+                file.photoPath +
+                '?size=300x300&crop' +
+                (file.hash ? '&hash=' + file.hash : '')
+              }
               alt={file.name}
               loading='lazy'
             />

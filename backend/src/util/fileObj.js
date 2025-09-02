@@ -75,6 +75,11 @@ export const getFileObj = async (albumPath, fileName) => {
   const exifDate = exifUtils.getExifDate(exifObj)
   const fileExif = exifUtils.getExifDetailProps(exifObj)
   const isVideo = fileTypes.isVideo(fileName)
+  const fileHash = (await fileUtils.getFileHash(filePath))
+    .toString()
+    .substring(0, 7)
+
+  //logger.info('fileHash!', { fileHash, filePath })
 
   // Get YML Meta if there
   const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML)
@@ -87,6 +92,7 @@ export const getFileObj = async (albumPath, fileName) => {
 
   const fileObj = {
     type: isVideo ? C.TYPE_VIDEO : C.TYPE_PHOTO,
+    hash: fileHash,
     title: fileTitle,
     date: dates.meta || dates.exif || dates.ctime,
     dates: dates,
