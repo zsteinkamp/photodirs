@@ -97,7 +97,8 @@ then
 EOF
 fi
 cat << EOF >> docker-compose.yml
-    restart: unless-stopped
+    restart: always
+    stop_signal: SIGQUIT
     volumes:
       - prod_cache:/cache:ro
 
@@ -105,13 +106,15 @@ cat << EOF >> docker-compose.yml
     build:
       context: ./frontend
       target: prod
-    restart: unless-stopped
+    restart: always
+    stop_signal: SIGKILL
 
   api:
     build:
       context: ./backend
       target: api
-    restart: unless-stopped
+    restart: always
+    stop_signal: SIGKILL
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:ro
@@ -120,7 +123,8 @@ cat << EOF >> docker-compose.yml
     build:
       context: ./backend
       target: watcher
-    restart: unless-stopped
+    restart: always
+    stop_signal: SIGKILL
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:ro
@@ -134,7 +138,8 @@ then
     build:
       context: ./backend
       target: admin
-    restart: unless-stopped
+    restart: always
+    stop_signal: SIGKILL
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:rw
