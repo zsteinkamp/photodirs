@@ -8,6 +8,10 @@ import Markdown from 'react-markdown'
 export default function AlbumList(props) {
   let albumList = null
   if (props.albums && props.albums.length > 0) {
+    if (props.sortAlbums && props.sortAlbums === 'oldest') {
+      props.albums.sort((a, b) => (a.date < b.date ? -1 : 1))
+    }
+    console.log('AlbumList', props.albums)
     const albumListItems = props.albums.map((album) => {
       // always make description an array to simplify impl
       if (typeof album.description === 'string' && album.description) {

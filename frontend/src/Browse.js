@@ -192,7 +192,7 @@ export default function Browse() {
               className=''
             />
           )}
-          <AlbumList albums={filteredData} />
+          <AlbumList albums={filteredData} sortAlbums={data.sortAlbums} />
           {isAdmin ? (
             <AdminFileList
               files={data.files}
