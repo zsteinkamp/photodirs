@@ -1,8 +1,4 @@
 .ThemeSwitcher {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  transform: translateY(0.1rem);
   border: none;
   background: transparent;
   cursor: pointer;

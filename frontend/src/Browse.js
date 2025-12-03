@@ -15,6 +15,7 @@ import PhotoElement from './PhotoElement'
 import TimeSlider from './TimeSlider'
 import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
+import ThemeSwitcher from './ThemeSwitcher'
 
 export default function Browse() {
   const isAdmin = useContext(AdminContext)
@@ -241,6 +242,9 @@ export default function Browse() {
           >
             Photodirs on GitHub
           </a>
+        </div>
+        <div>
+          <ThemeSwitcher />
         </div>
         <div>
           by <a href='https://steinkamp.us/'>Zack Steinkamp</a>
