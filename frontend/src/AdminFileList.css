@@ -23,6 +23,7 @@
 }
 
 .AdminFileList .colImage {
+  position: relative;
   margin: 0 2rem;
 }
 .AdminFileList .InlineEdit {
