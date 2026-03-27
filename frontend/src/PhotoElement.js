@@ -37,7 +37,7 @@ export default function PhotoElement({ data }) {
   const thumbRefs = useRef([])
 
   const returnToAlbum = () => {
-    navigate(parentPath)
+    navigate(parentPath, { preventScrollReset: true })
   }
   const goToPrevPhoto = () => {
     scrollCarouselTo(currFileIdx - 1)
@@ -230,8 +230,8 @@ export default function PhotoElement({ data }) {
     }
   }
 
-  const hashParam = file.hash ? '&hash=' + file.hash : ''
   const tiles = albumFiles.map((file, i) => {
+    const hashParam = file.hash ? '&hash=' + file.hash : ''
     return (
       <div
         ref={(el) => (tileRefs.current[i] = el)}
@@ -377,7 +377,7 @@ export default function PhotoElement({ data }) {
       <div ref={thumbsRef} className='thumbContainer'>
         {thumbnails}
       </div>
-      <Link title='Return to Album' className='closeBtn' to={parentPath}>
+      <Link title='Return to Album' className='closeBtn' to={parentPath} preventScrollReset>
         <SVGClose />
       </Link>
       <Link

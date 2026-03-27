@@ -3,7 +3,7 @@ import './Browse.css'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
-import { useContext, useState, useEffect } from 'react'
+import { useContext, useRef, useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import Markdown from 'react-markdown'
 
@@ -32,6 +32,22 @@ export default function Browse() {
 
   const navigate = useNavigate()
 
+  // Save album scroll positions so we can restore when returning from a photo
+  const albumScrollPositions = useRef({})
+
+  // Save scroll position on click (capture phase, before navigation resets it)
+  const browseRef = useRef(null)
+  useEffect(() => {
+    if (!data || data.type !== 'album') return
+    const el = browseRef.current
+    if (!el) return
+    const onClick = () => {
+      albumScrollPositions.current[data.path] = window.scrollY
+    }
+    el.addEventListener('click', onClick, true)
+    return () => el.removeEventListener('click', onClick, true)
+  }, [data])
+
   const location = useLocation()
   useEffect(() => {
     setApiPath(makeApiPath(location.pathname))
@@ -43,7 +59,7 @@ export default function Browse() {
   const goToParentAlbum = () => {
     if (data && data.breadcrumb && data.breadcrumb.length > 1) {
       // not at root
-      navigate(data.breadcrumb[data.breadcrumb.length - 2].path)
+      navigate(data.breadcrumb[data.breadcrumb.length - 2].path, { preventScrollReset: true })
     }
   }
 
@@ -108,6 +124,18 @@ export default function Browse() {
     setAdminApiPath(apiPath.replace(/^\/api/, '/api/admin'))
     getData()
   }, [apiPath])
+
+  // Restore scroll position when returning to an album from a photo
+  useEffect(() => {
+    if (!loading && data && data.type === 'album') {
+      const savedPosition = albumScrollPositions.current[data.path]
+      if (savedPosition !== undefined) {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, savedPosition)
+        })
+      }
+    }
+  }, [loading, data])
 
   /*
    * Something to put in breadcrumb if there is an error fetching
@@ -217,7 +245,7 @@ export default function Browse() {
    * Common layout for album/photo lists, loading, error
    */
   return (
-    <div className='Browse'>
+    <div className='Browse' ref={browseRef}>
       <header>
         <div className='logo'>
           <Link to='/'>
