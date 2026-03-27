@@ -4,7 +4,8 @@
   z-index: 1;
   top: 0;
   background: var(--main-bg-color);
-  padding-top: 0rem;
+  padding: 1rem;
+  margin: -1rem;
 }
 .TimeSlider .tsHeader {
   /* grid grid-cols-2 */
