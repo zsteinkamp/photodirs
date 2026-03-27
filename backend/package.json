@@ -6,16 +6,18 @@
   "type": "module",
   "scripts": {
     "lint": "npx eslint src/",
-    "start:api": "node src/api.js",
-    "start:watcher": "node src/watcher.js",
-    "start:admin": "node src/admin.js",
+    "typecheck": "npx tsc --noEmit",
+    "start:api": "node --loader ts-node/esm src/api.ts",
+    "start:watcher": "node --loader ts-node/esm src/watcher.ts",
+    "start:admin": "node --loader ts-node/esm src/admin.ts",
     "test": "mocha",
-    "watch:api": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:api'",
-    "watch:watcher": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:watcher'",
-    "watch:admin": "nodemon --watch src --watch .eslintrc.js --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:admin'"
+    "watch:api": "nodemon --watch src -e ts --watch .eslintrc.cjs --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:api'",
+    "watch:watcher": "nodemon --watch src -e ts --watch .eslintrc.cjs --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:watcher'",
+    "watch:admin": "nodemon --watch src -e ts --watch .eslintrc.cjs --watch package.json --exec 'clear && npm run lint && npm run test && npm run start:admin'"
   },
   "mocha": {
-    "spec": "src/**/*.spec.js"
+    "spec": "src/**/*.spec.ts",
+    "loader": "ts-node/esm"
   },
   "author": "Zack Steinkamp",
   "license": "ISC",
@@ -35,6 +37,9 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
+    "@types/glob": "^8.1.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/mocha": "^10.0.10",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "eslint": "^8.56.0",

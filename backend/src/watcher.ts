@@ -1,5 +1,3 @@
-'use strict'
-
 import { logger as _logger } from 'express-winston'
 import express from 'express'
 
@@ -7,6 +5,12 @@ import { scanDirectory } from './scanDir.js'
 import { LOGGER, WATCHER_PATH_CHECK_PORT } from './constants.js'
 
 const logger = LOGGER
+
+interface WatcherJob {
+  path: string
+  runAt?: number
+  runAtEnd?: () => Promise<void>
+}
 
 //
 // Set up Express server for path notifier HTTP endpoint
@@ -22,7 +26,6 @@ app.use(
 app.get(new RegExp('^/'), async (req, res) => {
   logger.info('WATCHER PATH NOTIFY GOT', { path: req.path })
   topqueueJob({
-    // runAt: now
     path: req.path,
   })
   return res.status(200).send('OK')
@@ -36,28 +39,28 @@ app.listen(WATCHER_PATH_CHECK_PORT, () => {
 //
 // Work Queue and associated methods
 //
-const workQueue = []
+const workQueue: WatcherJob[] = []
 
-const topqueueJob = job => {
+const topqueueJob = (job: WatcherJob) => {
   return workQueue.unshift(job)
 }
-const enqueueJob = job => {
+const enqueueJob = (job: WatcherJob) => {
   return workQueue.push(job)
 }
 
-const dequeueJob = () => {
+const dequeueJob = (): WatcherJob | undefined => {
   return workQueue.shift()
 }
 
-const enqueuePeriodicScan = () => {
+const enqueuePeriodicScan = async () => {
   enqueueJob({
-    runAt: Date.now() + 60 * 1000, // 60 seconds
+    runAt: Date.now() + 60 * 1000,
     path: '/',
     runAtEnd: enqueuePeriodicScan,
   })
 }
 
-const hasJobToDo = () => {
+const hasJobToDo = (): boolean => {
   if (workQueue.length === 0) {
     return false
   }
@@ -71,7 +74,7 @@ const hasJobToDo = () => {
   return false
 }
 
-const runJob = async job => {
+const runJob = async (job: WatcherJob) => {
   scanDirectory(job.path)
   if (job.runAtEnd) {
     await job.runAtEnd()
@@ -83,7 +86,7 @@ setInterval(async () => {
     'Polling Queue len=' + workQueue.length + ' workToDo?=' + hasJobToDo(),
   )
   if (hasJobToDo()) {
-    const job = dequeueJob()
+    const job = dequeueJob()!
     logger.debug('Running Job:', job)
     await runJob(job)
     logger.debug('Completed Job:', job)
@@ -95,7 +98,6 @@ setInterval(async () => {
 //
 ;(async () => {
   enqueueJob({
-    // runAt: now
     path: '/',
     runAtEnd: enqueuePeriodicScan,
   })

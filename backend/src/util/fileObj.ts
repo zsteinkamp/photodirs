@@ -1,5 +1,3 @@
-'use strict'
-
 import fsp from 'fs/promises'
 import path from 'path'
 import dayjs from 'dayjs'
@@ -18,7 +16,10 @@ const logger = C.LOGGER
 /*
  * returns the standard File object
  */
-export const getFileObj = async (albumPath, fileName) => {
+export const getFileObj = async (
+  albumPath: string,
+  fileName: string,
+): Promise<Record<string, unknown>> => {
   logger.debug('getFileObj', { albumPath, fileName })
   const fileObjMetaFname = cacheUtils.getFileObjMetadataFname(
     albumPath,
@@ -32,7 +33,7 @@ export const getFileObj = async (albumPath, fileName) => {
     logger.debug('GET_FILE_OBJ:EXISTS', { fileObjMetaFname })
     const metaStat = await fsp.stat(fileObjMetaFname)
 
-    let ymlStat = null
+    let ymlStat: { mtime: Date } | null = null
     if (await fileUtils.fileExists(fileYML)) {
       ymlStat = await fsp.stat(fileYML)
     }
@@ -46,7 +47,6 @@ export const getFileObj = async (albumPath, fileName) => {
       useCache,
       fileName,
     })
-    // check to see if the cached metadata file is not older than the album file it relates to
     if (useCache) {
       logger.debug('RETURN CACHE', { fileObjMetaFname })
       try {
@@ -79,18 +79,16 @@ export const getFileObj = async (albumPath, fileName) => {
     .toString()
     .substring(0, 7)
 
-  //logger.info('fileHash!', { fileHash, filePath })
-
   // Get YML Meta if there
   const fileMeta = await metaUtils.fetchAndMergeMeta({}, fileYML)
 
   const dates = {
     exif: exifDate,
     ctime: fileStat.ctime,
-    meta: fileMeta.date,
+    meta: fileMeta.date as string | undefined,
   }
 
-  const fileObj = {
+  const fileObj: Record<string, unknown> = {
     type: isVideo ? C.TYPE_VIDEO : C.TYPE_PHOTO,
     hash: fileHash,
     title: fileTitle,

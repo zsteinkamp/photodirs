@@ -1,5 +1,3 @@
-'use strict'
-
 import fs from 'fs'
 import { join } from 'path'
 import yaml from 'js-yaml'
@@ -9,9 +7,11 @@ import * as C from './constants.js'
 
 export const SUCCESS = 200
 
-const updateAlbumYML = (path, payload) => {
-  //console.log('UPDATE ALBUM YML', { path, payload })
-  let lstat = null
+const updateAlbumYML = (
+  path: string,
+  payload: Record<string, unknown>,
+): void => {
+  let lstat: fs.Stats | null = null
   const albumYmlFname = join(C.ALBUMS_ROOT, path, 'album.yml')
 
   try {
@@ -20,17 +20,16 @@ const updateAlbumYML = (path, payload) => {
     // no problemo
   }
 
-  let albumYmlData = {}
+  let albumYmlData: Record<string, unknown> = {}
   if (lstat) {
-    // file exists, so read in the YAML
-    //console.log('FIlE EXISTS ' + albumYmlFname)
-    albumYmlData = yaml.load(fs.readFileSync(albumYmlFname, 'utf8'))
+    albumYmlData = yaml.load(fs.readFileSync(albumYmlFname, 'utf8')) as Record<
+      string,
+      unknown
+    >
   }
 
-  // override values from the YML with the payload
   Object.assign(albumYmlData, payload)
 
-  // write out the metadata to the album.yml file
   fs.writeFile(albumYmlFname, yaml.dump(albumYmlData), err => {
     if (err) {
       console.log(err)
@@ -38,9 +37,11 @@ const updateAlbumYML = (path, payload) => {
   })
 }
 
-const updateMediaProperty = async (path, payload) => {
+const updateMediaProperty = async (
+  path: string,
+  payload: Record<string, unknown>,
+): Promise<void> => {
   const fsPath = join(C.ALBUMS_ROOT, path)
-  //console.log('UPDATE MEDIA PROPERTY', { fsPath, payload })
 
   const isVideo = fileTypes.isVideo(fsPath)
   const isTitle = !!(payload && payload.title)
@@ -69,18 +70,20 @@ const updateMediaProperty = async (path, payload) => {
   await ep.close()
 }
 
-export const adminCall = async (path, reqBody) => {
-  let lstat = null
+export const adminCall = async (
+  path: string,
+  reqBody: Record<string, unknown>,
+): Promise<[number, Record<string, unknown>]> => {
+  let lstat: fs.Stats | null = null
 
   try {
-    //console.warn('HEREZZZ', { path, fspath: join(C.ALBUMS_ROOT, path) })
     lstat = fs.lstatSync(join(C.ALBUMS_ROOT, path))
   } catch (e) {
     console.warn('Unknown path', { path })
     return [404, { msg: 'Not Found', path }]
   }
 
-  if (lstat.isDirectory()) {
+  if (lstat!.isDirectory()) {
     await updateAlbumYML(path, reqBody)
   } else {
     await updateMediaProperty(path, reqBody)

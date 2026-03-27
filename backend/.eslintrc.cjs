@@ -1,17 +1,15 @@
 module.exports = {
   extends: [
-    //"eslint:recommended",
-    //"plugin:@typescript-eslint/recommended",
+    'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    //'prettier',
   ],
+  parser: '@typescript-eslint/parser',
   ignorePatterns: ['**/node_modules/', '/dist/', '/lib/'],
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
   },
   rules: {
-    /*
     '@typescript-eslint/no-unused-vars': [
       'warn',
       {
@@ -20,9 +18,8 @@ module.exports = {
         caughtErrorsIgnorePattern: '^_',
       },
     ],
-    */
     'prettier/prettier': 'error',
   },
-  plugins: ['prettier'],
+  plugins: ['@typescript-eslint', 'prettier'],
   root: true,
 }

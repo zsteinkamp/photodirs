@@ -1,5 +1,3 @@
-'use strict'
-
 import { rm } from 'fs/promises'
 import { join, dirname } from 'path'
 
@@ -10,36 +8,42 @@ import { globPromise } from './file.js'
 
 const logger = LOGGER
 
-export function getCachedImageSizes(resizeOptions) {
-  const cacheWidth = 200 * Math.ceil(resizeOptions.width / 200)
-  const cacheHeight = 200 * Math.ceil(resizeOptions.height / 200)
+export function getCachedImageSizes(resizeOptions: {
+  width?: number
+  height?: number
+}): [number, number] {
+  const cacheWidth = 200 * Math.ceil((resizeOptions.width || 200) / 200)
+  const cacheHeight = 200 * Math.ceil((resizeOptions.height || 200) / 200)
   return [cacheWidth, cacheHeight]
 }
 
-export function makeResizeCachePath(filePath, height, width) {
+export function makeResizeCachePath(
+  filePath: string,
+  height: number,
+  width: number,
+): string {
   if (!filePath.startsWith(CACHE_ROOT)) {
-    // If this was a raw conversion, the filePath with already have the
-    // CACHE_ROOT, so we need to protect against making it
-    // `/cache/cache/...`.
     filePath = join(CACHE_ROOT, filePath)
   }
-  // e.g. /cache/albums/album_hawaii/hawaii.CR2^1200x800.jpg
   return `${filePath}^${width}x${height}.${getOutputTypeForFile(filePath)}`
 }
 
-export function getFileObjMetadataFname(albumPath, fileName) {
+export function getFileObjMetadataFname(
+  albumPath: string,
+  fileName: string,
+): string {
   return join(CACHE_ROOT, 'albums', albumPath, fileName + '.json')
 }
 
-export function cachePathForVideo(filePath) {
+export function cachePathForVideo(filePath: string): string {
   return join(CACHE_ROOT, filePath + '^transcoded.mp4')
 }
 
-export function cachePathForVideoThumbnail(filePath) {
+export function cachePathForVideoThumbnail(filePath: string): string {
   return join(CACHE_ROOT, filePath + '^thumb.jpg')
 }
 
-export async function cleanUpCacheFor(albumFilePath) {
+export async function cleanUpCacheFor(albumFilePath: string): Promise<void> {
   const files = await globPromise(
     join(CACHE_ROOT, 'albums', `${albumFilePath}*`),
   )

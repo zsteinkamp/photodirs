@@ -1,5 +1,3 @@
-'use strict'
-
 import { mkdir } from 'fs/promises'
 import { dirname } from 'path'
 import { promisify } from 'node:util'
@@ -16,37 +14,32 @@ import { fileExists, isFileOlderThanAny } from './file.js'
  * transcoded one is in the cache, or transcode and cache it. In either case,
  * return the cache path to the transcoded file in the cache.
  */
-export const getCachedVideoPath = async filePath => {
+export const getCachedVideoPath = async (filePath: string): Promise<string> => {
   const cachePath = cachePathForVideo(filePath)
   logger.debug('getCachedVideoPath', { filePath, cachePath })
-  // if the file at cachepath is NOT older than the filePath, then early return the cachepath
   if (
     (await fileExists(cachePath)) &&
     !(await isFileOlderThanAny(cachePath, [filePath]))
   ) {
-    // Return existing jpg
     return cachePath
   }
 
   logger.info('TRANSCODING START', { filePath, cachePath })
 
-  // Gotta give the cached file a home. Not worth checking for existence...
   await mkdir(dirname(cachePath), { recursive: true, mode: 755 })
 
-  // Need to generate JPEG version by asking ffmpeg to extract a thumbnail from the video into the cache
   await pExecFile('/usr/bin/ffmpeg', [
     '-i',
-    filePath, // video file input
-    '-y', // overwrite
+    filePath,
+    '-y',
     '-crf',
-    '30', // Decent quality but great on bandwidth
+    '30',
     '-vf',
-    'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2', // max 1080p and even dimensions
-    cachePath, // and write to the cachePath
+    'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2',
+    cachePath,
   ])
 
   logger.info('TRANSCODING END', { filePath, cachePath })
 
-  // Return the path to the cached JPEG
   return cachePath
 }

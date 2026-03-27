@@ -1,5 +1,3 @@
-'use strict'
-
 export const ALBUMS_ROOT = '/albums'
 export const API_BASE = '/api'
 export const CACHE_ROOT = '/cache'
@@ -32,16 +30,25 @@ export const EXIF_DETAIL_PROPERTIES = [
   'Orientation',
   'WhiteBalance',
 ]
-import * as logger from './logger.js'
-export const LOGGER = logger.default
+import logger from './logger.js'
+export const LOGGER = logger
 export const MAC_FORBIDDEN_FILES_REGEX =
   /(\.fseventsd|\.DocumentRevisions-V100|\.TemporaryItems|\.Trashes)/
 export const MAX_DIMENSION = 3000
-export const MAX_PARALLEL_JOBS = process.env['MAX_PARALLEL_JOBS'] || 4
+export const MAX_PARALLEL_JOBS = parseInt(
+  process.env['MAX_PARALLEL_JOBS'] || '4',
+)
 export const MIN_DIMENSION = 16
 export const PHOTO_URL_BASE = '/photo'
 export const VIDEO_URL_BASE = '/video'
-export const SIZE_PRESETS = {
+
+export interface SizePreset {
+  pregenerate?: boolean
+  size: string
+  crop?: boolean
+}
+
+export const SIZE_PRESETS: Record<string, SizePreset> = {
   // default size
   null: { pregenerate: true, size: '1600x1600', crop: false },
   // define your shortcuts here

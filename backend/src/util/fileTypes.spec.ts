@@ -1,5 +1,3 @@
-'use strict'
-
 import { equal } from 'assert'
 import { getOutputTypeForFile } from './fileTypes.js'
 

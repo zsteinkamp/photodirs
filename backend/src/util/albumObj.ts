@@ -1,5 +1,3 @@
-'use strict'
-
 import { readdir, readFile, mkdir, writeFile } from 'fs/promises'
 import { join, dirname, basename } from 'path'
 
@@ -25,12 +23,11 @@ const logger = LOGGER
 
 /*
  * Given a reqPath (i.e. the path root is the album root), return an array of
- * breadcrumb nodes, from the root to the current node.  Nodes have a title
- * and path.
+ * breadcrumb nodes, from the root to the current node.
  */
-export const getBreadcrumbForPath = async reqPath => {
-  const pushPaths = []
-  let pathParts = []
+export const getBreadcrumbForPath = async (reqPath: string) => {
+  const pushPaths: string[] = []
+  let pathParts: string[]
   if (reqPath === '/') {
     pathParts = ['']
   } else {
@@ -41,9 +38,9 @@ export const getBreadcrumbForPath = async reqPath => {
     const currPath = pushPaths.join('/')
     const albumObj = await getAlbumObj(currPath)
     const breadcrumbNode = {
-      title: albumObj.title || token,
-      path: albumObj.uriPath,
-      apiPath: albumObj.apiPath,
+      title: (albumObj.title as string) || token,
+      path: albumObj.uriPath as string,
+      apiPath: albumObj.apiPath as string,
     }
     return breadcrumbNode
   })
@@ -54,112 +51,114 @@ export const getBreadcrumbForPath = async reqPath => {
 /*
  * returns the extended album object
  */
-export const getExtendedAlbumObj = async extAlbumObj => {
+export const getExtendedAlbumObj = async (
+  extAlbumObj: Record<string, unknown>,
+): Promise<Record<string, unknown>> => {
   logger.debug('getExtendedAlbumObj', { path: extAlbumObj.path })
   const extAlbumFname = join(
     CACHE_ROOT,
     'albums',
-    extAlbumObj.path,
+    extAlbumObj.path as string,
     'album.extended.json',
   )
   if (await fileExists(extAlbumFname)) {
-    let subdirs
+    let subdirs: import('fs').Dirent[]
     try {
       subdirs = (
-        await readdir(join(ALBUMS_ROOT, extAlbumObj.path), {
+        await readdir(join(ALBUMS_ROOT, extAlbumObj.path as string), {
           withFileTypes: true,
         })
       ).filter(
         dirEnt =>
           dirEnt.isDirectory() && !dirEnt.name.match(MAC_FORBIDDEN_FILES_REGEX),
       )
-    } catch (e) {
-      if (e.code === 'PERM' || e.code === 'EACCES') {
-        logger.info('Permission Denied', { error: e })
+    } catch (e: unknown) {
+      const err = e as NodeJS.ErrnoException
+      if (err.code === 'PERM' || err.code === 'EACCES') {
+        logger.info('Permission Denied', { error: err })
       } else {
-        logger.error('readdir error', e)
+        logger.error('readdir error', e as Error)
         throw e
       }
+      subdirs = []
     }
     const subdirAlbumJson = subdirs.map(elem =>
-      join(CACHE_ROOT, 'albums', extAlbumObj.path, elem.name, 'album.json'),
+      join(
+        CACHE_ROOT,
+        'albums',
+        extAlbumObj.path as string,
+        elem.name,
+        'album.json',
+      ),
     )
-    // make sure to check the local `album.json` too
     subdirAlbumJson.push(
-      join(CACHE_ROOT, 'albums', extAlbumObj.path, 'album.json'),
+      join(CACHE_ROOT, 'albums', extAlbumObj.path as string, 'album.json'),
     )
 
-    // return cached if our metadata file is not older than the directory
-    // it's in and not older than any album.json files in subdirectories
     if (!(await isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
       logger.debug('RETURN CACHE', extAlbumFname)
       return JSON.parse(await readFile(extAlbumFname, { encoding: 'utf8' }))
     }
   }
-  const dirs = []
-  const files = []
-  const albumPath = join(ALBUMS_ROOT, extAlbumObj.path)
+  const dirs: import('fs').Dirent[] = []
+  const files: import('fs').Dirent[] = []
+  const albumPath = join(ALBUMS_ROOT, extAlbumObj.path as string)
   try {
     ;(await readdir(albumPath, { withFileTypes: true }))
       .filter(dirEnt => !dirEnt.name.match(MAC_FORBIDDEN_FILES_REGEX))
-      .forEach(async dirEnt => {
+      .forEach(dirEnt => {
         logger.debug('GET_EXT_ALB_OBJ:SUBDIRS', { dirEnt })
         if (dirEnt.isDirectory()) {
           dirs.push(dirEnt)
-          //// ensure the directory isn't empty
-          //const supportedFiles = await fileUtils.getSupportedFiles(path.join(extAlbumObj.path, dirEnt.name));
-          //logger.debug('GET_EXT_ALB_OBJ:SUPPORTED_FILES', { path: extAlbumObj.path, supportedFiles });
-          //if (supportedFiles.length > 0) {
-          //  dirs.push(dirEnt);
-          //}
         } else if (dirEnt.isFile()) {
           if (isSupportedImageFile(dirEnt.name)) {
             files.push(dirEnt)
           }
         }
       })
-  } catch (e) {
-    if (e.code === 'PERM' || e.code === 'EACCES') {
-      logger.info('Permission Denied', { error: e })
+  } catch (e: unknown) {
+    const err = e as NodeJS.ErrnoException
+    if (err.code === 'PERM' || err.code === 'EACCES') {
+      logger.info('Permission Denied', { error: err })
     } else {
-      logger.error('readdir error2', e)
+      logger.error('readdir error2', e as Error)
       throw e
     }
   }
 
-  extAlbumObj.breadcrumb = await getBreadcrumbForPath(extAlbumObj.path)
+  extAlbumObj.breadcrumb = await getBreadcrumbForPath(
+    extAlbumObj.path as string,
+  )
 
-  // TODO: Pagination / caching this metadata
   const albumResult = await promiseAllInBatches(
     dirs,
-    dir => getAlbumObj(join('/', extAlbumObj.path, dir.name)),
+    dir => getAlbumObj(join('/', extAlbumObj.path as string, dir.name)),
     MAX_PARALLEL_JOBS,
   )
 
-  // Sort albums in descending date order
   albumResult.sort((a, b) => {
-    // b-a for descending order
-    return new Date(b.date) - new Date(a.date)
+    return (
+      new Date(b.date as string).getTime() -
+      new Date(a.date as string).getTime()
+    )
   })
   extAlbumObj.albums = albumResult
 
-  // TODO: metadata caching and/or pagination
   const fileResult = await promiseAllInBatches(
     files,
-    file => getFileObj(extAlbumObj.path, file.name),
+    file => getFileObj(extAlbumObj.path as string, file.name),
     MAX_PARALLEL_JOBS,
   )
-  //
+
   fileResult.sort((a, b) => {
     if (extAlbumObj.sort && extAlbumObj.sort === 'fname') {
-      return a.fileName < b.fileName ? -1 : 1
+      return (a.fileName as string) < (b.fileName as string) ? -1 : 1
     } else {
-      return a.date < b.date ? -1 : 1
+      return (a.date as string) < (b.date as string) ? -1 : 1
     }
   })
   extAlbumObj.files = fileResult
 
-  // write out the file for next time
   await mkdir(dirname(extAlbumFname), { recursive: true, mode: 755 })
   await writeFile(extAlbumFname, JSON.stringify(extAlbumObj))
   logger.info('GET_EXTENDED_ALBUM_OBJ - Wrote cache file', { extAlbumFname })
@@ -170,27 +169,25 @@ export const getExtendedAlbumObj = async extAlbumObj => {
 /*
  * returns the standard album object
  */
-export const getAlbumObj = async dirName => {
+export const getAlbumObj = async (
+  dirName: string,
+): Promise<Record<string, unknown>> => {
   logger.debug('getAlbumObj', { dirName })
   const stdAlbumFname = join(CACHE_ROOT, 'albums', dirName, 'album.json')
   if (await fileExists(stdAlbumFname)) {
-    // get the path in the `/cache` directory of the supported file metadatas
     const supportedFilesBare = await getSupportedFiles(dirName)
     const fileObjFnames = supportedFilesBare.map(fName =>
       getFileObjMetadataFname(dirName, fName),
     )
-    // make sure we also compare with the album.yml file in the album dir
     fileObjFnames.push(join(ALBUMS_ROOT, dirName, 'album.yml'))
     logger.debug('GET_ALBUM_OBJ', { fileObjFnames })
 
-    // return the cached version only if the album metadata is not older than `.` or any supported file metadatas in that directory
     if (!(await isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
       logger.debug('RETURN CACHE', stdAlbumFname)
       return JSON.parse(await readFile(stdAlbumFname, { encoding: 'utf8' }))
     }
   }
 
-  // TODO: other methods of inferring date? - dir mtime, oldest file, newest file
   const uriPath = dirName.split('/').map(encodeURIComponent).join('/')
   const albumTitle = basename(dirName)
     .replace(/^\//, '')
@@ -198,7 +195,7 @@ export const getAlbumObj = async dirName => {
     .replace(/^\d{4}-\d{2}-\d{2}/, '')
     .trim()
 
-  let albumObj = {
+  let albumObj: Record<string, unknown> = {
     type: TYPE_ALBUM,
     title: albumTitle,
     path: join('/', dirName),
@@ -207,14 +204,10 @@ export const getAlbumObj = async dirName => {
     description: null,
   }
 
-  // Merge meta with album object
   const metaPath = join(ALBUMS_ROOT, dirName, 'album.yml')
   albumObj = await fetchAndMergeMeta(albumObj, metaPath)
 
-  // now divine the date if it was not set in the album.yml file
   if (!albumObj.date) {
-    // let's try to come up with a date
-    // 1) If the directory name has a date
     const matches = dirName.match(/(\d{4}-\d{2}-\d{2})/)
     if (matches) {
       try {
@@ -224,8 +217,7 @@ export const getAlbumObj = async dirName => {
       }
     }
     if (!albumObj.date) {
-      // 2) Next get the exif data for files inside and use the oldest
-      let leastDate = null
+      let leastDate: Date | null = null
       const supportedFiles = await getSupportedFiles(dirName)
       const exifArr = await promiseAllInBatches(
         supportedFiles,
@@ -234,8 +226,8 @@ export const getAlbumObj = async dirName => {
       )
       logger.debug('GET_ALBUM_OBJ', { dirName, exifArr })
       for (const exif of exifArr) {
-        const exifDate = new Date(getExifDate(exif))
-        if (exifDate) {
+        const exifDate = new Date(getExifDate(exif) as string)
+        if (exifDate && !isNaN(exifDate.getTime())) {
           logger.debug('GET_ALBUM_OBJ:EXIF', { dt: exifDate })
           if (!leastDate || exifDate < leastDate) {
             leastDate = exifDate
@@ -243,23 +235,20 @@ export const getAlbumObj = async dirName => {
         }
       }
       if (leastDate) {
-        // 3) it got set to something
         albumObj.date = leastDate.toISOString()
       }
     }
   }
 
   if (!albumObj.date) {
-    // gotta put something, so put today
     albumObj.date = new Date().toISOString()
   }
 
   if (albumObj.thumbnail) {
-    // fixup with directory name
     albumObj.thumbnail = join(
       PHOTO_URL_BASE,
       uriPath,
-      encodeURIComponent(albumObj.thumbnail),
+      encodeURIComponent(albumObj.thumbnail as string),
     )
   } else {
     const thumbFname = await getAlbumDefaultThumbnailFilename(dirName)
@@ -272,7 +261,6 @@ export const getAlbumObj = async dirName => {
     }
   }
 
-  // write out the file for next time
   await mkdir(dirname(stdAlbumFname), { recursive: true, mode: 755 })
   await writeFile(stdAlbumFname, JSON.stringify(albumObj))
   logger.info('GET_ALBUM_OBJ - Wrote cache file', { stdAlbumFname })
@@ -283,19 +271,22 @@ export const getAlbumObj = async dirName => {
 /*
  * Fancy algorithm to get the default thumbnail for an album
  */
-export const getAlbumDefaultThumbnailFilename = async reqPath => {
+export const getAlbumDefaultThumbnailFilename = async (
+  reqPath: string,
+): Promise<string | null> => {
   const albumPath = join(ALBUMS_ROOT, reqPath)
-  let thumbEntry
+  let thumbEntry: import('fs').Dirent | undefined
 
   try {
     thumbEntry = (await readdir(albumPath, { withFileTypes: true }))
       .filter(dirEnt => !dirEnt.name.match(MAC_FORBIDDEN_FILES_REGEX))
       .find(dirEnt => isSupportedImageFile(dirEnt.name))
-  } catch (e) {
-    if (e.code === 'PERM' || e.code === 'EACCES') {
-      logger.info('Permission Denied', { error: e })
+  } catch (e: unknown) {
+    const err = e as NodeJS.ErrnoException
+    if (err.code === 'PERM' || err.code === 'EACCES') {
+      logger.info('Permission Denied', { error: err })
     } else {
-      logger.error('readdir error3', e)
+      logger.error('readdir error3', e as Error)
       throw e
     }
   }

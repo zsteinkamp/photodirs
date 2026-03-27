@@ -1,8 +1,10 @@
-'use strict'
-
-export async function promiseAllInBatches(items, task, batchSize) {
+export async function promiseAllInBatches<T, R>(
+  items: T[],
+  task: (item: T) => Promise<R>,
+  batchSize: number,
+): Promise<R[]> {
   let position = 0
-  let results = []
+  let results: R[] = []
   while (position < items.length) {
     const itemsForBatch = items.slice(position, position + batchSize)
     results = [

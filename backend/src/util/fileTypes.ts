@@ -1,6 +1,4 @@
-'use strict'
-
-export function getOutputTypeForFile(filePath) {
+export function getOutputTypeForFile(filePath: string): string {
   if (isVideo(filePath)) {
     return 'mp4'
   } else if (isGif(filePath)) {
@@ -10,7 +8,7 @@ export function getOutputTypeForFile(filePath) {
   }
   return 'jpg'
 }
-export function isSupportedImageFile(filePath) {
+export function isSupportedImageFile(filePath: string): boolean {
   return (
     isJpeg(filePath) ||
     isHeif(filePath) ||
@@ -19,21 +17,21 @@ export function isSupportedImageFile(filePath) {
     isPng(filePath)
   )
 }
-export function isJpeg(filePath) {
+export function isJpeg(filePath: string): boolean {
   return !!filePath.match(/(jpeg|jpg)$/i)
 }
-export function isHeif(filePath) {
+export function isHeif(filePath: string): boolean {
   return !!filePath.match(/(heif|heic)$/i)
 }
-export function isGif(filePath) {
+export function isGif(filePath: string): boolean {
   return !!filePath.match(/(gif)$/i)
 }
-export function isPng(filePath) {
+export function isPng(filePath: string): boolean {
   return !!filePath.match(/(png)$/i)
 }
-export function isRaw(filePath) {
+export function isRaw(filePath: string): boolean {
   return !!filePath.match(/(crw|cr2|cr3|dng|arw)$/i)
 }
-export function isVideo(filePath) {
+export function isVideo(filePath: string): boolean {
   return !!filePath.match(/(avi|mov|mp4)$/i)
 }
