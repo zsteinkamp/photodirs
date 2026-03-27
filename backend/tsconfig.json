@@ -6,7 +6,8 @@
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "outDir": "./dist",
+    "noEmit": false
   },
   "ts-node": {
     "esm": true,

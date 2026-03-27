@@ -68,15 +68,16 @@ CMD [ "npm", "run", "watch:api" ]
 
 ## PRODUCTION BUILD BELOW
 FROM dev AS prod-base
-ENV NODE_ENV=production
 COPY ./src/ ./src/
-# run the production api server (no watching)
+COPY ./tsconfig.json ./
+RUN npm run build
+ENV NODE_ENV=production
 
 FROM prod-base AS api
-CMD [ "npm", "run", "start:api" ]
+CMD [ "npm", "run", "start:api:prod" ]
 
 FROM prod-base AS watcher
-CMD [ "npm", "run", "start:watcher" ]
+CMD [ "npm", "run", "start:watcher:prod" ]
 
 FROM prod-base AS admin
-CMD [ "npm", "run", "start:admin" ]
+CMD [ "npm", "run", "start:admin:prod" ]

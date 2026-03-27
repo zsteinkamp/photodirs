@@ -3,3 +3,4 @@
 /docker-compose.yml
 /nginx.conf
 /test-album/*
+backend/dist/
