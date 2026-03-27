@@ -4,18 +4,24 @@ import { AdminContext } from './AdminContext'
 
 import { Link } from 'react-router-dom'
 import InlineEdit from './InlineEdit'
+import { BreadcrumbItem } from './types'
 
-export default function Breadcrumb(props) {
+interface BreadcrumbProps {
+  crumbs: BreadcrumbItem[]
+  onEdit: (val: string) => void
+}
+
+export default function Breadcrumb({ crumbs, onEdit }: BreadcrumbProps) {
   const isAdmin = useContext(AdminContext)
-  const crumbArr = props.crumbs.map((crumb, idx) => {
+  const crumbArr = crumbs.map((crumb, idx) => {
     let itemMarkup
-    if (idx === props.crumbs.length - 1) {
+    if (idx === crumbs.length - 1) {
       if (isAdmin) {
         itemMarkup = (
           <InlineEdit
             placeholder='Enter a title...'
             value={crumb.title}
-            setValue={props.onEdit}
+            setValue={onEdit}
           />
         )
       } else {

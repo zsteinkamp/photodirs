@@ -4,20 +4,28 @@ import './InlineEdit.css'
 
 import { useState } from 'react'
 
-const InlineEdit = ({ placeholder, value, setValue, tabIndex }) => {
+interface InlineEditProps {
+  placeholder: string
+  value: string
+  setValue: (val: string) => void
+  tabIndex?: number
+}
+
+const InlineEdit = ({ placeholder, value, setValue, tabIndex }: InlineEditProps) => {
   const [editingValue, setEditingValue] = useState(value)
 
-  const onChange = (event) => setEditingValue(event.target.innerText)
+  const onChange = (event: React.FormEvent<HTMLSpanElement>) =>
+    setEditingValue((event.target as HTMLSpanElement).innerText)
 
-  const onKeyDown = (event) => {
+  const onKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
     if (event.key === 'Enter' || event.key === 'Escape') {
-      event.target.blur()
+      ;(event.target as HTMLSpanElement).blur()
     }
   }
 
   let lastVal = value
 
-  const onBlur = (event) => {
+  const onBlur = (event: React.FocusEvent<HTMLSpanElement>) => {
     if (event.target.innerText !== lastVal) {
       lastVal = event.target.innerText
       setValue(event.target.innerText)
@@ -29,13 +37,12 @@ const InlineEdit = ({ placeholder, value, setValue, tabIndex }) => {
       contentEditable
       suppressContentEditableWarning
       className='InlineEdit'
-      type='text'
       aria-label='Field name'
       role='textbox'
-      onChange={onChange}
+      onInput={onChange}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
-      placeholder={placeholder}
+
       tabIndex={tabIndex}
     >
       {editingValue}

@@ -2,20 +2,14 @@ import './ThemeSwitcher.css'
 
 import { useState, useEffect } from 'react'
 
-// Inspired (and to a large degree copied) from Andrew Nelson's post on the topic
-// https://medium.com/@--andrewnelson/add-a-dark-mode-toggle-to-your-nextjs-react-app-375b230a4c27
-// I have simplified it, not just by reducing the number of themes from 3 to 2,
-// but given a clearer understanding of how React works.
+const THEME_LIGHT = 'light'
+const THEME_DARK = 'dark'
+const THEME_KEY = 'theme'
 
 export default function ThemeSwitcher() {
-  const [theme, setTheme] = useState()
+  const [theme, setTheme] = useState<string | undefined>()
 
-  const THEME_LIGHT = 'light'
-  const THEME_DARK = 'dark'
-  const THEME_KEY = 'theme'
-
-  const toggleTheme = (e) => {
-    //console.log(e)
+  const toggleTheme = () => {
     setTheme(theme === THEME_DARK ? THEME_LIGHT : THEME_DARK)
   }
 
@@ -41,15 +35,13 @@ export default function ThemeSwitcher() {
   }
 
   useEffect(() => {
-    // initial set
     const storedTheme = localStorage.getItem(THEME_KEY)
     const prefTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
       ? THEME_DARK
       : THEME_LIGHT
     setTheme(storedTheme ?? prefTheme)
 
-    // watch for changes in system preference
-    const useSetTheme = (e) => {
+    const useSetTheme = (e: MediaQueryListEvent) => {
       setTheme(e.matches ? THEME_DARK : THEME_LIGHT)
     }
     const watchSysTheme = window.matchMedia('(prefers-color-scheme: dark)')
@@ -63,14 +55,12 @@ export default function ThemeSwitcher() {
     if (!theme) {
       return
     }
-    //console.log('THEME USEEFFECT TOP', { theme })
     const lastTheme = localStorage.getItem(THEME_KEY)
     if (lastTheme) {
       document.documentElement.classList.remove(lastTheme)
     }
     document.documentElement.classList.add(theme)
     localStorage.setItem(THEME_KEY, theme)
-    //console.log('THEME USEEFFECT BOTTOM', { theme })
   }, [theme])
 
   return (
@@ -82,7 +72,7 @@ export default function ThemeSwitcher() {
         data-theme={theme}
         className='ThemeSwitcher'
       >
-        {buttonIcon(theme)}
+        {buttonIcon()}
       </button>
     </>
   )

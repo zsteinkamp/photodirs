@@ -10,31 +10,36 @@ import VideoIcon from './VideoIcon'
 
 import dayjs from 'dayjs'
 import 'dayjs/plugin/utc'
+import { MediaData } from './types'
 
-export default function PhotoElement({ data }) {
+interface PhotoElementProps {
+  data: MediaData
+}
+
+export default function PhotoElement({ data }: PhotoElementProps) {
   const parentPath = data.album.uriPath
   const albumFiles = data.album.files
 
   const [careAboutScroll, setCareAboutScroll] = useState(true)
-  const [currData, setCurrData] = useState(data)
+  const [currData, setCurrData] = useState<MediaData>(data)
   const [currFileIdx, setCurrFileIdx] = useState(
     albumFiles.findIndex((file) => {
       return file.path === data.path
     })
   )
-  const [scrollCareTimeout, setScrollCareTimeout] = useState(null)
+  const [scrollCareTimeout, setScrollCareTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
 
   const navigate = useNavigate()
-  const carouselRef = useRef(null)
-  const thumbsRef = useRef(null)
-  const imageContainerRef = useRef(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const thumbsRef = useRef<HTMLDivElement>(null)
+  const imageContainerRef = useRef<HTMLDivElement>(null)
 
   // if the data in state is the same as the data in props
   const isInitialLoad = currData === data
 
   // a ref for each image tile
-  const tileRefs = useRef([])
-  const thumbRefs = useRef([])
+  const tileRefs = useRef<HTMLDivElement[]>([])
+  const thumbRefs = useRef<HTMLAnchorElement[]>([])
 
   const returnToAlbum = () => {
     navigate(parentPath, { preventScrollReset: true })
@@ -50,13 +55,13 @@ export default function PhotoElement({ data }) {
     window.location.href = data.photoPath + '?size=orig'
   }
 
-  const scrollCarouselTo = (idx) => {
+  const scrollCarouselTo = (idx: number) => {
     handleThumbClick((albumFiles.length + idx) % albumFiles.length)
   }
 
   // Debounce fetching metadata for the currFileIdx, since it can change
   // rapidly while scrolling
-  const debounceRef = useRef(null)
+  const debounceRef = useRef<number | null>(null)
 
   // currFileIdx effect
   useEffect(() => {
@@ -66,10 +71,10 @@ export default function PhotoElement({ data }) {
 
     // pause any videos
     tileRefs.current.forEach((e) => {
-      for (const ce of e.children) {
+      for (const ce of Array.from(e.children)) {
         if (ce.tagName === 'VIDEO') {
-          ce.pause()
-          ce.blur()
+          ;(ce as HTMLVideoElement).pause()
+          ;(ce as HTMLVideoElement).blur()
         }
       }
     })
@@ -81,16 +86,17 @@ export default function PhotoElement({ data }) {
       thumbRef.classList.add('sel')
     }
 
-    const safeIndex = (idx) => {
+    const safeIndex = (idx: number) => {
       return (albumFiles.length + idx) % albumFiles.length
     }
 
     // preload images -- turn off lazy attribute of adjacent images
-    tileRefs.current[safeIndex(currFileIdx + 1)].firstChild.loading = 'auto'
-    tileRefs.current[safeIndex(currFileIdx - 1)].firstChild.loading = 'auto'
+    tileRefs.current[safeIndex(currFileIdx + 1)].firstChild &&
+      ((tileRefs.current[safeIndex(currFileIdx + 1)].firstChild as HTMLImageElement).loading = 'eager')
+    tileRefs.current[safeIndex(currFileIdx - 1)].firstChild &&
+      ((tileRefs.current[safeIndex(currFileIdx - 1)].firstChild as HTMLImageElement).loading = 'eager')
 
     const updateData = async () => {
-      //console.log('UPDATE DATA');
       const crc = carouselRef.current
       if (!crc) {
         return
@@ -104,7 +110,7 @@ export default function PhotoElement({ data }) {
         )
       }
 
-      let actualData = await response.json()
+      const actualData: MediaData = await response.json()
       setCurrData(actualData)
 
       // update displayed URL without engaging router -- have to do it this way
@@ -126,21 +132,19 @@ export default function PhotoElement({ data }) {
     imageContainerRef.current.classList.toggle('fullscreen')
   }
 
-  const keyCodeToAction = {
+  const keyCodeToAction: Record<number, () => void> = {
     27: returnToAlbum, // escape
     37: goToPrevPhoto, // left arrow
     39: goToNextPhoto, // right arrow
     70: toggleFullScreen, // letter f
   }
 
-  const handleKeypress = (event) => {
+  const handleKeypress = (event: KeyboardEvent) => {
     if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
       const keypressAction = keyCodeToAction[event.keyCode]
       if (keypressAction) {
         keypressAction()
         event.preventDefault()
-      } else {
-        //console.log('KEYPRESS', event.keyCode);
       }
     }
   }
@@ -157,21 +161,17 @@ export default function PhotoElement({ data }) {
     if (!crc) {
       return
     }
-    const trc = thumbsRef.current
+    const trc = thumbsRef.current!
     const carouselScrollCoeff =
       crc.scrollLeft / (crc.scrollWidth - crc.clientWidth)
 
-    const thumbContentWidth = trc.scrollWidth - trc.clientWidth // half client width added as padding to the ends
-    // the width of one thumbnail image. The ratio of this number to the "sel" class padding is important for some of the math below.
+    const thumbContentWidth = trc.scrollWidth - trc.clientWidth
     const thumbnailWidth = thumbRefs.current[0].clientWidth
-    // get the proportion of thumbnail pixels        full width        - one thumbnail  - sel margin treatment (2 rem on 5 rem thumb) */
     const thumbContentProp =
       carouselScrollCoeff *
       (thumbContentWidth - thumbnailWidth - thumbnailWidth / 2.5)
 
-    // now apply back to the
-    // scrollLeft property:  proprtion in px + half of a thumbnail width + half of the sel margin treatment
-    thumbsRef.current.scrollLeft =
+    thumbsRef.current!.scrollLeft =
       thumbContentProp + thumbnailWidth / 2 + thumbnailWidth / 5
   }
 
@@ -182,7 +182,7 @@ export default function PhotoElement({ data }) {
 
     alignThumbToCarousel()
 
-    const crc = carouselRef.current
+    const crc = carouselRef.current!
     const newFileIdx = Math.round(crc.scrollLeft / crc.clientWidth)
     if (currFileIdx !== newFileIdx) {
       setCurrFileIdx(newFileIdx)
@@ -196,7 +196,7 @@ export default function PhotoElement({ data }) {
       carouselRef.current.addEventListener('scroll', handleScroll)
     }
     return () => {
-      current.removeEventListener('scroll', handleScroll)
+      current?.removeEventListener('scroll', handleScroll)
     }
   })
 
@@ -221,7 +221,7 @@ export default function PhotoElement({ data }) {
     )
   }
 
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const xProp = e.clientX / tileRefs.current[currFileIdx].clientWidth
     if (xProp < 0.25) {
       goToPrevPhoto()
@@ -234,7 +234,7 @@ export default function PhotoElement({ data }) {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
     return (
       <div
-        ref={(el) => (tileRefs.current[i] = el)}
+        ref={(el) => { if (el) tileRefs.current[i] = el }}
         key={file.uriPath}
         onClick={handleClick}
         className='carouselItem'
@@ -264,7 +264,7 @@ export default function PhotoElement({ data }) {
     )
   })
 
-  const handleThumbClick = (tileIndex) => {
+  const handleThumbClick = (tileIndex: number) => {
     setCareAboutScroll(false)
     if (scrollCareTimeout) {
       clearTimeout(scrollCareTimeout)
@@ -278,10 +278,8 @@ export default function PhotoElement({ data }) {
           behavior: 'smooth',
         })
         setScrollCareTimeout(null)
-        //alignThumbToCarousel();
       }, 1000)
     )
-    //console.log(tileIndex, tileRefs.current[tileIndex]);
     tileRefs.current[tileIndex].scrollIntoView()
     setCurrFileIdx(tileIndex)
   }
@@ -290,10 +288,10 @@ export default function PhotoElement({ data }) {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
     return (
       <Link
-        ref={(el) => (thumbRefs.current[i] = el)}
+        ref={(el) => { if (el) thumbRefs.current[i] = el }}
         to={file.uriPath}
         key={file.uriPath}
-        onClick={(e) => handleThumbClick(i)}
+        onClick={() => handleThumbClick(i)}
       >
         <img
           draggable='false'
@@ -320,7 +318,6 @@ export default function PhotoElement({ data }) {
     const tileRef = tileRefs.current[currFileIdx]
     if (tileRef) {
       tileRef.scrollIntoView()
-      //carouselRef.current.style['scroll-behavior'] = 'smooth';
     }
     const thumbRef = thumbRefs.current[currFileIdx]
     if (thumbRef) {

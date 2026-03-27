@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { AdminContext } from './AdminContext'
 import AdminHeader from './AdminHeader'
 
-export default function IsAdmin({ children }) {
+interface IsAdminProps {
+  children: React.ReactNode
+}
+
+export default function IsAdmin({ children }: IsAdminProps) {
   const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {

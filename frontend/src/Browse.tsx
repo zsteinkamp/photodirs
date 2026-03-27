@@ -16,27 +16,29 @@ import TimeSlider from './TimeSlider'
 import InlineEditArea from './InlineEditArea'
 import { AdminContext } from './AdminContext'
 import ThemeSwitcher from './ThemeSwitcher'
+import { RecordType } from './getDateBins'
+import { ApiData, AlbumData, AlbumSummary, BreadcrumbItem } from './types'
 
 export default function Browse() {
   const isAdmin = useContext(AdminContext)
-  const makeApiPath = (path) => {
+  const makeApiPath = (path: string) => {
     return '/api/albums' + path
   }
 
   const [apiPath, setApiPath] = useState(makeApiPath(window.location.pathname))
   const [adminApiPath, setAdminApiPath] = useState(apiPath)
-  const [data, setData] = useState(null)
-  const [filteredData, setFilteredData] = useState(null)
+  const [data, setData] = useState<ApiData | null>(null)
+  const [filteredData, setFilteredData] = useState<AlbumSummary[] | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const navigate = useNavigate()
 
   // Save album scroll positions so we can restore when returning from a photo
-  const albumScrollPositions = useRef({})
+  const albumScrollPositions = useRef<Record<string, number>>({})
 
   // Save scroll position on click (capture phase, before navigation resets it)
-  const browseRef = useRef(null)
+  const browseRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!data || data.type !== 'album') return
     const el = browseRef.current
@@ -63,12 +65,11 @@ export default function Browse() {
     }
   }
 
-  const keyCodeToAction = {
+  const keyCodeToAction: Record<number, () => void> = {
     27: goToParentAlbum, // escape
   }
 
-  const handleKeypress = (event) => {
-    //console.log(event.keyCode, event.ctrlKey, event.shiftKey, event.altKey, event.metaKey);
+  const handleKeypress = (event: KeyboardEvent) => {
     if (!event.ctrlKey && !event.shiftKey && !event.altKey && !event.metaKey) {
       const keypressAction = keyCodeToAction[event.keyCode]
       if (keypressAction) {
@@ -98,13 +99,14 @@ export default function Browse() {
             `HTTP error ${response.status}: ${JSON.stringify(body)}`
           )
         }
-        let actualData = await response.json()
-        //console.log({ actualData })
+        const actualData: ApiData = await response.json()
         setData(actualData)
-        setFilteredData(actualData.albums)
+        if (actualData.type === 'album') {
+          setFilteredData(actualData.albums)
+        }
 
         // set page title
-        if (actualData.album && actualData.album.title && actualData.title) {
+        if (actualData.type !== 'album' && actualData.album?.title && actualData.title) {
           document.title = [actualData.album.title, actualData.title].join(
             ' / '
           )
@@ -114,7 +116,7 @@ export default function Browse() {
 
         setError(null)
       } catch (err) {
-        setError(err.message)
+        setError((err as Error).message)
         setData(null)
         setFilteredData(null)
       } finally {
@@ -140,7 +142,7 @@ export default function Browse() {
   /*
    * Something to put in breadcrumb if there is an error fetching
    */
-  const errorBreadcrumb = [
+  const errorBreadcrumb: BreadcrumbItem[] = [
     { title: 'Home', path: '/', apiPath: '/api/albums/' },
     { title: 'Error', path: '/', apiPath: '/api/albums/' },
   ]
@@ -148,14 +150,14 @@ export default function Browse() {
   /*
    * Received photo data on api, return a PhotoElement
    */
-  if (!error && !loading && (data.type === 'photo' || data.type === 'video')) {
+  if (!error && !loading && data && (data.type === 'photo' || data.type === 'video')) {
     return <PhotoElement data={data} />
   }
 
-  const editAlbumMetadata = async (payload) => {
+  const editAlbumMetadata = async (payload: Record<string, string>) => {
     try {
       const response = await fetch(adminApiPath, {
-        method: 'POST', // or 'PUT'
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -166,13 +168,15 @@ export default function Browse() {
     } catch (error) {
       console.error('Error:', error)
     }
-    Object.assign(data, payload)
+    if (data) {
+      Object.assign(data, payload)
+    }
   }
 
   /*
    * Main content section, all these cases share a layout
    */
-  const getPageBody = (loading, error, data) => {
+  const getPageBody = () => {
     if (loading) {
       return <div className='loading'>Loading...</div>
     }
@@ -183,52 +187,52 @@ export default function Browse() {
       )
     }
 
-    const updateAlbumThumb = (val) => {
+    const updateAlbumThumb = (val: string) => {
       editAlbumMetadata({ thumbnail: val })
     }
 
-    if (data.type === 'album') {
+    if (data && data.type === 'album') {
+      const albumData = data as AlbumData
       const thumbnailFname =
-        data.thumbnail && data.thumbnail.split('/').reverse()[0]
+        albumData.thumbnail && albumData.thumbnail.split('/').reverse()[0]
       return (
         <div className='album'>
           <div className='header'>
-            {data.path !== '/' && (
+            {albumData.path !== '/' && (
               <div className='date'>
-                {dayjs(data.date).utc().format('YYYY-MM-DD dddd')}
+                {dayjs(albumData.date).utc().format('YYYY-MM-DD dddd')}
               </div>
             )}
             {isAdmin ? (
               <InlineEditArea
                 placeholder='Enter a description...'
-                value={data.description}
+                value={albumData.description ?? ''}
                 setValue={(val) => editAlbumMetadata({ description: val })}
               >
-                {data.description}
+                {albumData.description}
               </InlineEditArea>
             ) : (
               <div className='desc'>
-                <Markdown>{data.description}</Markdown>
+                <Markdown>{albumData.description}</Markdown>
               </div>
             )}
           </div>
           {location.pathname !== '/' ? null : (
             <TimeSlider
-              data={data.albums}
-              filteredData={filteredData}
-              setFilteredData={setFilteredData}
-              className=''
+              data={albumData.albums as unknown as RecordType[]}
+              filteredData={(filteredData ?? []) as unknown as RecordType[]}
+              setFilteredData={setFilteredData as unknown as (data: RecordType[]) => void}
             />
           )}
-          <AlbumList albums={filteredData} sortAlbums={data.sortAlbums} />
+          <AlbumList albums={filteredData} sortAlbums={albumData.sortAlbums} />
           {isAdmin ? (
             <AdminFileList
-              files={data.files}
+              files={albumData.files}
               thumbnail={thumbnailFname}
               updateAlbumThumb={updateAlbumThumb}
             />
           ) : (
-            <FileList files={data.files} />
+            <FileList files={albumData.files} />
           )}
         </div>
       )
@@ -236,7 +240,7 @@ export default function Browse() {
 
     return (
       <div className='error'>
-        Unknown type <pre>{data.type}</pre>.
+        Unknown type <pre>{data?.type}</pre>.
       </div>
     )
   }
@@ -259,7 +263,7 @@ export default function Browse() {
           />
         )}
       </header>
-      <div className='pageBody'>{getPageBody(loading, error, data)}</div>
+      <div className='pageBody'>{getPageBody()}</div>
       <footer>
         <div>
           Check out out{' '}

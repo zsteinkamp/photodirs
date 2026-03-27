@@ -1,6 +1,6 @@
 import './VideoIcon.css'
 
-export default function VideoIcon(props) {
+export default function VideoIcon() {
   return (
     <div className='videoIcon'>
       <svg
@@ -17,7 +17,7 @@ export default function VideoIcon(props) {
             strokeLinejoin: 'miter',
             strokeMiterlimit: 10,
             fill: 'none',
-            fillRule: 'nonzero',
+            fillRule: 'nonzero' as const,
             opacity: 1,
           }}
           transform='translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)'
@@ -31,7 +31,7 @@ export default function VideoIcon(props) {
               strokeLinecap: 'butt',
               strokeLinejoin: 'miter',
               strokeMiterlimit: 10,
-              fillRule: 'nonzero',
+              fillRule: 'nonzero' as const,
               opacity: 1,
             }}
             transform=' matrix(1 0 0 1 0 0) '
