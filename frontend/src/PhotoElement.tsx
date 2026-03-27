@@ -132,8 +132,21 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     imageContainerRef.current.classList.toggle('fullscreen')
   }
 
+  const toggleVideoPlayback = () => {
+    const tile = tileRefs.current[currFileIdx]
+    if (!tile) return
+    const video = tile.querySelector('video')
+    if (!video) return
+    if (video.paused) {
+      video.play()
+    } else {
+      video.pause()
+    }
+  }
+
   const keyCodeToAction: Record<number, () => void> = {
     27: returnToAlbum, // escape
+    32: toggleVideoPlayback, // spacebar
     37: goToPrevPhoto, // left arrow
     39: goToNextPhoto, // right arrow
     70: toggleFullScreen, // letter f
