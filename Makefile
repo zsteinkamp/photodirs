@@ -1,5 +1,8 @@
 .DEFAULT_GOAL := default
 
+.PHONY: default ps logs shell down rmvol clean help \
+        dev devlogs devps devshell devdown devrmvol
+
 GREP               ?= $(shell command -v ggrep 2> /dev/null || command -v grep 2> /dev/null)
 AWK                ?= $(shell command -v gawk 2> /dev/null || command -v awk 2> /dev/null)
 

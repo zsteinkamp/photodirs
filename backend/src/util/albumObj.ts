@@ -180,6 +180,15 @@ export const getAlbumObj = async (
       getFileObjMetadataFname(dirName, fName),
     )
     fileObjFnames.push(join(ALBUMS_ROOT, dirName, 'album.yml'))
+    // Invalidate against immediate subalbum caches so recursive thumbnail
+    // and counts refresh when descendants change.
+    for (const sub of await getDirEntries(join(ALBUMS_ROOT, dirName))) {
+      if (sub.isDirectory()) {
+        fileObjFnames.push(
+          join(CACHE_ROOT, 'albums', dirName, sub.name, 'album.json'),
+        )
+      }
+    }
     logger.debug('GET_ALBUM_OBJ', { fileObjFnames })
 
     if (!(await isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
@@ -244,6 +253,8 @@ export const getAlbumObj = async (
     albumObj.date = new Date().toISOString()
   }
 
+  const dirEntries = await getDirEntries(join(ALBUMS_ROOT, dirName))
+
   if (albumObj.thumbnail) {
     albumObj.thumbnail = join(
       PHOTO_URL_BASE,
@@ -251,13 +262,30 @@ export const getAlbumObj = async (
       encodeURIComponent(albumObj.thumbnail as string),
     )
   } else {
-    const thumbFname = await getAlbumDefaultThumbnailFilename(dirName)
-    if (thumbFname) {
+    const thumbPath = await getAlbumDefaultThumbnailPath(dirName, dirEntries)
+    if (thumbPath) {
       albumObj.thumbnail = join(
         PHOTO_URL_BASE,
         uriPath,
-        encodeURIComponent(thumbFname),
+        ...thumbPath.map(encodeURIComponent),
       )
+    }
+  }
+
+  if (!albumObj.description) {
+    const subdirCount = dirEntries.filter(d => d.isDirectory()).length
+    const fileCount = dirEntries.filter(
+      d => d.isFile() && isSupportedImageFile(d.name),
+    ).length
+    const parts: string[] = []
+    if (subdirCount > 0) {
+      parts.push(`${subdirCount} Album${subdirCount === 1 ? '' : 's'}`)
+    }
+    if (fileCount > 0) {
+      parts.push(`${fileCount} Photo${fileCount === 1 ? '' : 's'}`)
+    }
+    if (parts.length > 0) {
+      albumObj.description = parts.join(' / ')
     }
   }
 
@@ -269,29 +297,56 @@ export const getAlbumObj = async (
 }
 
 /*
- * Fancy algorithm to get the default thumbnail for an album
+ * Read the entries of a directory, filtering out Mac forbidden files.
+ * Returns an empty array on permission errors.
  */
-export const getAlbumDefaultThumbnailFilename = async (
-  reqPath: string,
-): Promise<string | null> => {
-  const albumPath = join(ALBUMS_ROOT, reqPath)
-  let thumbEntry: import('fs').Dirent | undefined
-
+const getDirEntries = async (
+  dirPath: string,
+): Promise<import('fs').Dirent[]> => {
   try {
-    thumbEntry = (await readdir(albumPath, { withFileTypes: true }))
-      .filter(dirEnt => !dirEnt.name.match(MAC_FORBIDDEN_FILES_REGEX))
-      .find(dirEnt => isSupportedImageFile(dirEnt.name))
+    return (await readdir(dirPath, { withFileTypes: true })).filter(
+      d => !d.name.match(MAC_FORBIDDEN_FILES_REGEX),
+    )
   } catch (e: unknown) {
     const err = e as NodeJS.ErrnoException
     if (err.code === 'PERM' || err.code === 'EACCES') {
       logger.info('Permission Denied', { error: err })
-    } else {
-      logger.error('readdir error3', e as Error)
-      throw e
+      return []
     }
+    if (err.code === 'ENOENT') {
+      return []
+    }
+    logger.error('readdir error3', e as Error)
+    throw e
   }
-  if (thumbEntry) {
-    return thumbEntry.name
+}
+
+/*
+ * Returns the default thumbnail for an album as an array of unencoded path
+ * segments relative to the album directory. Picks the first supported image
+ * in the directory; if none exist, recursively descends into subdirectories
+ * (alphabetical descending, so date-prefixed dirs surface newest first).
+ */
+export const getAlbumDefaultThumbnailPath = async (
+  reqPath: string,
+  entries?: import('fs').Dirent[],
+): Promise<string[] | null> => {
+  const dirEntries =
+    entries ?? (await getDirEntries(join(ALBUMS_ROOT, reqPath)))
+
+  const imgFile = dirEntries.find(
+    d => d.isFile() && isSupportedImageFile(d.name),
+  )
+  if (imgFile) return [imgFile.name]
+
+  const subdirs = dirEntries
+    .filter(d => d.isDirectory())
+    .sort((a, b) => (a.name > b.name ? -1 : 1))
+  for (const subdir of subdirs) {
+    const subPath = await getAlbumDefaultThumbnailPath(
+      join(reqPath, subdir.name),
+    )
+    if (subPath) return [subdir.name, ...subPath]
   }
   return null
 }
