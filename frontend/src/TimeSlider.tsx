@@ -94,7 +94,7 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
       }
     }
     setFilteredData(tempData)
-  }, [minSlider, maxSlider, filter])
+  }, [minSlider, maxSlider, filter, data])
 
   const onBinClick = (ts: number) => {
     if (!dateBins.granularity) {
