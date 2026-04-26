@@ -102,8 +102,8 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
     }
     const maxdjs = dayjs(ts).utc().endOf(dateBins.granularity)
     const maxval = maxdjs.valueOf()
-    setMinSlider(ts)
-    setMaxSlider(maxval)
+    updateMinSlider(ts)
+    updateMaxSlider(maxval)
   }
 
   const thumbFormatForGranularity = (granularity: string) => {
