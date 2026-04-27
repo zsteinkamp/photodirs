@@ -97,7 +97,11 @@ export const getExtendedAlbumObj = async (
 
     if (!(await isFileOlderThanAny(extAlbumFname, subdirAlbumJson))) {
       logger.debug('RETURN CACHE', extAlbumFname)
-      return JSON.parse(await readFile(extAlbumFname, { encoding: 'utf8' }))
+      try {
+        return JSON.parse(await readFile(extAlbumFname, { encoding: 'utf8' }))
+      } catch (e) {
+        logger.warn('Error parsing JSON, rebuilding', { extAlbumFname })
+      }
     }
   }
   const dirs: import('fs').Dirent[] = []
@@ -193,7 +197,11 @@ export const getAlbumObj = async (
 
     if (!(await isFileOlderThanAny(stdAlbumFname, fileObjFnames))) {
       logger.debug('RETURN CACHE', stdAlbumFname)
-      return JSON.parse(await readFile(stdAlbumFname, { encoding: 'utf8' }))
+      try {
+        return JSON.parse(await readFile(stdAlbumFname, { encoding: 'utf8' }))
+      } catch (e) {
+        logger.warn('Error parsing JSON, rebuilding', { stdAlbumFname })
+      }
     }
   }
 
