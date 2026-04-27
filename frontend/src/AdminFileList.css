@@ -65,6 +65,78 @@
   color: var(--main-bg-color, #222);
   border-color: #6cf;
 }
+.AdminFileList .LocationEditor {
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-width: 30rem;
+}
+.AdminFileList .LocationEditor.located {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+.AdminFileList .LocationEditor .locationLabel {
+  font-size: 0.9rem;
+  flex: 1;
+  word-break: break-word;
+}
+.AdminFileList .LocationEditor .clearLocation {
+  background: transparent;
+  border: 1px solid var(--photoelement-icon-fill, #ccc);
+  color: var(--photoelement-icon-fill, #ccc);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  line-height: 1;
+}
+.AdminFileList .LocationEditor .clearLocation:hover {
+  background: var(--photoelement-icon-fill, #ccc);
+  color: var(--main-bg-color, #222);
+}
+.AdminFileList .LocationEditor .locationSearch {
+  display: flex;
+  gap: 0.25rem;
+}
+.AdminFileList .LocationEditor .locationSearch input {
+  flex: 1;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.9rem;
+}
+.AdminFileList .LocationEditor .locationSearch button {
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+}
+.AdminFileList .LocationEditor .locationError {
+  font-size: 0.85rem;
+  color: #f88;
+}
+.AdminFileList .LocationEditor .locationResults,
+.AdminFileList .LocationEditor .locationOthers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.AdminFileList .LocationEditor .locationResult,
+.AdminFileList .LocationEditor .locationOther {
+  text-align: left;
+  background: var(--main-bg-color, #222);
+  color: var(--photoelement-icon-fill, #ccc);
+  border: 1px solid var(--photoelement-icon-fill, #ccc);
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.AdminFileList .LocationEditor .locationResult:hover,
+.AdminFileList .LocationEditor .locationOther:hover {
+  background: var(--photoelement-icon-fill, #ccc);
+  color: var(--main-bg-color, #222);
+}
 .AdminFileList .InlineEdit {
   width: 30rem;
   padding: 0.5rem;

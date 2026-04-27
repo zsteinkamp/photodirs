@@ -7,7 +7,8 @@ import InlineEditArea from './InlineEditArea'
 import InlineEdit from './InlineEdit'
 import SVGRotateLeft from './SVGRotateLeft'
 import SVGRotateRight from './SVGRotateRight'
-import { AlbumFile } from './types'
+import LocationEditor from './LocationEditor'
+import { AlbumFile, PhotoLocation } from './types'
 
 interface AdminFileListProps {
   files: AlbumFile[] | null
@@ -19,6 +20,7 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }: Ad
   const [currThumb, setCurrThumb] = useState(thumbnail)
   const [rotationVersions, setRotationVersions] = useState<Record<string, number>>({})
   const [orientations, setOrientations] = useState<Record<string, number>>({})
+  const [, setLocationVersion] = useState(0)
 
   const editMediaMetadata = async (media: AlbumFile, payload: Partial<AlbumFile>) => {
     try {
@@ -69,6 +71,28 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }: Ad
   const toggleRotation = (file: AlbumFile, target: number) => {
     const current = orientations[file.uriPath] ?? 1
     setOrientation(file, current === target ? 1 : target)
+  }
+
+  const setLocation = async (
+    file: AlbumFile,
+    location: PhotoLocation | null,
+  ) => {
+    const adminApiPath = file.apiPath.replace(/^\/api/, '/api/admin')
+    try {
+      const res = await fetch(adminApiPath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location }),
+      })
+      if (!res.ok) {
+        console.error('Location set failed', res.status, await res.text())
+        return
+      }
+      file.location = location
+      setLocationVersion((v: number) => v + 1)
+    } catch (err) {
+      console.error('Location set error', err)
+    }
   }
 
   if (!files || files.length === 0) {
@@ -143,6 +167,13 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }: Ad
                 <SVGRotateRight />
               </button>
             </div>
+          )}
+          {file.type !== 'video' && files && (
+            <LocationEditor
+              file={file}
+              albumFiles={files}
+              setLocation={setLocation}
+            />
           )}
         </div>
       </div>

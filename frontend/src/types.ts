@@ -4,6 +4,12 @@ export interface BreadcrumbItem {
   apiPath: string
 }
 
+export interface PhotoLocation {
+  lat: number
+  lon: number
+  label: string | null
+}
+
 export interface AlbumFile {
   type: 'photo' | 'video'
   name: string
@@ -18,6 +24,7 @@ export interface AlbumFile {
   videoPath?: string
   description?: string
   date?: string
+  location?: PhotoLocation | null
 }
 
 export interface AlbumSummary {

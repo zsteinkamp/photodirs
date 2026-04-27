@@ -74,6 +74,7 @@ export const getFileObj = async (
   const fileDescription = exifUtils.getExifDescription(exifObj) || ''
   const exifDate = exifUtils.getExifDate(exifObj)
   const fileExif = exifUtils.getExifDetailProps(exifObj)
+  const fileLocation = exifUtils.getExifLocation(exifObj)
   const isVideo = fileTypes.isVideo(fileName)
   const fileHash = (await fileUtils.getFileHash(filePath))
     .toString()
@@ -103,6 +104,7 @@ export const getFileObj = async (
     photoPath: path.join(C.PHOTO_URL_BASE, uriAlbumPath, uriFileName),
     apiPath: path.join(C.API_BASE, C.ALBUMS_ROOT, uriAlbumPath, uriFileName),
     exif: fileExif,
+    location: fileLocation,
   }
 
   if (isVideo) {

@@ -51,6 +51,49 @@ const updateMediaOrientation = async (
   await ep.close()
 }
 
+interface LocationPayload {
+  lat: number
+  lon: number
+  label?: string | null
+}
+
+const updateMediaLocation = async (
+  path: string,
+  location: LocationPayload | null,
+): Promise<void> => {
+  const fsPath = join(C.ALBUMS_ROOT, path)
+  const ep = new ExiftoolProcess('/usr/bin/exiftool')
+  await ep.open()
+  if (location === null) {
+    await ep.writeMetadata(
+      fsPath,
+      {
+        GPSLatitude: '',
+        GPSLatitudeRef: '',
+        GPSLongitude: '',
+        GPSLongitudeRef: '',
+        'XMP-iptcCore:Location': '',
+        [C.EXIF_LOCATION_LABEL_FALLBACK]: '',
+      },
+      ['overwrite_original'],
+    )
+  } else {
+    const { lat, lon, label } = location
+    await ep.writeMetadata(
+      fsPath,
+      {
+        GPSLatitude: Math.abs(lat),
+        GPSLatitudeRef: lat >= 0 ? 'N' : 'S',
+        GPSLongitude: Math.abs(lon),
+        GPSLongitudeRef: lon >= 0 ? 'E' : 'W',
+        'XMP-iptcCore:Location': label ?? '',
+      },
+      ['overwrite_original'],
+    )
+  }
+  await ep.close()
+}
+
 const updateMediaProperty = async (
   path: string,
   payload: Record<string, unknown>,
@@ -101,6 +144,8 @@ export const adminCall = async (
     await updateAlbumYML(path, reqBody)
   } else if (typeof reqBody.orientation === 'number') {
     await updateMediaOrientation(path, reqBody.orientation)
+  } else if ('location' in reqBody) {
+    await updateMediaLocation(path, reqBody.location as LocationPayload | null)
   } else {
     await updateMediaProperty(path, reqBody)
   }

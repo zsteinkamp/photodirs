@@ -27,6 +27,47 @@ app.get(new RegExp('^/api/admin/?$'), async (_req, res) => {
 
 app.use(bodyParser.json())
 
+const geocodeCache = new Map<string, unknown[]>()
+app.get('/api/admin/geocode', async (req, res) => {
+  const q = String(req.query.q ?? '').trim()
+  if (!q) {
+    return res.status(400).json({ error: 'missing q' })
+  }
+  if (geocodeCache.has(q)) {
+    return res.status(200).json({ results: geocodeCache.get(q) })
+  }
+  try {
+    const url =
+      'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=' +
+      encodeURIComponent(q)
+    const resp = await fetch(url, {
+      headers: {
+        'User-Agent': 'photodirs/1.0 (zack@steinkamp.us)',
+        'Accept-Language': 'en',
+      },
+    })
+    if (!resp.ok) {
+      return res
+        .status(502)
+        .json({ error: 'geocoder error', status: resp.status })
+    }
+    const data = (await resp.json()) as Array<{
+      display_name: string
+      lat: string
+      lon: string
+    }>
+    const results = data.map(d => ({
+      label: d.display_name,
+      lat: parseFloat(d.lat),
+      lon: parseFloat(d.lon),
+    }))
+    geocodeCache.set(q, results)
+    return res.status(200).json({ results })
+  } catch (e) {
+    return res.status(500).json({ error: (e as Error).message })
+  }
+})
+
 app.all(new RegExp('^/api/admin/albums(/.*)'), async (req, res) => {
   try {
     logger.info('API Request Received', { path: req.path })
