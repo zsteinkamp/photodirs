@@ -76,6 +76,17 @@ const TimeSlider: React.FC<TimeSliderProps> = ({
   }
 
   useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return
+      updateMinSlider(dateBins.minDate)
+      updateMaxSlider(dateBins.maxDate)
+      updateFilterVal('')
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [dateBins.minDate, dateBins.maxDate])
+
+  useEffect(() => {
     const tempData: RecordType[] = []
     if (undefined === dateBins.granularity) {
       return

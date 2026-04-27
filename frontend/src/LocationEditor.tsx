@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { AlbumFile, PhotoLocation } from './types'
 
 interface LocationEditorProps {
@@ -41,10 +41,7 @@ export default function LocationEditor({
   const [results, setResults] = useState<GeocodeResult[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const otherLocations = useMemo(
-    () => distinctOtherLocations(albumFiles, file),
-    [albumFiles, file],
-  )
+  const otherLocations = distinctOtherLocations(albumFiles, file)
 
   const runSearch = async (e?: React.FormEvent) => {
     e?.preventDefault()
