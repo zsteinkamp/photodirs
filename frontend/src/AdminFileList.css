@@ -15,16 +15,55 @@
   justify-content: flex-start;
   padding: 0.5rem;
 }
-.AdminFileList input {
-  display: none;
+.AdminFileList .colDefault {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
 }
-.AdminFileList input:checked + label div img {
+.AdminFileList .colDefault input[type='radio'] {
+  width: 1.5rem;
+  height: 1.5rem;
+  cursor: pointer;
+}
+.AdminFileList .colImage.isDefault img {
   outline: 0.5rem solid #6cf;
 }
 
 .AdminFileList .colImage {
   position: relative;
   margin: 0 2rem;
+}
+.AdminFileList .rotateBtns {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+}
+.AdminFileList .rotateBtns button {
+  background: var(--main-bg-color, #222);
+  color: var(--photoelement-icon-fill, #ccc);
+  border: 1px solid var(--photoelement-icon-fill, #ccc);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.AdminFileList .rotateBtns button svg {
+  width: 100%;
+  height: 100%;
+}
+.AdminFileList .rotateBtns button:hover {
+  background: var(--photoelement-icon-fill, #ccc);
+  color: var(--main-bg-color, #222);
+}
+.AdminFileList .rotateBtns button.pressed {
+  background: #6cf;
+  color: var(--main-bg-color, #222);
+  border-color: #6cf;
 }
 .AdminFileList .InlineEdit {
   width: 30rem;
