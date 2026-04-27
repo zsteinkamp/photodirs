@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Set EXIF date fields on slide-scan JPEGs based on folder name.
+# Folder format: YY-MM or YY-MM-N (e.g. 79-06, 79-06-2 = June 1979 roll 2).
+# Date written: 19YY-MM-15  HH:MM:00
+#   HH = sequence number (1-9), or 12 if no sequence
+#   MM = slide index within folder (sorted by filename, 00..)
+# Run inside the admin dev container so /albums is writable.
+
+set -euo pipefail
+
+ALBUMS_ROOT="${1:-/albums}"
+
+if ! command -v exiftool >/dev/null 2>&1; then
+  echo "exiftool not found" >&2
+  exit 1
+fi
+
+shopt -s nullglob
+
+processed=0
+skipped=0
+errors=0
+
+for dir in "$ALBUMS_ROOT"/*/; do
+  folder=$(basename "$dir")
+
+  if [[ "$folder" =~ ^([0-9]{2})-([0-9]{2})(-([0-9]+))?$ ]]; then
+    yy="${BASH_REMATCH[1]}"
+    mm="${BASH_REMATCH[2]}"
+    seq="${BASH_REMATCH[4]:-}"
+    year="19${yy}"
+
+    if [[ -z "$seq" ]]; then
+      hh=12
+    else
+      hh=$(printf "%02d" "$seq")
+    fi
+
+    idx=0
+    mapfile -t files < <(find "$dir" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' \) | LC_ALL=C sort)
+
+    for f in "${files[@]}"; do
+      mn=$(printf "%02d" "$idx")
+      datestr="${year}:${mm}:15 ${hh}:${mn}:00"
+      if exiftool -q -q -overwrite_original \
+          -DateTimeOriginal="$datestr" \
+          -CreateDate="$datestr" \
+          -ModifyDate="$datestr" \
+          "$f"; then
+        processed=$((processed+1))
+      else
+        echo "ERROR on $f" >&2
+        errors=$((errors+1))
+      fi
+      idx=$((idx+1))
+    done
+    echo "[$folder] $idx files -> ${year}-${mm}-15 ${hh}:00..${hh}:$(printf %02d $((idx-1)))"
+  else
+    echo "SKIP unrecognized folder: $folder" >&2
+    skipped=$((skipped+1))
+  fi
+done
+
+echo "--- done: processed=$processed skipped=$skipped errors=$errors ---"
