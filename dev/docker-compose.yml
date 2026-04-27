@@ -37,7 +37,7 @@ services:
     volumes:
       - ..:/app
       - api_node_modules:/app/backend/node_modules
-      - /mnt/shared/photos/slides:/albums:ro
+      - ${ALBUMS_PATH:-../test-album}:/albums:ro
       - dev_cache:/cache
 
   watcher:
@@ -51,7 +51,7 @@ services:
     volumes:
       - ../:/app
       - api_node_modules:/app/backend/node_modules
-      - /mnt/shared/photos/slides:/albums:ro
+      - ${ALBUMS_PATH:-../test-album}:/albums:ro
       - dev_cache:/cache
 
   admin:
@@ -65,7 +65,7 @@ services:
     volumes:
       - ..:/app
       - api_node_modules:/app/backend/node_modules
-      - /mnt/shared/photos/slides:/albums:rw
+      - ${ALBUMS_PATH:-../test-album}:/albums:rw
       - dev_cache:/cache
 
 volumes:

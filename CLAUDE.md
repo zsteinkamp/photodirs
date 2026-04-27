@@ -18,6 +18,8 @@ make devdown      # Stop dev containers
 make              # Interactive config + start production containers
 ```
 
+Dev mounts `../test-album` at `/albums` by default. Override per machine by creating `dev/.env` with `ALBUMS_PATH=/host/path/to/photos` (see `dev/.env.example`). `dev/.env` is gitignored.
+
 Backend (inside container):
 ```bash
 npm test        # Mocha tests
