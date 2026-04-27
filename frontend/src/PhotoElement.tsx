@@ -1,5 +1,5 @@
 import './PhotoElement.css'
-import React, { Fragment, useEffect, useRef, useState } from 'react'
+import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Markdown from 'react-markdown'
 
@@ -7,6 +7,7 @@ import SVGDownload from './SVGDownload'
 import SVGFullscreen from './SVGFullscreen'
 import SVGClose from './SVGClose'
 import VideoIcon from './VideoIcon'
+import { AdminContext } from './AdminContext'
 
 import dayjs from 'dayjs'
 import 'dayjs/plugin/utc'
@@ -28,7 +29,9 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     })
   )
   const [scrollCareTimeout, setScrollCareTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
+  const [rotationVersions, setRotationVersions] = useState<Record<string, number>>({})
 
+  const isAdmin = useContext(AdminContext)
   const navigate = useNavigate()
   const carouselRef = useRef<HTMLDivElement>(null)
   const thumbsRef = useRef<HTMLDivElement>(null)
@@ -53,6 +56,29 @@ export default function PhotoElement({ data }: PhotoElementProps) {
 
   const downloadOriginal = () => {
     window.location.href = data.photoPath + '?size=orig'
+  }
+
+  const setOrientation = async (orientation: number) => {
+    const file = albumFiles[currFileIdx]
+    if (!file) return
+    const adminApiPath = file.apiPath.replace(/^\/api/, '/api/admin')
+    try {
+      const res = await fetch(adminApiPath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orientation }),
+      })
+      if (!res.ok) {
+        console.error('Rotation failed', res.status, await res.text())
+        return
+      }
+      setRotationVersions((prev) => ({
+        ...prev,
+        [file.uriPath]: Date.now(),
+      }))
+    } catch (err) {
+      console.error('Rotation error', err)
+    }
   }
 
   const scrollCarouselTo = (idx: number) => {
@@ -252,6 +278,8 @@ export default function PhotoElement({ data }: PhotoElementProps) {
 
   const tiles = albumFiles.map((file, i) => {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
+    const rv = rotationVersions[file.uriPath]
+    const rvParam = rv ? '&rv=' + rv : ''
     return (
       <div
         ref={(el) => { if (el) tileRefs.current[i] = el }}
@@ -272,8 +300,8 @@ export default function PhotoElement({ data }: PhotoElementProps) {
             </video>
           ) : (
             <img
-              src={`${file.photoPath}?size=1600x1600${hashParam}`}
-              srcSet={`${file.photoPath}?size=400x400${hashParam} 400w, ${file.photoPath}?size=800x800${hashParam} 800w, ${file.photoPath}?size=1600x1600${hashParam} 1600w`}
+              src={`${file.photoPath}?size=1600x1600${hashParam}${rvParam}`}
+              srcSet={`${file.photoPath}?size=400x400${hashParam}${rvParam} 400w, ${file.photoPath}?size=800x800${hashParam}${rvParam} 800w, ${file.photoPath}?size=1600x1600${hashParam}${rvParam} 1600w`}
               alt={file.title}
               loading='lazy'
               onDragStart={handleImageDragStart(file)}
@@ -306,6 +334,8 @@ export default function PhotoElement({ data }: PhotoElementProps) {
 
   const thumbnails = albumFiles.map((file, i) => {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
+    const rv = rotationVersions[file.uriPath]
+    const rvParam = rv ? '&rv=' + rv : ''
     return (
       <Link
         ref={(el) => { if (el) thumbRefs.current[i] = el }}
@@ -315,7 +345,7 @@ export default function PhotoElement({ data }: PhotoElementProps) {
       >
         <img
           draggable='false'
-          src={`${file.photoPath}?size=400x400${hashParam}`}
+          src={`${file.photoPath}?size=400x400${hashParam}${rvParam}`}
           alt={file.title}
           loading='lazy'
         />
@@ -413,6 +443,14 @@ export default function PhotoElement({ data }: PhotoElementProps) {
       >
         <SVGDownload />
       </Link>
+      {isAdmin && albumFiles[currFileIdx]?.type !== 'video' && (
+        <div className='rotateBtns'>
+          <button title='Rotate 90° counter-clockwise' onClick={() => setOrientation(8)}>↶</button>
+          <button title='Rotate 180°' onClick={() => setOrientation(3)}>⇅</button>
+          <button title='Rotate 90° clockwise' onClick={() => setOrientation(6)}>↷</button>
+          <button title='Reset orientation' onClick={() => setOrientation(1)}>1:1</button>
+        </div>
+      )}
     </div>
   )
 }

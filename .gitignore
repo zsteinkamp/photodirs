@@ -4,3 +4,5 @@
 /nginx.conf
 /test-album/*
 backend/dist/
+node_modules/
+/tmp_thumbs/

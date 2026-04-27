@@ -380,3 +380,33 @@
 .PhotoElement .fullscreenBtn svg g path {
   stroke: var(--photoelement-icon-fill);
 }
+.PhotoElement .rotateBtns {
+  position: absolute;
+  right: 1rem;
+  top: 4rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.PhotoElement .rotateBtns:hover {
+  opacity: 1;
+}
+.PhotoElement .rotateBtns button {
+  background: var(--main-bg-color, #222);
+  color: var(--photoelement-icon-fill, #ccc);
+  border: 1px solid var(--photoelement-icon-fill, #ccc);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.PhotoElement .rotateBtns button:hover {
+  background: var(--photoelement-icon-fill, #ccc);
+  color: var(--main-bg-color, #222);
+}

@@ -37,6 +37,20 @@ const updateAlbumYML = (
   })
 }
 
+const updateMediaOrientation = async (
+  path: string,
+  orientation: number,
+): Promise<void> => {
+  const fsPath = join(C.ALBUMS_ROOT, path)
+  const ep = new ExiftoolProcess('/usr/bin/exiftool')
+  await ep.open()
+  await ep.writeMetadata(fsPath, { Orientation: orientation }, [
+    'overwrite_original',
+    'n',
+  ])
+  await ep.close()
+}
+
 const updateMediaProperty = async (
   path: string,
   payload: Record<string, unknown>,
@@ -85,6 +99,8 @@ export const adminCall = async (
 
   if (lstat!.isDirectory()) {
     await updateAlbumYML(path, reqBody)
+  } else if (typeof reqBody.orientation === 'number') {
+    await updateMediaOrientation(path, reqBody.orientation)
   } else {
     await updateMediaProperty(path, reqBody)
   }
