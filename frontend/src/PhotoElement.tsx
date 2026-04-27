@@ -1,5 +1,5 @@
 import './PhotoElement.css'
-import React, { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import { Fragment, useContext, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Markdown from 'react-markdown'
 
@@ -11,7 +11,7 @@ import { AdminContext } from './AdminContext'
 
 import dayjs from 'dayjs'
 import 'dayjs/plugin/utc'
-import { AlbumFile, MediaData } from './types'
+import { MediaData } from './types'
 
 interface PhotoElementProps {
   data: MediaData
@@ -269,13 +269,6 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     }
   }
 
-  const handleImageDragStart = (file: AlbumFile) => (e: React.DragEvent<HTMLImageElement>) => {
-    const url = new URL(file.photoPath + '?size=orig', window.location.origin).href
-    e.dataTransfer.setData('DownloadURL', `application/octet-stream:${file.fileName}:${url}`)
-    e.dataTransfer.setData('text/uri-list', url)
-    e.dataTransfer.setData('text/plain', url)
-  }
-
   const tiles = albumFiles.map((file, i) => {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
     const rv = rotationVersions[file.uriPath]
@@ -304,7 +297,6 @@ export default function PhotoElement({ data }: PhotoElementProps) {
               srcSet={`${file.photoPath}?size=400x400${hashParam}${rvParam} 400w, ${file.photoPath}?size=800x800${hashParam}${rvParam} 800w, ${file.photoPath}?size=1600x1600${hashParam}${rvParam} 1600w`}
               alt={file.title}
               loading='lazy'
-              onDragStart={handleImageDragStart(file)}
             />
           )}
         </div>
