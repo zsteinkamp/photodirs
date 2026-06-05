@@ -69,3 +69,23 @@ Five Docker services behind an NGINX reverse proxy:
 ## Docker Build
 
 Custom multi-stage Dockerfile builds libvips 8.14 from source for HEIF support. CI builds 5 images for linux/amd64 and linux/arm64 via GitHub Actions, pushes to GHCR.
+
+## Production host boot-ordering gate (NFS reboot fix)
+
+**Symptom (fixed 2026-06-05):** After the production host `linux` rebooted, the
+containers came up but the `prod_albums` NFS mount (`truenas.lan:.../photos`,
+`type: nfs, soft,nolock`) was empty, and the stack had to be restarted by hand.
+
+**Root cause:** Docker mounts named NFS volumes lazily at container start and was
+starting containers before TrueNAS was serving NFS (`docker.service`'s
+`After=network-online.target` is a no-op here — wait-online is disabled). A manual
+`docker compose restart` fixed it only by dropping the volume refcount to 0 and forcing
+a remount once NFS was up.
+
+**Fix (host-level, shared with the `musics` repo — see `musics/CLAUDE.md` for the
+verbatim file contents):** a oneshot `wait-for-truenas.service` polls `rpcinfo` until
+NFSv4 is serving (30s timeout so it can never wedge boot), and `docker.service` plus the
+`/mnt/shared` fstab mount are ordered behind it. Files on `linux`:
+`/usr/local/sbin/wait-for-nfs.sh`, `/etc/systemd/system/wait-for-truenas.service`,
+`/etc/systemd/system/docker.service.d/10-wait-nfs.conf`, and an
+`x-systemd.requires=wait-for-truenas.service` option on the `/mnt/shared` fstab line.
