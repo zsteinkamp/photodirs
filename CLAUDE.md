@@ -20,14 +20,24 @@ make              # Interactive config + start production containers
 
 Dev mounts `../test-album` at `/albums` by default. Override per machine by creating `dev/.env` with `ALBUMS_PATH=/host/path/to/photos` (see `dev/.env.example`). `dev/.env` is gitignored.
 
-Backend (inside container):
-```bash
-npm test        # Mocha tests
-npm run lint    # ESLint
-```
+### Running node/npm commands (tsc, lint, test) — always in the devcontainer
 
-Frontend (inside container):
+The host has **no working toolchain** — `tsc`, `eslint`, and the right `node_modules`
+live only inside the dev containers. Running `npx tsc` on the host fails ("This is not
+the tsc command you are looking for"). When `make dev` is up, run commands with
+`docker exec` (no need for a shell). The running containers are:
+
+- `photodirs-dev-api-1`, `photodirs-dev-admin-1`, `photodirs-dev-watcher-1` — backend
+  (source mounted at `/app/backend`, hot-reload, so host edits are picked up live)
+- frontend dev server container — source at `/app/frontend`
+
 ```bash
+# Backend — typecheck / lint / test (any backend container works)
+docker exec -w /app/backend photodirs-dev-api-1 npx tsc --noEmit -p /app/backend/tsconfig.json
+docker exec -w /app/backend photodirs-dev-api-1 npm run lint    # ESLint
+docker exec -w /app/backend photodirs-dev-api-1 npm test        # Mocha tests
+
+# Frontend
 npm start       # React dev server
 npm run build   # Production build
 npm test        # React tests

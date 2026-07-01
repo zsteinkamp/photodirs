@@ -53,6 +53,7 @@ app.get(new RegExp('^/photo/(.+)'), async (req, res) => {
       req.params[0],
       req.query.size as string | undefined,
       req.query.crop as string | undefined,
+      req.query.hash as string | undefined,
       res,
     )
   } catch (e) {

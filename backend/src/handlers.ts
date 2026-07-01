@@ -26,6 +26,7 @@ export const photoGet = async (
   reqPath: string,
   size: string | undefined,
   crop: string | boolean | undefined,
+  hash: string | undefined,
   res: Response,
 ): Promise<void> => {
   const filePath = path.join(C.ALBUMS_ROOT, reqPath)
@@ -34,7 +35,7 @@ export const photoGet = async (
     return
   }
 
-  handleImage(filePath, size, crop, res)
+  handleImage(filePath, size, crop, hash, res)
 }
 
 export const videoGet = async (

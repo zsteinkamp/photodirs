@@ -20,14 +20,22 @@ export const handleImage = async (
   filePath: string,
   size: string | undefined,
   crop: string | boolean | undefined,
+  hash: string | undefined,
   res: Response,
 ): Promise<void> => {
   let width = 1600
   let height = 1600
 
+  // A `hash` param makes the URL content-addressed: the frontend changes it
+  // whenever the underlying file changes, so the response is safe to cache
+  // forever. Without it, fall back to a conservative 1-day TTL.
+  const cacheControl = hash
+    ? 'public, max-age=31536000, immutable'
+    : 'public, max-age=86400'
+
   if (typeof size === 'string') {
     if (size === 'orig') {
-      res.set('Cache-Control', 'public, max-age=86400')
+      res.set('Cache-Control', cacheControl)
       res.set(
         'Content-Disposition',
         `attachment; filename="${basename(filePath)}"`,
@@ -74,7 +82,7 @@ export const handleImage = async (
   const transform = getSharpTransform(cachedImagePath, resizeOptions)
 
   res.type(`image/${getOutputTypeForFile(cachedImagePath)}`)
-  res.set('Cache-control', 'public, max-age=86400')
+  res.set('Cache-control', cacheControl)
   async function plumbing() {
     await pipeline(readStream, transform!, res)
   }
