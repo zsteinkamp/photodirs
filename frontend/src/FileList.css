@@ -1,6 +1,6 @@
 .FileList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
   gap: 0.5rem;
   margin-top: 2rem;
   margin-bottom: 2rem;
