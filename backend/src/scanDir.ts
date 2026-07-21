@@ -2,7 +2,12 @@ import { readdir } from 'fs/promises'
 import { join } from 'path'
 import fastq from 'fastq'
 
-import { LOGGER, ALBUMS_ROOT, MAC_FORBIDDEN_FILES_REGEX } from './constants.js'
+import {
+  LOGGER,
+  ALBUMS_ROOT,
+  MAC_FORBIDDEN_FILES_REGEX,
+  MAX_PARALLEL_JOBS,
+} from './constants.js'
 import { getAlbumObj, getExtendedAlbumObj } from './util/albumObj.js'
 import { promiseAllInBatches } from './util/batch.js'
 import { getFileObj } from './util/fileObj.js'
@@ -13,10 +18,42 @@ import * as videoUtils from './util/video.js'
 
 const logger = LOGGER
 
+//
+// GLOBAL concurrency limiters, shared across the ENTIRE recursive scan.
+//
+// scanDirectory() recurses, and the per-directory promiseAllInBatches() limits
+// below only cap fan-out at a single tree node. Because the batches nest, the
+// effective concurrency of the heavy media operations grows ~10^depth, which
+// spawned dozens of simultaneous ffmpeg/Sharp jobs and drove the host into
+// swap. Routing every CPU/RAM-heavy op through a single global fastq queue
+// caps TOTAL concurrent heavy work at MAX_PARALLEL_JOBS regardless of how many
+// directories are being scanned at once. These operations never await each
+// other, so a shared queue cannot deadlock.
+//
 const transcoder = async ({ filePath }: { filePath: string }) => {
   return await videoUtils.getCachedVideoPath(filePath)
 }
+// Video transcode is the heaviest ffmpeg job: keep it strictly serial.
 const transcodingQueue = fastq.promise(transcoder, 1)
+// Videos already queued/in-flight for transcode, so the 60s periodic scan
+// doesn't re-push the same file every minute while the library catches up.
+const transcodePending = new Set<string>()
+
+// Video poster-frame extraction (ffmpeg).
+const posterQueue = fastq.promise(
+  async ({ absFname }: { absFname: string }) => jpegFileForVideo(absFname),
+  MAX_PARALLEL_JOBS,
+)
+// RAW -> JPEG conversion (dcraw + Sharp).
+const rawQueue = fastq.promise(
+  async ({ absFname }: { absFname: string }) => jpegFileForRaw(absFname),
+  MAX_PARALLEL_JOBS,
+)
+// Pre-generated resizes (Sharp/libvips — the big memory consumer).
+const resizeQueue = fastq.promise(
+  async ({ absFname }: { absFname: string }) => preResize(absFname),
+  MAX_PARALLEL_JOBS,
+)
 
 export const scanDirectory = async (dirName: string): Promise<void> => {
   logger.debug('SCAN_DIRECTORY:TOP', { dirName })
@@ -34,35 +71,50 @@ export const scanDirectory = async (dirName: string): Promise<void> => {
     await promiseAllInBatches(
       subdirs,
       dirEnt => scanDirectory(join(dirName, dirEnt.name)),
-      10,
+      MAX_PARALLEL_JOBS,
     )
 
     const dirFiles = await getSupportedFiles(dirName)
 
     logger.debug('SCAN_DIRECTORY:MID', { dirName, dirFiles })
 
-    await promiseAllInBatches(dirFiles, fName => getFileObj(dirName, fName), 10)
+    await promiseAllInBatches(
+      dirFiles,
+      fName => getFileObj(dirName, fName),
+      MAX_PARALLEL_JOBS,
+    )
 
     await promiseAllInBatches(
       dirFiles,
       async fName => {
         let absFname = join('/albums', dirName, fName)
         if (isRaw(absFname)) {
-          const jpegPath = await jpegFileForRaw(absFname)
+          const jpegPath = await rawQueue.push({ absFname })
           logger.debug('PRE-CONVERT RAW', { absFname, jpegPath })
           if (jpegPath) absFname = jpegPath
         } else if (isVideo(absFname)) {
-          transcodingQueue.push({ filePath: absFname })
-          const posterPath = await jpegFileForVideo(absFname)
+          // Fire-and-forget transcode, but only enqueue once per file until it
+          // finishes — otherwise the 60s periodic scan re-queues every
+          // uncached video every minute and the queue grows without bound.
+          if (!transcodePending.has(absFname)) {
+            transcodePending.add(absFname)
+            transcodingQueue
+              .push({ filePath: absFname })
+              .catch((err: unknown) =>
+                logger.error('TRANSCODE_FAILED', { absFname, err }),
+              )
+              .finally(() => transcodePending.delete(absFname))
+          }
+          const posterPath = await posterQueue.push({ absFname })
           logger.debug('PRE-GENERATE VIDEO THUMBNAIL', {
             absFname,
             posterPath,
           })
           absFname = posterPath
         }
-        await preResize(absFname)
+        await resizeQueue.push({ absFname })
       },
-      10,
+      MAX_PARALLEL_JOBS,
     )
 
     const albumObj = await getAlbumObj(dirName)
