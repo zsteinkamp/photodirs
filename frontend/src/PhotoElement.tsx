@@ -105,6 +105,19 @@ export default function PhotoElement({ data }: PhotoElementProps) {
       }
     })
 
+    // autoplay the video on the now-current slide. Playing with sound works
+    // when we got here via a user gesture (thumbnail click, arrow key, scroll);
+    // if the browser blocks it (e.g. a deep-link opening straight onto a video),
+    // fall back to muted playback so it still starts.
+    const currentVideo =
+      tileRefs.current[currFileIdx]?.querySelector('video')
+    if (currentVideo) {
+      currentVideo.play().catch(() => {
+        currentVideo.muted = true
+        currentVideo.play().catch(() => {})
+      })
+    }
+
     const tileRef = tileRefs.current[currFileIdx]
     const thumbRef = thumbRefs.current[currFileIdx]
     if (tileRef) {
