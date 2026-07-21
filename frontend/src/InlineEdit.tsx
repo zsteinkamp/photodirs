@@ -12,10 +12,10 @@ interface InlineEditProps {
 }
 
 const InlineEdit = ({ placeholder, value, setValue, tabIndex }: InlineEditProps) => {
-  const [editingValue, setEditingValue] = useState(value)
-
-  const onChange = (event: React.FormEvent<HTMLSpanElement>) =>
-    setEditingValue((event.target as HTMLSpanElement).innerText)
+  // Capture the initial text once. We deliberately do NOT feed edits back into
+  // the contentEditable's children — doing so re-renders and resets the caret to
+  // the start on every keystroke, which reverses the typed text.
+  const [initialValue] = useState(value)
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
     if (event.key === 'Enter' || event.key === 'Escape') {
@@ -23,11 +23,8 @@ const InlineEdit = ({ placeholder, value, setValue, tabIndex }: InlineEditProps)
     }
   }
 
-  let lastVal = value
-
   const onBlur = (event: React.FocusEvent<HTMLSpanElement>) => {
-    if (event.target.innerText !== lastVal) {
-      lastVal = event.target.innerText
+    if (event.target.innerText !== value) {
       setValue(event.target.innerText)
     }
   }
@@ -39,13 +36,12 @@ const InlineEdit = ({ placeholder, value, setValue, tabIndex }: InlineEditProps)
       className='InlineEdit'
       aria-label='Field name'
       role='textbox'
-      onInput={onChange}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
 
       tabIndex={tabIndex}
     >
-      {editingValue}
+      {initialValue}
     </span>
   )
 }

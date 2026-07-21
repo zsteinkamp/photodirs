@@ -23,7 +23,10 @@ const distinctOtherLocations = (
     if (f.fileName === current.fileName) continue
     const loc = f.location
     if (!loc) continue
-    const key = `${loc.lat.toFixed(5)},${loc.lon.toFixed(5)}`
+    // Only offer human-assigned named places as quick-picks. Raw auto-EXIF
+    // coordinates would flood the list in GPS-heavy albums (one pin per photo).
+    if (!loc.label) continue
+    const key = loc.label
     if (seen.has(key)) continue
     seen.add(key)
     out.push(loc)
