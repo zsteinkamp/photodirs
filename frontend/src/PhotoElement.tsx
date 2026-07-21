@@ -97,11 +97,10 @@ export default function PhotoElement({ data }: PhotoElementProps) {
 
     // pause any videos
     tileRefs.current.forEach((e) => {
-      for (const ce of Array.from(e.children)) {
-        if (ce.tagName === 'VIDEO') {
-          ;(ce as HTMLVideoElement).pause()
-          ;(ce as HTMLVideoElement).blur()
-        }
+      const video = e.querySelector('video')
+      if (video) {
+        video.pause()
+        video.blur()
       }
     })
 
