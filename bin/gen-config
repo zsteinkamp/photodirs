@@ -125,6 +125,13 @@ cat << EOF >> docker-compose.yml
       target: watcher
     restart: always
     stop_signal: SIGKILL
+    # Resource guardrails: the watcher pre-transcodes/resizes media and can
+    # spike CPU and RAM. Cap it so a runaway scan can never take the host into
+    # swap. MAX_PARALLEL_JOBS bounds concurrent ffmpeg/Sharp jobs.
+    mem_limit: 2g
+    cpus: 2.0
+    environment:
+      - MAX_PARALLEL_JOBS=2
     volumes:
       - prod_cache:/cache
       - prod_albums:/albums:ro

@@ -154,6 +154,8 @@ export const jpegFileForVideo = async (filePath: string): Promise<string> => {
   await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 })
 
   await pExecFile('/usr/bin/ffmpeg', [
+    '-threads',
+    '2',
     '-i',
     filePath,
     '-y',

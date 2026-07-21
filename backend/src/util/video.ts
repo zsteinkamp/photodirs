@@ -29,6 +29,8 @@ export const getCachedVideoPath = async (filePath: string): Promise<string> => {
   await mkdir(dirname(cachePath), { recursive: true, mode: 755 })
 
   await pExecFile('/usr/bin/ffmpeg', [
+    '-threads',
+    '2',
     '-i',
     filePath,
     '-y',
