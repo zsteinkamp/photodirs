@@ -7,6 +7,7 @@ import {
   EXIF_DETAIL_PROPERTIES,
   EXIF_DATE_PROPERTY,
   EXIF_VIDEO_DATE_PROPERTY,
+  EXIF_VIDEO_CREATION_DATE_PROPERTY,
   META_TITLE_PROPERTY,
   EXIF_TITLE_PROPERTY,
   EXIF_VIDEO_TITLE_PROPERTY,
@@ -84,18 +85,26 @@ export const getExifDetailProps = (
  * Get exif date
  */
 export const getExifDate = (exif: Record<string, unknown>): string | null => {
-  let exifDate =
+  // Photos store DateTimeOriginal as local wall-clock (no timezone). Videos have
+  // no DateTimeOriginal: their CreateDate is UTC, which would shift them by the
+  // capture timezone offset relative to photos and scramble the interleaved
+  // order. CreationDate carries the local wall-clock (with offset), so prefer it
+  // for videos. We keep only the wall-clock portion (dropping any offset) so
+  // photos and videos are compared on the same footing.
+  const exifDate =
     (exif[EXIF_DATE_PROPERTY] as string) ||
+    (exif[EXIF_VIDEO_CREATION_DATE_PROPERTY] as string) ||
     (exif[EXIF_VIDEO_DATE_PROPERTY] as string) ||
     null
-  if (exifDate) {
-    exifDate =
-      exifDate.substr(0, 10).replaceAll(':', '-') +
-      'T' +
-      exifDate.substr(11, 8) +
-      'Z'
+  if (!exifDate) {
+    return null
   }
-  return exifDate
+  return (
+    exifDate.substr(0, 10).replaceAll(':', '-') +
+    'T' +
+    exifDate.substr(11, 8) +
+    'Z'
+  )
 }
 
 /*

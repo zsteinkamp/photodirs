@@ -9,6 +9,9 @@ export const EXIF_DESCRIPTION_PROPERTY = 'Caption-Abstract'
 export const EXIF_VIDEO_TITLE_PROPERTY = 'Title'
 export const EXIF_VIDEO_DESCRIPTION_PROPERTY = 'Description'
 export const EXIF_VIDEO_DATE_PROPERTY = 'CreateDate'
+// Videos have no DateTimeOriginal; CreateDate is UTC while CreationDate carries
+// the local wall-clock (with offset), matching how photos store DateTimeOriginal.
+export const EXIF_VIDEO_CREATION_DATE_PROPERTY = 'CreationDate'
 export const EXIF_LOCATION_LABEL_PROPERTY = 'Location'
 export const EXIF_LOCATION_LABEL_FALLBACK = 'Sub-location'
 export const EXIF_DETAIL_PROPERTIES = [

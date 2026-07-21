@@ -156,10 +156,14 @@ export const getExtendedAlbumObj = async (
 
   fileResult.sort((a, b) => {
     if (extAlbumObj.sort && extAlbumObj.sort === 'fname') {
-      return (a.fileName as string) < (b.fileName as string) ? -1 : 1
-    } else {
-      return (a.date as string) < (b.date as string) ? -1 : 1
+      return (a.fileName as string).localeCompare(b.fileName as string)
     }
+    // Oldest first. Parse to timestamps so a Date ctime fallback and ISO-string
+    // exif dates compare consistently (a bare `<` mixes the two types).
+    return (
+      new Date(a.date as string).getTime() -
+      new Date(b.date as string).getTime()
+    )
   })
   extAlbumObj.files = fileResult
 
