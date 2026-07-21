@@ -297,6 +297,7 @@ export default function PhotoElement({ data }: PhotoElementProps) {
             <video
               draggable='false'
               controls
+              loop
               autoPlay={false}
               poster={`${file.photoPath}?size=1600x1600`}
               preload='none'
