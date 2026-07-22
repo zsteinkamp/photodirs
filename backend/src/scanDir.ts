@@ -105,12 +105,20 @@ export const scanDirectory = async (dirName: string): Promise<void> => {
               )
               .finally(() => transcodePending.delete(absFname))
           }
-          const posterPath = await posterQueue.push({ absFname })
-          logger.debug('PRE-GENERATE VIDEO THUMBNAIL', {
-            absFname,
-            posterPath,
-          })
-          absFname = posterPath
+          // A thumbnail failure (e.g. ffmpeg OOM-killed on a huge 4K frame)
+          // must not abort the whole directory scan / crash the watcher: skip
+          // just this file's poster + resize and let the rest proceed.
+          try {
+            const posterPath = await posterQueue.push({ absFname })
+            logger.debug('PRE-GENERATE VIDEO THUMBNAIL', {
+              absFname,
+              posterPath,
+            })
+            absFname = posterPath
+          } catch (err: unknown) {
+            logger.error('VIDEO_THUMBNAIL_FAILED', { absFname, err })
+            return
+          }
         }
         await resizeQueue.push({ absFname })
       },

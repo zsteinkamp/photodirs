@@ -160,7 +160,11 @@ export const jpegFileForVideo = async (filePath: string): Promise<string> => {
     filePath,
     '-y',
     '-vf',
-    'thumbnail=100',
+    // Scale down *before* the thumbnail filter buffers frames. thumbnail=100
+    // holds 100 decoded frames in memory to pick a representative one; at 4K
+    // (~24MB/frame) that's ~2.4GB and gets OOM-killed. The thumbnail is tiny,
+    // so selecting from downscaled frames is equivalent and ~50x cheaper.
+    'scale=-2:480,thumbnail=100',
     '-frames:v',
     '1',
     '-update',

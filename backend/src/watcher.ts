@@ -75,7 +75,11 @@ const hasJobToDo = (): boolean => {
 }
 
 const runJob = async (job: WatcherJob) => {
-  scanDirectory(job.path)
+  // Never let a scan failure become an unhandled rejection — that crashes the
+  // whole watcher process and stops all future polling.
+  scanDirectory(job.path).catch((err: unknown) =>
+    logger.error('SCAN_DIRECTORY_FAILED', { path: job.path, err }),
+  )
   if (job.runAtEnd) {
     await job.runAtEnd()
   }
