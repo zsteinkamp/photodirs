@@ -305,6 +305,7 @@ export default function PhotoElement({ data }: PhotoElementProps) {
               controls
               loop
               autoPlay={false}
+              playsInline
               poster={`${file.photoPath}?size=1600x1600`}
               preload='none'
             >
