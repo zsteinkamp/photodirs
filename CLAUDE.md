@@ -43,6 +43,24 @@ npm run build   # Production build
 npm test        # React tests
 ```
 
+## Deploying to production
+
+Production runs on the host `linux` at `~/dev/photodirs`, where the compose
+stack builds images **locally from source** (the compose file uses `build:`,
+not the GHCR `image:` tags — CI's GHCR push is not what prod consumes). So a
+`docker compose pull` there is a no-op; deploy = update source, then build and
+recreate. From any machine that can `ssh linux`:
+
+```bash
+ssh linux 'cd ~/dev/photodirs && git pull && make'
+```
+
+`make` (default target) runs `config` then
+`docker compose build && docker compose up -d --force-recreate --remove-orphans`,
+rebuilding every service. Push to `main` first so `git pull` on the host picks
+up the commit. After deploy, a hard refresh may be needed to bust the browser's
+cache of the old frontend bundle.
+
 ## Architecture
 
 Five Docker services behind an NGINX reverse proxy:
