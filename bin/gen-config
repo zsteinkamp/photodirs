@@ -128,7 +128,9 @@ cat << EOF >> docker-compose.yml
     # Resource guardrails: the watcher pre-transcodes/resizes media and can
     # spike CPU and RAM. Cap it so a runaway scan can never take the host into
     # swap. MAX_PARALLEL_JOBS bounds concurrent ffmpeg/Sharp jobs.
-    mem_limit: 2g
+    # Native-resolution 4K video transcodes peak ~2-3GB on their own; 4g leaves
+    # headroom for a transcode running alongside concurrent Sharp resizes.
+    mem_limit: 4g
     cpus: 2.0
     environment:
       - MAX_PARALLEL_JOBS=2

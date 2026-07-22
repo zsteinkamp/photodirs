@@ -37,7 +37,7 @@ export const getCachedVideoPath = async (filePath: string): Promise<string> => {
     '-crf',
     '22',
     '-preset',
-    'slow',
+    'veryfast',
     // Keep the source resolution — do NOT downscale. The old
     // scale=1920:1080 cap squeezed vertical videos (e.g. 2160x3840) down to
     // ~608x1080, throwing away most of their detail. pad only rounds the
