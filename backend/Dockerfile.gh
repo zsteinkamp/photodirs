@@ -6,16 +6,17 @@ RUN apt-get update && apt-get install -y libraw-bin
 # START HEIF/HEIC SUPPORT - custom libvips build
 # mostly from https://github.com/jcupitt/docker-builds/blob/master/libvips-ubuntu20.04/Dockerfile
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
       bc \
       build-essential \
+      cmake \
       ffmpeg \
       glib-2.0-dev \
       jq \
       less \
+      libde265-dev \
       libexif-dev \
       libexpat-dev \
-      libheif-dev \
       libimage-exiftool-perl \
       libjpeg62-turbo-dev \
       liblcms2-dev \
@@ -30,6 +31,25 @@ RUN apt-get install -y \
       wget
 
 WORKDIR /usr/local/src
+
+# START libheif build from source
+# The Debian bookworm `libheif-dev` package ships libheif 1.15.1, whose
+# hardcoded auxiliary-image-reference security limit rejects HEIC files that
+# carry multiple auxiliary images (e.g. iPhone depth/HDR-gain-map photos) with
+# "Too many auxiliary image references". Build a current libheif so libvips
+# (below) links against it. libde265 provides the HEVC decoder; we only decode
+# HEIC (never encode), so no x265/aom encoder is needed.
+ARG LIBHEIF_VERSION=1.20.2
+RUN mkdir libheif \
+        && cd libheif \
+        && wget -q https://github.com/strukturag/libheif/releases/download/v${LIBHEIF_VERSION}/libheif-${LIBHEIF_VERSION}.tar.gz -O - | tar xfz - --strip-components 1 \
+        && cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DWITH_EXAMPLES=OFF --install-prefix /usr/local -B build . \
+        && cmake --build build -j"$(nproc)" \
+        && cmake --install build \
+        && ldconfig
+# Make the freshly built libheif discoverable by libvips' meson/pkg-config probe.
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+# END libheif
 
 ARG VIPS_BRANCH=8.14
 ARG VIPS_URL=https://github.com/libvips/libvips/tarball
