@@ -26,8 +26,12 @@ export PHOTODIRS_NFS_HOST=${PHOTODIRS_NFS_HOST:=truenas.lan}
 export PHOTODIRS_NFS_PATH=${PHOTODIRS_NFS_PATH:=/mnt/data-pool/shared/photos}
 export PHOTODIRS_ORIG_DIR=${PHOTODIRS_ORIG_DIR:=/mnt/shared/photos}
 
-# interactive setup if interactive terminal
-if [ -n $PS1 ]
+# interactive setup only when stdin is a terminal. (The old `[ -n $PS1 ]`
+# check was always true — unquoted empty $PS1 makes it `[ -n ]`, i.e. test a
+# non-empty "-n" — so headless deploys like `ssh host 'make'` would try to
+# prompt. `[ -t 0 ]` prompts only interactively; non-interactive runs fall
+# through to .env / built-in defaults.)
+if [ -t 0 ]
 then
   echo
   echo '=================================================================='

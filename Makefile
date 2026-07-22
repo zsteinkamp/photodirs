@@ -30,7 +30,7 @@ rmvol: config ## Reset the production cache docker volume
 
 config: docker-compose.yml nginx.conf ## Run setup script to generate docker-compose.yml and nginx.conf files
 
-docker-compose.yml nginx.conf:
+docker-compose.yml nginx.conf: bin/gen-config
 	bin/gen-config
 
 clean: config ## Remove docker-compose.yml and nginx.conf files
