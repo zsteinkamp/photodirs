@@ -229,6 +229,22 @@
   padding-right: 0;
   background: var(--photoelement-fullscreen-background-color);
 }
+/* In fullscreen the item fills the viewport so the media (which fills the
+ * item) can use the whole screen height, not just --main-height. */
+.PhotoElement .imageContainer.fullscreen .carousel .carouselItem {
+  height: 100vh;
+  height: 100dvh;
+}
+/* Fill the carousel item so media (esp. portrait) uses the full available
+ * height. object-fit: contain keeps aspect ratio and letterboxes/pillarboxes
+ * as needed; drop-shadow follows the visible content's alpha, not the box. */
+.PhotoElement .imageContainer .carouselItem .mediaContainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .PhotoElement .imageContainer .carouselItem video,
 .PhotoElement .imageContainer .carouselItem img {
   outline-width: 0;
@@ -238,7 +254,14 @@
   filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
   transition: background-color 0.2s;
   max-width: 100%;
-  max-height: calc(100dvh - 12rem);
+  max-height: 100%;
+}
+/* A <video preload="none"> has no real intrinsic size until it plays (Chrome
+ * defaults to 300x150), so max-* alone leaves portrait videos tiny. Pin the
+ * box to the full area and let object-fit: contain size the actual frame. */
+.PhotoElement .imageContainer .carouselItem video {
+  width: 100%;
+  height: 100%;
 }
 
 .PhotoElement .imageContainer .exif {

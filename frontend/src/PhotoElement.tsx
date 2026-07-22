@@ -292,7 +292,7 @@ export default function PhotoElement({ data }: PhotoElementProps) {
         onClick={handleClick}
         className='carouselItem'
       >
-        <div>
+        <div className='mediaContainer'>
           {file.type === 'video' ? (
             <video
               draggable='false'
