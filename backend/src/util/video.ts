@@ -35,9 +35,15 @@ export const getCachedVideoPath = async (filePath: string): Promise<string> => {
     filePath,
     '-y',
     '-crf',
-    '30',
+    '22',
+    '-preset',
+    'slow',
+    // Keep the source resolution — do NOT downscale. The old
+    // scale=1920:1080 cap squeezed vertical videos (e.g. 2160x3840) down to
+    // ~608x1080, throwing away most of their detail. pad only rounds the
+    // dimensions up to even numbers, which H.264 requires.
     '-vf',
-    'scale=w=1920:h=1080:force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2',
+    'pad=ceil(iw/2)*2:ceil(ih/2)*2',
     cachePath,
   ])
 
