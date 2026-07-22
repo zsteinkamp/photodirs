@@ -433,3 +433,100 @@
   background: var(--photoelement-icon-fill, #ccc);
   color: var(--main-bg-color, #222);
 }
+
+/* ---------------------------------------------------------------------------
+ * Narrow screens (phones): the desktop two-column title/description layout has
+ * no room, so collapse to a single-column title with an "i" button on the
+ * right that toggles the description in an overlay panel.
+ * ------------------------------------------------------------------------- */
+.PhotoElement .descToggle {
+  display: none; /* only shown at the narrow breakpoint below */
+  /* sits in the top-right control cluster, left of download/fullscreen */
+  position: absolute;
+  top: 1rem;
+  right: 9.25em;
+  z-index: 1;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--photoelement-icon-fill, #ccc);
+  background: var(--main-bg-color, #222);
+  color: var(--photoelement-icon-fill, #ccc);
+  font-family: var(--condensed-font, serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.PhotoElement .descToggle[aria-expanded='true'] {
+  background: var(--photoelement-icon-fill, #ccc);
+  color: var(--main-bg-color, #222);
+}
+.PhotoElement .descPanel {
+  display: none; /* only meaningful at the narrow breakpoint below */
+}
+
+@media (max-width: 48rem) {
+  .PhotoElement .header {
+    width: 100vw;
+    box-sizing: border-box;
+    padding: 0;
+  }
+  .PhotoElement .header .headerTitle,
+  .PhotoElement .header .headerTitle.solomente {
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    align-items: flex-start;
+    text-align: left;
+    margin-right: 0;
+    /* clear the absolute close (left) and fullscreen/download (right) buttons */
+    padding-left: 2.75rem;
+    padding-right: 8em;
+  }
+  /* when a description exists, also leave room for the info toggle */
+  .PhotoElement .header .headerTitle:not(.solomente) {
+    padding-right: 11.5em;
+  }
+  /* the desktop description column doesn't fit; the toggle replaces it */
+  .PhotoElement .header .headerElems {
+    display: none;
+  }
+  /* Give the photo the full width. The exif panel is hover-only (unusable on
+   * touch) and its margin plus the carousel item's right padding otherwise
+   * steal ~68px and push the image off-center. */
+  .PhotoElement .imageContainer .exif {
+    display: none;
+  }
+  .PhotoElement .imageContainer .carousel .carouselItem {
+    padding-right: 0;
+  }
+  .PhotoElement .descToggle {
+    display: flex;
+  }
+  .PhotoElement .descPanel {
+    display: block;
+    position: absolute;
+    top: calc(var(--header-height) + 0.75rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    z-index: 1100;
+    background: var(--main-bg-color);
+    color: var(--album-link-color-visited);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    max-height: 60dvh;
+    overflow-y: auto;
+    filter: drop-shadow(0 0.25rem 0.5rem var(--shadow-color));
+  }
+  .PhotoElement .descPanel > :first-child {
+    margin-top: 0;
+  }
+  .PhotoElement .descPanel > :last-child {
+    margin-bottom: 0;
+  }
+}

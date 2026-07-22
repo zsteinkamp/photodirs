@@ -30,6 +30,9 @@ export default function PhotoElement({ data }: PhotoElementProps) {
   )
   const [scrollCareTimeout, setScrollCareTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
   const [rotationVersions, setRotationVersions] = useState<Record<string, number>>({})
+  // Narrow-screen only: reveal the description in an overlay panel (there is no
+  // room for the desktop two-column title/description layout on a phone).
+  const [showDesc, setShowDesc] = useState(false)
 
   const isAdmin = useContext(AdminContext)
   const navigate = useNavigate()
@@ -94,6 +97,9 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     if (!tileRefs.current || !thumbRefs.current) {
       return
     }
+
+    // close the mobile description overlay when moving to another photo
+    setShowDesc(false)
 
     // pause any videos
     tileRefs.current.forEach((e) => {
@@ -410,6 +416,18 @@ export default function PhotoElement({ data }: PhotoElementProps) {
           )}
         </div>
         {currData.description && (
+          <button
+            type='button'
+            className='descToggle'
+            aria-expanded={showDesc}
+            aria-label={showDesc ? 'Hide description' : 'Show description'}
+            title={showDesc ? 'Hide description' : 'Show description'}
+            onClick={() => setShowDesc((v) => !v)}
+          >
+            i
+          </button>
+        )}
+        {currData.description && (
           <div className='headerElems'>
             <div className='description'>
               <div className='descriptionPlaceholder'>
@@ -422,6 +440,11 @@ export default function PhotoElement({ data }: PhotoElementProps) {
           </div>
         )}
       </div>
+      {currData.description && showDesc && (
+        <div className='descPanel'>
+          <Markdown>{currData.description}</Markdown>
+        </div>
+      )}
       <div ref={imageContainerRef} className='imageContainer'>
         {mainElement}
         {exifElement}
