@@ -256,10 +256,18 @@
   max-width: 100%;
   max-height: 100%;
 }
-/* A <video preload="none"> has no real intrinsic size until it plays (Chrome
- * defaults to 300x150), so max-* alone leaves portrait videos tiny. Pin the
- * box to the full area and let object-fit: contain size the actual frame. */
-.PhotoElement .imageContainer .carouselItem video {
+/* Pin the media box to the full area and let object-fit: contain size the
+ * actual frame. Both video and img need this, for different reasons:
+ *  - <video preload="none"> has no real intrinsic size until it plays (Chrome
+ *    defaults to 300x150).
+ *  - The <img> uses a srcSet of `w` descriptors with no `sizes`/width/height,
+ *    so `sizes` defaults to 100vw and the browser density-corrects the
+ *    intrinsic size down to a box smaller than the container. (The descriptors
+ *    also label a portrait 1206x1600 file as "1600w", overstating its width.)
+ * In both cases max-width/max-height alone (a ceiling, never a floor) leaves
+ * portrait media short. width/height:100% gives a definite box to fill. */
+.PhotoElement .imageContainer .carouselItem video,
+.PhotoElement .imageContainer .carouselItem img {
   width: 100%;
   height: 100%;
 }
