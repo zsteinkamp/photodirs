@@ -121,6 +121,7 @@ export default function AdminFileList({ files, thumbnail, updateAlbumThumb }: Ad
               src={
                 file.photoPath +
                 '?size=300x300&crop' +
+                (file.hash ? '&hash=' + file.hash : '') +
                 (rotationVersions[file.uriPath] ? '&v=' + rotationVersions[file.uriPath] : '')
               }
               alt={file.name}

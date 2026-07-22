@@ -306,10 +306,13 @@ export default function PhotoElement({ data }: PhotoElementProps) {
               loop
               autoPlay={false}
               playsInline
-              poster={`${file.photoPath}?size=1600x1600`}
+              poster={`${file.photoPath}?size=1600x1600${hashParam}`}
               preload='none'
             >
-              <source src={file.videoPath} type='video/mp4' />
+              <source
+                src={`${file.videoPath}${file.hash ? '?hash=' + file.hash : ''}`}
+                type='video/mp4'
+              />
             </video>
           ) : (
             <img

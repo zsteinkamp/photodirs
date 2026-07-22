@@ -16,7 +16,12 @@ import { getFileObjMetadataFname } from './cache.js'
 import { getExifObjForFile, getExifDate } from './exif.js'
 import { getFileObj } from './fileObj.js'
 import { isSupportedImageFile } from './fileTypes.js'
-import { fileExists, isFileOlderThanAny, getSupportedFiles } from './file.js'
+import {
+  fileExists,
+  isFileOlderThanAny,
+  getSupportedFiles,
+  getFileHash,
+} from './file.js'
 import { fetchAndMergeMeta } from './meta.js'
 
 const logger = LOGGER
@@ -267,20 +272,36 @@ export const getAlbumObj = async (
 
   const dirEntries = await getDirEntries(join(ALBUMS_ROOT, dirName))
 
+  // Track the thumbnail's on-disk path so we can attach a content hash, letting
+  // the frontend cache-bust the album cover when its source bytes change.
+  let thumbDiskPath: string | null = null
   if (albumObj.thumbnail) {
+    const thumbName = albumObj.thumbnail as string
+    thumbDiskPath = join(ALBUMS_ROOT, dirName, thumbName)
     albumObj.thumbnail = join(
       PHOTO_URL_BASE,
       uriPath,
-      encodeURIComponent(albumObj.thumbnail as string),
+      encodeURIComponent(thumbName),
     )
   } else {
     const thumbPath = await getAlbumDefaultThumbnailPath(dirName, dirEntries)
     if (thumbPath) {
+      thumbDiskPath = join(ALBUMS_ROOT, dirName, ...thumbPath)
       albumObj.thumbnail = join(
         PHOTO_URL_BASE,
         uriPath,
         ...thumbPath.map(encodeURIComponent),
       )
+    }
+  }
+  if (thumbDiskPath) {
+    try {
+      albumObj.thumbnailHash = (await getFileHash(thumbDiskPath)).substring(
+        0,
+        7,
+      )
+    } catch (e) {
+      logger.warn('Could not hash album thumbnail', { thumbDiskPath, error: e })
     }
   }
 

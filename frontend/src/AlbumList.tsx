@@ -37,7 +37,7 @@ export default function AlbumList({ albums, sortAlbums }: AlbumListProps) {
           {album.thumbnail && (
             <div className='thumbnail'>
               <img
-                src={`${album.thumbnail}?size=300x300&crop`}
+                src={`${album.thumbnail}?size=300x300&crop${album.thumbnailHash ? '&hash=' + album.thumbnailHash : ''}`}
                 loading='lazy'
                 alt={album.title}
               />

@@ -36,6 +36,7 @@ export interface AlbumSummary {
   uriPath: string
   description?: string | string[]
   thumbnail?: string
+  thumbnailHash?: string
 }
 
 export interface AlbumData {
@@ -47,6 +48,7 @@ export interface AlbumData {
   apiPath: string
   uriPath: string
   thumbnail?: string
+  thumbnailHash?: string
   sortAlbums?: string
   albums: AlbumSummary[]
   files: AlbumFile[]
