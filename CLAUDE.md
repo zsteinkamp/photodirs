@@ -45,6 +45,12 @@ npm test        # React tests
 
 ## Deploying to production
 
+**Always get the maintainer's explicit approval before deploying to
+production.** Committing and pushing to `main` is fine, but stop before running
+`make` on the host — show the diff and wait for a green light. Do not treat an
+approval for one deploy as standing authorization for later ones; each prod
+deploy needs its own sign-off.
+
 Production runs on the host `linux` at `~/dev/photodirs`, where the compose
 stack builds images **locally from source** (the compose file uses `build:`,
 not the GHCR `image:` tags — CI's GHCR push is not what prod consumes). So a
