@@ -278,15 +278,6 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     )
   }
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const xProp = e.clientX / tileRefs.current[currFileIdx].clientWidth
-    if (xProp < 0.25) {
-      goToPrevPhoto()
-    } else if (xProp > 0.75) {
-      goToNextPhoto()
-    }
-  }
-
   const tiles = albumFiles.map((file, i) => {
     const hashParam = file.hash ? '&hash=' + file.hash : ''
     const rv = rotationVersions[file.uriPath]
@@ -295,7 +286,6 @@ export default function PhotoElement({ data }: PhotoElementProps) {
       <div
         ref={(el) => { if (el) tileRefs.current[i] = el }}
         key={file.uriPath}
-        onClick={handleClick}
         className='carouselItem'
       >
         <div className='mediaContainer'>
