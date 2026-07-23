@@ -68,3 +68,7 @@ export const TYPE_PHOTO = 'photo'
 export const TYPE_VIDEO = 'video'
 
 export const WATCHER_PATH_CHECK_PORT = 3000
+// Read-only queue/status dashboard served by the watcher. Exposed on the host
+// so it's reachable on the LAN, but intentionally NOT behind nginx / the public
+// reverse proxy — keep it internal.
+export const STATUS_PORT = 3999

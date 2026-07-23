@@ -1,8 +1,10 @@
 import { logger as _logger } from 'express-winston'
 import express from 'express'
 
-import { scanDirectory } from './scanDir.js'
-import { LOGGER, WATCHER_PATH_CHECK_PORT } from './constants.js'
+import { scanDirectory, getQueueCounts } from './scanDir.js'
+import * as jobStatus from './util/jobStatus.js'
+import { STATUS_HTML } from './statusPage.js'
+import { LOGGER, WATCHER_PATH_CHECK_PORT, STATUS_PORT } from './constants.js'
 
 const logger = LOGGER
 
@@ -59,6 +61,28 @@ const enqueuePeriodicScan = async () => {
     runAtEnd: enqueuePeriodicScan,
   })
 }
+
+//
+// Read-only status dashboard (queue counts + active/recent jobs). Served on its
+// own port so it can be reached on the LAN without being placed behind nginx /
+// the public reverse proxy.
+//
+const statusApp = express()
+statusApp.get('/status.json', (_req, res) => {
+  res.header({ 'cache-control': 'no-store' }).json({
+    now: Date.now(),
+    scanQueue: workQueue.length,
+    queues: getQueueCounts(),
+    active: jobStatus.getActiveJobs(),
+    recent: jobStatus.getRecentJobs(),
+  })
+})
+statusApp.get('/', (_req, res) => {
+  res.type('html').send(STATUS_HTML)
+})
+statusApp.listen(STATUS_PORT, () => {
+  logger.info('WATCHER STATUS LISTENING', { port: STATUS_PORT })
+})
 
 const hasJobToDo = (): boolean => {
   if (workQueue.length === 0) {

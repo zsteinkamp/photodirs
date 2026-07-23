@@ -15,8 +15,29 @@ import { isRaw, isVideo } from './util/fileTypes.js'
 import { getSupportedFiles } from './util/file.js'
 import { jpegFileForRaw, jpegFileForVideo, preResize } from './util/image.js'
 import * as videoUtils from './util/video.js'
+import * as jobStatus from './util/jobStatus.js'
 
 const logger = LOGGER
+
+// Wrap a queue worker so its start/end/failure is recorded in the job registry
+// that powers the status dashboard. The file label is the album-relative path.
+const instrument =
+  <T extends { filePath?: string; absFname?: string }, R>(
+    type: jobStatus.JobType,
+    fn: (arg: T) => Promise<R>,
+  ) =>
+  async (arg: T): Promise<R> => {
+    const file = (arg.filePath ?? arg.absFname ?? '').replace(/^\/albums\//, '')
+    const id = jobStatus.jobStart(type, file)
+    try {
+      const result = await fn(arg)
+      jobStatus.jobEnd(id, 'done')
+      return result
+    } catch (e: unknown) {
+      jobStatus.jobEnd(id, 'failed', (e as Error).message)
+      throw e
+    }
+  }
 
 //
 // GLOBAL concurrency limiters, shared across the ENTIRE recursive scan.
@@ -34,26 +55,50 @@ const transcoder = async ({ filePath }: { filePath: string }) => {
   return await videoUtils.getCachedVideoPath(filePath)
 }
 // Video transcode is the heaviest ffmpeg job: keep it strictly serial.
-const transcodingQueue = fastq.promise(transcoder, 1)
+const transcodingQueue = fastq.promise(instrument('transcode', transcoder), 1)
 // Videos already queued/in-flight for transcode, so the 60s periodic scan
 // doesn't re-push the same file every minute while the library catches up.
 const transcodePending = new Set<string>()
 
 // Video poster-frame extraction (ffmpeg).
 const posterQueue = fastq.promise(
-  async ({ absFname }: { absFname: string }) => jpegFileForVideo(absFname),
+  instrument('poster', async ({ absFname }: { absFname: string }) =>
+    jpegFileForVideo(absFname),
+  ),
   MAX_PARALLEL_JOBS,
 )
 // RAW -> JPEG conversion (dcraw + Sharp).
 const rawQueue = fastq.promise(
-  async ({ absFname }: { absFname: string }) => jpegFileForRaw(absFname),
+  instrument('raw', async ({ absFname }: { absFname: string }) =>
+    jpegFileForRaw(absFname),
+  ),
   MAX_PARALLEL_JOBS,
 )
 // Pre-generated resizes (Sharp/libvips — the big memory consumer).
 const resizeQueue = fastq.promise(
-  async ({ absFname }: { absFname: string }) => preResize(absFname),
+  instrument('resize', async ({ absFname }: { absFname: string }) =>
+    preResize(absFname),
+  ),
   MAX_PARALLEL_JOBS,
 )
+
+// Live counts for the status dashboard. fastq exposes running() (in-flight)
+// and length() (waiting) at runtime, but its 1.15 typings omit running(), so
+// read through a narrow cast.
+type QueueStats = { running(): number; length(): number }
+const stats = (q: QueueStats): { running: number; queued: number } => ({
+  running: q.running(),
+  queued: q.length(),
+})
+export const getQueueCounts = (): Record<
+  string,
+  { running: number; queued: number }
+> => ({
+  transcode: stats(transcodingQueue as unknown as QueueStats),
+  poster: stats(posterQueue as unknown as QueueStats),
+  raw: stats(rawQueue as unknown as QueueStats),
+  resize: stats(resizeQueue as unknown as QueueStats),
+})
 
 export const scanDirectory = async (dirName: string): Promise<void> => {
   logger.debug('SCAN_DIRECTORY:TOP', { dirName })

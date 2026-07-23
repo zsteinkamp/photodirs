@@ -129,6 +129,11 @@ cat << EOF >> docker-compose.yml
       target: watcher
     restart: always
     stop_signal: SIGKILL
+    # Read-only queue/status dashboard. Exposed on the host so it's reachable on
+    # the LAN; intentionally NOT proxied through nginx / the public reverse
+    # proxy — keep this internal.
+    ports:
+      - '3999:3999'
     # Resource guardrails: the watcher pre-transcodes/resizes media and can
     # spike CPU and RAM. Cap it so a runaway scan can never take the host into
     # swap. MAX_PARALLEL_JOBS bounds concurrent ffmpeg/Sharp jobs.
