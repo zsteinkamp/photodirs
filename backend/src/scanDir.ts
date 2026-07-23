@@ -116,14 +116,22 @@ export const scanDirectory = async (dirName: string): Promise<void> => {
           // Fire-and-forget transcode, but only enqueue once per file until it
           // finishes — otherwise the 60s periodic scan re-queues every
           // uncached video every minute and the queue grows without bound.
-          if (!transcodePending.has(absFname)) {
-            transcodePending.add(absFname)
+          //
+          // Capture the source path in a const: absFname is reassigned to the
+          // poster path below, and this .finally() runs *after* the transcode
+          // completes (i.e. after that reassignment). Deleting `absFname` would
+          // remove the wrong key, leaking the source path in transcodePending
+          // forever and permanently blocking any future re-transcode of the
+          // file (so `touch`ing a source never re-encoded it until a restart).
+          const videoPath = absFname
+          if (!transcodePending.has(videoPath)) {
+            transcodePending.add(videoPath)
             transcodingQueue
-              .push({ filePath: absFname })
+              .push({ filePath: videoPath })
               .catch((err: unknown) =>
-                logger.error('TRANSCODE_FAILED', { absFname, err }),
+                logger.error('TRANSCODE_FAILED', { absFname: videoPath, err }),
               )
-              .finally(() => transcodePending.delete(absFname))
+              .finally(() => transcodePending.delete(videoPath))
           }
           // A thumbnail failure (e.g. ffmpeg OOM-killed on a huge 4K frame)
           // must not abort the whole directory scan / crash the watcher: skip
