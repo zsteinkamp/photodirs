@@ -61,3 +61,26 @@ export const getActiveJobs = (): ActiveJob[] =>
   [...active.values()].sort((a, b) => a.startedAt - b.startedAt)
 
 export const getRecentJobs = (): RecentJob[] => recent
+
+// Turn an absolute albums/cache path into a compact album-relative label.
+export const label = (p: string): string =>
+  p.replace(/^\/(albums|cache\/albums|cache)\//, '')
+
+// Record a job around a unit of real work. Call this only after a cache-hit
+// early-return, so the dashboard reflects actual ffmpeg/Sharp work and not the
+// no-op freshness checks the periodic scan runs on every file.
+export const track = async <T>(
+  type: JobType,
+  file: string,
+  fn: () => Promise<T>,
+): Promise<T> => {
+  const id = jobStart(type, label(file))
+  try {
+    const result = await fn()
+    jobEnd(id, 'done')
+    return result
+  } catch (e: unknown) {
+    jobEnd(id, 'failed', (e as Error).message)
+    throw e
+  }
+}

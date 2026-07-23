@@ -8,6 +8,7 @@ import { LOGGER } from '../constants.js'
 const logger = LOGGER
 import { cachePathForVideo } from './cache.js'
 import { fileExists, isFileOlderThanAny } from './file.js'
+import * as jobStatus from './jobStatus.js'
 
 /*
  * Given a path to an original video in the albums path, see if the
@@ -37,6 +38,7 @@ export const getCachedVideoPath = async (filePath: string): Promise<string> => {
   // the temp name keeps concurrent transcoders (watcher + on-demand api) from
   // colliding.
   const tmpPath = `${cachePath}.${process.pid}.tmp.mp4`
+  const jobId = jobStatus.jobStart('transcode', jobStatus.label(filePath))
   try {
     await pExecFile('/usr/bin/ffmpeg', [
       '-threads',
@@ -74,9 +76,11 @@ export const getCachedVideoPath = async (filePath: string): Promise<string> => {
       tmpPath,
     ])
     await rename(tmpPath, cachePath)
+    jobStatus.jobEnd(jobId, 'done')
   } catch (err: unknown) {
     // Don't leave a stray temp file behind on failure.
     await rm(tmpPath, { force: true })
+    jobStatus.jobEnd(jobId, 'failed', (err as Error).message)
     throw err
   }
 

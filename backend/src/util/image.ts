@@ -13,6 +13,7 @@ import * as fileTypes from './fileTypes.js'
 import * as imageUtils from './image.js'
 import * as fileUtils from './file.js'
 import * as cacheUtils from './cache.js'
+import * as jobStatus from './jobStatus.js'
 
 import type { ResizeOptions } from 'sharp'
 
@@ -77,11 +78,20 @@ export const getCachedImagePath = async (
       await pipeline(readStream, transform!, outStream)
       logger.info('GET_CACHED_IMAGE_PATH:WROTE_FILE', { filePath, cachePath })
     }
-    await plumbing().catch(async err => {
-      logger.error('IMG CACHE PIPELINE ERROR 2', { filePath, cachePath, err })
-      await fsp.rm(cachePath, { force: true })
-      return null
-    })
+    await jobStatus.track(
+      'resize',
+      `${filePath}@${cacheWidth}x${cacheHeight}`,
+      () =>
+        plumbing().catch(async err => {
+          logger.error('IMG CACHE PIPELINE ERROR 2', {
+            filePath,
+            cachePath,
+            err,
+          })
+          await fsp.rm(cachePath, { force: true })
+          return null
+        }),
+    )
   }
   return cachePath
 }
@@ -126,15 +136,17 @@ export const jpegFileForRaw = async (
     await pipeline(tiffPipe, transform, outStream)
     logger.info('JPEG_FILE_FOR_RAW:WROTE_JPG', { filePath, cachePath })
   }
-  await plumbing().catch(async err => {
-    logger.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', {
-      filePath,
-      cachePath,
-      err,
-    })
-    await fsp.rm(cachePath, { force: true })
-    return null
-  })
+  await jobStatus.track('raw', filePath, () =>
+    plumbing().catch(async err => {
+      logger.error('JPEG_FILE_FOR_RAW:PIPELINE_ERROR', {
+        filePath,
+        cachePath,
+        err,
+      })
+      await fsp.rm(cachePath, { force: true })
+      return null
+    }),
+  )
   return cachePath
 }
 
@@ -153,24 +165,26 @@ export const jpegFileForVideo = async (filePath: string): Promise<string> => {
 
   await fsp.mkdir(path.dirname(cachePath), { recursive: true, mode: 755 })
 
-  await pExecFile('/usr/bin/ffmpeg', [
-    '-threads',
-    '2',
-    '-i',
-    filePath,
-    '-y',
-    '-vf',
-    // Scale down *before* the thumbnail filter buffers frames. thumbnail=100
-    // holds 100 decoded frames in memory to pick a representative one; at 4K
-    // (~24MB/frame) that's ~2.4GB and gets OOM-killed. The thumbnail is tiny,
-    // so selecting from downscaled frames is equivalent and ~50x cheaper.
-    'scale=-2:480,thumbnail=100',
-    '-frames:v',
-    '1',
-    '-update',
-    '1',
-    cachePath,
-  ])
+  await jobStatus.track('poster', filePath, () =>
+    pExecFile('/usr/bin/ffmpeg', [
+      '-threads',
+      '2',
+      '-i',
+      filePath,
+      '-y',
+      '-vf',
+      // Scale down *before* the thumbnail filter buffers frames. thumbnail=100
+      // holds 100 decoded frames in memory to pick a representative one; at 4K
+      // (~24MB/frame) that's ~2.4GB and gets OOM-killed. The thumbnail is tiny,
+      // so selecting from downscaled frames is equivalent and ~50x cheaper.
+      'scale=-2:480,thumbnail=100',
+      '-frames:v',
+      '1',
+      '-update',
+      '1',
+      cachePath,
+    ]),
+  )
 
   logger.info('WROTE VIDEO THUMB', { filePath, cachePath })
 
