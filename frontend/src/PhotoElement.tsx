@@ -1,5 +1,5 @@
 import './PhotoElement.css'
-import { Fragment, useContext, useEffect, useRef, useState } from 'react'
+import { Fragment, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Markdown from 'react-markdown'
 
@@ -346,7 +346,20 @@ export default function PhotoElement({ data }: PhotoElementProps) {
         ref={(el) => { if (el) thumbRefs.current[i] = el }}
         to={file.uriPath}
         key={file.uriPath}
-        onClick={() => handleThumbClick(i)}
+        onClick={(e) => {
+          // Plain clicks move the carousel in place (handleThumbClick scrolls
+          // to the tile and the debounced fetch rewrites the URL via
+          // history.replaceState). Letting the router navigate would make
+          // Browse unmount PhotoElement while it refetches, and the remounted
+          // carousel starts at scrollLeft 0 -- a visible flash of the first
+          // tile. Modified clicks fall through so the browser can still
+          // open the photo in a new tab/window.
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+            return
+          }
+          e.preventDefault()
+          handleThumbClick(i)
+        }}
       >
         <img
           draggable='false'
@@ -365,8 +378,11 @@ export default function PhotoElement({ data }: PhotoElementProps) {
     </div>
   )
 
-  // this will run on initial load and center the tile corresponding to the URL
-  useEffect(() => {
+  // This will run on initial load and center the tile corresponding to the URL.
+  // It has to be a layout effect: a plain useEffect runs after paint, so the
+  // carousel would paint once at scrollLeft 0 (i.e. the first tile) before
+  // jumping to the right one.
+  useLayoutEffect(() => {
     if (!isInitialLoad || !tileRefs.current || !thumbRefs.current) {
       return
     }
