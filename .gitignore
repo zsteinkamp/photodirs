@@ -1,4 +1,5 @@
 .DS_Store
+/cache
 .env
 /docker-compose.yml
 /nginx.conf
